@@ -24,9 +24,6 @@ The lecture overview below is **preliminary** and subject to changes.
 6. Evaluation
 7. Mechanistic interpretability
 
-```{tableofcontents}
-```
-
 ## Further materials
 
 There are various courses on deep learning, NLP and LLMs out there. To name a few, these are excellent sources for further related materials:
