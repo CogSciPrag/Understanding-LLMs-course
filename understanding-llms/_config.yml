@@ -9,7 +9,7 @@ logo: logo.png
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
-  execute_notebooks: force
+  execute_notebooks: 'off'
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -36,3 +36,8 @@ launch_buttons:
   thebe: true
   colab_url: "https://colab.research.google.com"
   binderhub_url: "https://mybinder.org"
+
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
