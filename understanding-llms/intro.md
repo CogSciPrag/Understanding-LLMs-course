@@ -34,3 +34,7 @@ There are various courses on deep learning, NLP and LLMs out there. To name a fe
 * [Large Language Models](https://rycolab.io/classes/llm-s24/) by Ryan Cotterell's lab
 * [Large Language Models](https://stanford-cs324.github.io/winter2022/) by Percy Liang's lab
 * [Pragmatic NLG with neural language models](https://michael-franke.github.io/npNLG/000-intro.html) by Michael Franke
+
+Andrej Karpathy has an excellent [1h overview video](https://www.youtube.com/watch?v=zjkBMFhNj_g).
+
+We also highly recommend Brian Christian's book [The Alignment Problem](https://brianchristian.org/the-alignment-problem/) for a more general perspective on AI and computational CogSci.
