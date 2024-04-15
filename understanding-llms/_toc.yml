@@ -7,4 +7,9 @@ parts:
 - caption: 01 Introduction
   chapters:
   - file: lectures/01-introduction
-  - file: tutorials/01-introduction
+- caption: 02 ANNs & RNNs
+  chapters:
+  - file: tutorials/02a-pytorch-intro
+  - file: tutorials/02b-MLE
+  - file: tutorials/02b-MLP-pytorch
+  - file: tutorials/02d-char-level-RNN
