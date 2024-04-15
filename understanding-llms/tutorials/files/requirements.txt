@@ -1,0 +1,11 @@
+python==3.9
+pytorch-cuda==11.6
+numpy
+matplotlib
+transformers
+sentencepiece
+datasets
+langchain
+torchrl
+llama-index
+bertviz
