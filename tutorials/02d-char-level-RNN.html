@@ -1,0 +1,1172 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 2.4: Character-level sequence modeling w/ RNNs &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/02d-char-level-RNN';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Sheet 2.2: ML-estimation" href="02b-MLE.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/02d-char-level-RNN.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/02d-char-level-RNN.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/02d-char-level-RNN.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/02d-char-level-RNN.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 2.4: Character-level sequence modeling w/ RNNs</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packages-global-parameters">Packages &amp; global parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-inspecting-the-data">Loading &amp; inspecting the data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-test-split">Train-test split</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-model">Defining the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#helper-functions-for-training">Helper functions for training</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-network">Training the network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-inference">Evaluation &amp; inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inference">Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inverting-the-generation-model">Inverting the generation model</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-2-4-character-level-sequence-modeling-w-rnns">
+<h1>Sheet 2.4: Character-level sequence modeling w/ RNNs<a class="headerlink" href="#sheet-2-4-character-level-sequence-modeling-w-rnns" title="Permalink to this heading">#</a></h1>
+<p><strong>Author:</strong> Michael Franke</p>
+<p>The goal of this tutorial is to get familiar with simple language models.
+To be able to have a manageable (quick to train, evaluate, inspect) case study, we look at character-level predictions of surnames from different languages.
+(The inspiration and source of this notebook is <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html">this tutorial</a> from PyTorch’s documentation.)</p>
+<section id="packages-global-parameters">
+<h2>Packages &amp; global parameters<a class="headerlink" href="#packages-global-parameters" title="Permalink to this heading">#</a></h2>
+<p>In addition to the usual packages for neural network modeling, we will also require packages for I/O and string handling.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## import packages</span>
+<span class="c1">##################################################</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="loading-inspecting-the-data">
+<h2>Loading &amp; inspecting the data<a class="headerlink" href="#loading-inspecting-the-data" title="Permalink to this heading">#</a></h2>
+<p>Our training data are lists of surnames from different countries.
+We will use this data set to train a model that predicts a name, given the country as a prompt.</p>
+<p>The (pre-processed) data is stored in a JSON file.
+We load it and define a few useful variables for later use.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## read and inspect the data</span>
+<span class="c1">##################################################</span>
+<span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/michael-franke/npNLG/main/neural_pragmatic_nlg/05-RNNs/names-data.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
+    <span class="n">namesData</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="c1"># # local import</span>
+<span class="c1"># with open(&#39;names-data.json&#39;) as dataFile:</span>
+<span class="c1">#     namesData = json.load(dataFile)</span>
+
+<span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">namesData</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">n_categories</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+
+<span class="c1"># we use all ASCII letters as the vocabulary (plus tokens [EOS], [SOS])</span>
+<span class="n">all_letters</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="s2">&quot; .,;&#39;-&quot;</span>
+<span class="n">n_letters</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_letters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="c1"># all letter plus [EOS] and [SOS] token</span>
+<span class="n">SOSIndex</span>    <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">EOSIndex</span>    <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The data consists of two things:
+a list of strings, called “categories”, contains all the categories (languages) for which we have data;
+a dictionary, called “namesData”, contains a list of names for each category.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.1: Inspect the data</span></strong></p>
+<ol class="arabic simple" start="0">
+<li><p>[Just for yourself.] Find out what’s in the data set. How any different countries do we have? How many names per country? Are all names unique in a given country? Do the names sound typical to your ears for the given countries?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="train-test-split">
+<h2>Train-test split<a class="headerlink" href="#train-test-split" title="Permalink to this heading">#</a></h2>
+<p>We will split the data into a training and a test set.
+Look at the code and try to answer the exercise question of how this split is realized.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## make a train/test split</span>
+<span class="c1">##################################################</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">test_data</span>  <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">split_percentage</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">namesData</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="n">total_size</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">test_size</span>     <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_size</span><span class="o">/</span><span class="n">split_percentage</span><span class="p">)</span>
+    <span class="n">train_size</span>    <span class="o">=</span> <span class="n">total_size</span> <span class="o">-</span> <span class="n">test_size</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">total_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">)</span>
+    <span class="n">indices</span>       <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_size</span><span class="p">)]</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+    <span class="n">train_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">train_size</span><span class="p">]</span>
+    <span class="n">test_indices</span>  <span class="o">=</span> <span class="n">indices</span><span class="p">[(</span><span class="n">train_size</span><span class="o">+</span><span class="mi">1</span><span class="p">):(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">train_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_indices</span><span class="p">]</span>
+    <span class="n">test_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>  <span class="o">=</span> <span class="p">[</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_indices</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Czech 519 467 52
+German 724 652 72
+Arabic 2000 1800 200
+Japanese 991 892 99
+Chinese 268 241 27
+Vietnamese 73 66 7
+Russian 9408 8467 941
+French 277 249 28
+Irish 232 209 23
+English 3668 3301 367
+Spanish 298 268 30
+Greek 203 183 20
+Italian 709 638 71
+Portuguese 74 67 7
+Scottish 100 90 10
+Dutch 297 267 30
+Korean 94 85 9
+Polish 139 125 14
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.2: Explain the train-test split</span></strong></p>
+<ol class="arabic simple">
+<li><p>How is the original data information split into training and test set? (E.g., what amount of data is allocated to each part?; is the split exclusive and exhaustive?; how is it determined which items goes where?)</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="defining-the-model">
+<h2>Defining the model<a class="headerlink" href="#defining-the-model" title="Permalink to this heading">#</a></h2>
+<p>The model we use is a (hand-crafted) recurrent neural network.
+The architecture follows <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html">this tutorial</a>, from where we also borrow the following picture:</p>
+<p><img alt="img" src="../_images/05-RNN-diagram.png" /></p>
+<p>The model makes consecutive predictions about the next character.
+It is conditioned on three vectors:</p>
+<ol class="arabic simple">
+<li><p>’category’ is a one-hot vector encoding the country</p></li>
+<li><p>’input’ is a one-hot vector encoding the character</p></li>
+<li><p>’hidden’ is the RNN’s hidden state (remembering what happened before)</p></li>
+</ol>
+<p>These vectors are first combined and then used to produce a next-character probability distribution <em>and</em> the hidden state to be fed into the next round of predictions.</p>
+<p>Next to the usual functions (initialization and forward pass), there is also a function that returns a blank ’hidden state’.
+This will be used later during training and inference, because at the start of each application (training or inference) the RNN should have a blank memory.
+(It makes sense to include this function in the definition of the module because it depends on the module’s parameters (size of the hidden layer).)</p>
+<p>Notice that the architecture features a dropout layer, which randomly sets a fixed proportion of units to 0.
+The inclusion of dropout introduces a random element in the model during training and inference.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## define RNN</span>
+<span class="c1">##################################################</span>
+
+<span class="k">class</span> <span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span>
+                             <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span>
+                             <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">output_size</span><span class="p">,</span>
+                             <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+        <span class="n">input_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
+        <span class="n">output_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span> <span class="n">output</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span><span class="p">(</span><span class="n">output_combined</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
+
+    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.3: Inspect the model</span></strong></p>
+<ol class="arabic simple" start="0">
+<li><p>[Just for yourself.] Make sure that you understand the model architecture and its implementation. E.g., do you agree that this code implements the model graph shown above? Can you think of slight alterations to the model which might also work?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="helper-functions-for-training">
+<h2>Helper functions for training<a class="headerlink" href="#helper-functions-for-training" title="Permalink to this heading">#</a></h2>
+<p>For training, we will present the model with randomly sampled single items.
+This is why we define a ’randomTrainingPair’ function which returns, well, a random training pair (category and name).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## helper functions for training</span>
+<span class="c1">##################################################</span>
+
+<span class="c1"># Random item from a list</span>
+<span class="k">def</span> <span class="nf">randomChoice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+
+<span class="c1"># Get a random category and random line from that category</span>
+<span class="k">def</span> <span class="nf">randomTrainingPair</span><span class="p">():</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">category</span><span class="p">,</span> <span class="n">line</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We also need to make sure that the training and test data are in a format that the model understands.
+So, this is where we use vector representations for the categories and sequences of characters.
+For sequences of characters we distinguish those used as input to the model (’inputTensor’) and those used in training as what needs to be predicted (’targetTensor’).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># One-hot vector for category</span>
+<span class="k">def</span> <span class="nf">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
+    <span class="n">li</span> <span class="o">=</span> <span class="n">categories</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_categories</span><span class="p">)</span>
+    <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+<span class="c1"># One-hot matrix of first to last letters (not including [EOS]) for input</span>
+<span class="c1"># The first input is always [SOS]</span>
+<span class="k">def</span> <span class="nf">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
+    <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">SOSIndex</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
+        <span class="n">letter</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">]</span>
+        <span class="n">tensor</span><span class="p">[</span><span class="n">li</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">letter</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+<span class="k">def</span> <span class="nf">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">letter_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">])</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))]</span>
+    <span class="n">letter_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOSIndex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">letter_indexes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we construct a function that returns a random training pair in the proper vectorized format.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make category, input, and target tensors from a random category, line pair</span>
+<span class="k">def</span> <span class="nf">randomTrainingExample</span><span class="p">():</span>
+    <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">randomTrainingPair</span><span class="p">()</span>
+    <span class="n">category_tensor</span> <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.4: Understand the representational format </span></strong></p>
+<ol class="arabic simple">
+<li><p>Write a doc-string for the function ’randomTrainingExample’ that is short but completely explanatory regarding the format and meaning of its output.</p></li>
+</ol>
+</div></blockquote>
+<p>We use this timing function to keep track of training time:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">timeSince</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">since</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">-=</span> <span class="n">m</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">m </span><span class="si">%d</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="training-the-network">
+<h2>Training the network<a class="headerlink" href="#training-the-network" title="Permalink to this heading">#</a></h2>
+<p>This function captures a single training step for one training triplet (category, input representation of the name, output representation of the string).</p>
+<p>What is important to note here is that at the start of each “name”, so to speak, we need to supply a fresh ’hidden layer’, but that subsequent calls to the RNN’s forward pass function will use the hidden layer that is returned from the previous forward pass.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## single training pass</span>
+<span class="c1">##################################################</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">):</span>
+    <span class="c1"># reshape target tensor</span>
+    <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># get a fresh hidden layer</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+    <span class="c1"># reset cumulative loss</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># zero the gradients</span>
+    <span class="c1"># sequentially probe predictions and collect loss</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">loss</span> <span class="o">+=</span> <span class="n">l</span>
+    <span class="c1"># perform backward pass</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="c1"># perform optimization</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="c1"># return prediction and loss</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="c1"># / input_line_tensor.size(0)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The actual training process is furthermore not very special.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## actual training loop</span>
+<span class="c1">## (should take about 2-4 minutes)</span>
+<span class="c1">##################################################</span>
+
+<span class="c1"># instantiate the model</span>
+<span class="n">rnn</span> <span class="o">=</span> <span class="n">RNN</span><span class="p">(</span><span class="n">n_letters</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
+<span class="c1"># training objective</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+<span class="c1"># learning rate</span>
+<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0005</span>
+<span class="c1"># optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">rnn</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
+<span class="c1"># training parameters</span>
+<span class="n">n_iters</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">print_every</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">plot_every</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">all_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># will be reset every &#39;plot_every&#39; iterations</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_iters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="o">*</span><span class="n">randomTrainingExample</span><span class="p">())</span>
+    <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span>
+
+    <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">plot_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">all_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_loss</span> <span class="o">/</span> <span class="n">plot_every</span><span class="p">)</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">rolling_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_losses</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="n">print_every</span><span class="o">*</span><span class="p">(</span><span class="nb">iter</span><span class="o">//</span><span class="n">print_every</span><span class="p">):])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d%%</span><span class="s1">) </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeSince</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
+                                     <span class="nb">iter</span><span class="p">,</span>
+                                     <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                                     <span class="n">rolling_mean</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0m 8s (5000 5%) 19.7095
+0m 18s (10000 10%) 18.9236
+0m 27s (15000 15%) 18.5409
+0m 36s (20000 20%) 18.2693
+0m 44s (25000 25%) 18.0792
+0m 53s (30000 30%) 17.9295
+1m 2s (35000 35%) 17.8005
+1m 11s (40000 40%) 17.7098
+1m 20s (45000 45%) 17.6422
+1m 28s (50000 50%) 17.5712
+1m 37s (55000 55%) 17.4996
+1m 46s (60000 60%) 17.4391
+1m 54s (65000 65%) 17.3925
+2m 3s (70000 70%) 17.3458
+2m 12s (75000 75%) 17.3080
+2m 21s (80000 80%) 17.2738
+2m 29s (85000 85%) 17.2379
+2m 38s (90000 90%) 17.2074
+2m 47s (95000 95%) 17.1815
+2m 56s (100000 100%) 17.1523
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is a plot of the temporal development of the model’s performance during training:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## monitoring loss function during training</span>
+<span class="c1">##################################################</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">all_losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/fcc909ff03fd7eb52373d66b0047cceb9ecec82f95097ce5cdb7bae0dba64d2c.png" src="../_images/fcc909ff03fd7eb52373d66b0047cceb9ecec82f95097ce5cdb7bae0dba64d2c.png" />
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.5: Investigate the training regime </span></strong></p>
+<ol class="arabic simple">
+<li><p>What exactly is the loss function here? What are we training the model on: perplexity, average surprisal, or yet something else?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="evaluation-inference">
+<h2>Evaluation &amp; inference<a class="headerlink" href="#evaluation-inference" title="Permalink to this heading">#</a></h2>
+<p>Let’s see what the model has learned and how well it does in producing new names.</p>
+<p>Here are some auxiliary functions to obtain surprisal values and related notions for sequences of characters.
+We can use them to compare the model’s performance on the training and test data set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## evaluation</span>
+<span class="c1">##################################################</span>
+
+<span class="k">def</span> <span class="nf">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">category_tensor</span>    <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span>  <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">targetTensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">hidden</span>             <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+    <span class="n">surprisal</span>          <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">surprisal</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">surprisal</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">get_surprisal_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">surprisl_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">surp_avg_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">perplxty_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">surprisl</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">surp_avg</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">perplxty</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># training</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">category</span><span class="p">]:</span>
+            <span class="n">item_surpr</span> <span class="o">=</span> <span class="n">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">surprisl</span>  <span class="o">+=</span> <span class="n">item_surpr</span>
+            <span class="n">surp_avg</span>  <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">perplxty</span>  <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">n_items</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
+
+        <span class="n">surprisl_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">surprisl</span> <span class="o">/</span><span class="n">n_items</span><span class="p">)</span>
+        <span class="n">surp_avg_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">surp_avg</span> <span class="o">/</span> <span class="n">n_items</span><span class="p">)</span>
+        <span class="n">perplxty_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">perplxty</span> <span class="o">/</span> <span class="n">n_items</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">surprisl_dict</span><span class="p">,</span> <span class="n">surp_avg_dict</span><span class="p">,</span> <span class="n">perplxty_dict</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">makeDF</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">,</span> <span class="s2">&quot;surp_scaled&quot;</span><span class="p">,</span> <span class="s2">&quot;perplexity&quot;</span><span class="p">]</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">surprisal_test</span>  <span class="o">=</span> <span class="n">makeDF</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">test_data</span><span class="p">))</span>
+<span class="n">surprisal_train</span> <span class="o">=</span> <span class="n">makeDF</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">train_data</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">mean surprisal (test):&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">surprisal_test</span><span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">mean surprisal (train):&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">surprisal_train</span><span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean surprisal (test): 18.016745242671462
+
+mean surprisal (train): 16.636244877269675
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.5: Interpret the evaluation metric </span></strong></p>
+<ol class="arabic simple">
+<li><p>What do these two last numbers represent? What’s better: a higher or lower value? What do the two numbers tell us when we compare them?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="inference">
+<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this heading">#</a></h2>
+<p>Let’s also explore the trained model’s predictions to compare them against our own intuitions of what might be typical names in a given country.</p>
+<p>Here’s a function that takes a country and an initial string, and it outputs a model prediction for how to continue that string.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## prediction function</span>
+<span class="c1">##################################################</span>
+
+<span class="n">max_length</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># make a prediction based on given sequence</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">initial_sequence</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_length</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span>
+
+    <span class="n">category_tensor</span>    <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span>  <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span>
+    <span class="n">hidden</span>             <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">initial_sequence</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+
+    <span class="c1"># greedy decoding: choosing the most likely guess</span>
+    <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">topi</span> <span class="o">=</span> <span class="n">topi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">topi</span> <span class="o">==</span> <span class="n">EOSIndex</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">+=</span> <span class="n">all_letters</span><span class="p">[</span><span class="n">topi</span><span class="p">]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Müllerr
+Müllerr
+Mülligen
+Müllerr
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can also probe the model with an empty string:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Japanese&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Japanese&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Japanese&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Japanese&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kauka
+Kauka
+Kauka
+Kauko
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.6: Explore the model’s predictions </span></strong></p>
+<ol class="arabic simple">
+<li><p>Play around with these prediction functions for a country or several of which you have robust intuitions about how names from that country might sound. Report on one feature that speaks in favor of the model, and one that suggests that the model is not perfect (or seriously flawed).</p></li>
+<li><p>Is the prediction function as implemented in this subsection stochastic or not?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="inverting-the-generation-model">
+<h2>Inverting the generation model<a class="headerlink" href="#inverting-the-generation-model" title="Permalink to this heading">#</a></h2>
+<p>The model we have trained here could be consider a <strong>speaker model</strong>: the model generates language (very limited in scope but still).
+Additionally, the model can be used to probe how likely a particular name would be (as a generated string) for a particular category/country.
+So, essentially we get something like <span class="math notranslate nohighlight">\(P_{S}(name \mid category)\)</span> as a speaker likelihood function.
+For instance, we can do this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">get_surprisal_item</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Franke&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">get_surprisal_item</span><span class="p">(</span><span class="s2">&quot;Arabic&quot;</span><span class="p">,</span> <span class="s2">&quot;Franke&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13.49710464477539
+18.95446014404297
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.7: Category prediction with Bayes rule </span></strong></p>
+<ol class="arabic simple">
+<li><p>Use the model as a speaker likelihood function to compute, via Bayes rule, the probability <span class="math notranslate nohighlight">\(P(category\mid name)\)</span> for the names “Dovesky”, “Jackson” and “Satoshi”. Compare the results against those obtained by the RNN-based classifier reported in <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html">this tutorial</a> (all the way at the end).</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "kernels"
+        },
+        kernelOptions: {
+            name: "kernels",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'kernels'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02b-MLE.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Sheet 2.2: ML-estimation</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packages-global-parameters">Packages &amp; global parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-inspecting-the-data">Loading &amp; inspecting the data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-test-split">Train-test split</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-model">Defining the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#helper-functions-for-training">Helper functions for training</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-network">Training the network</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-inference">Evaluation &amp; inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inference">Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inverting-the-generation-model">Inverting the generation model</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

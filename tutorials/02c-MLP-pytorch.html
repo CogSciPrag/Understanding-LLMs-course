@@ -1,0 +1,1044 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules) &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/02c-MLP-pytorch';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/02c-MLP-pytorch.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/02c-MLP-pytorch.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/02c-MLP-pytorch.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/02c-MLP-pytorch.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packages-global-parameters">Packages &amp; global parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#true-model-training-data">True model &amp; training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-mlp-using-pytorchs-built-in-modules">Defining the MLP using PyTorch’s built-in modules</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-explicit-definition-nn-module">More explicit definition NN module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-concise-definition-of-nn-module">More concise definition of NN module</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-training-data">Preparing the training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-2-3-non-linear-regression-mlp-w-pytorch-modules">
+<h1>Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)<a class="headerlink" href="#sheet-2-3-non-linear-regression-mlp-w-pytorch-modules" title="Permalink to this heading">#</a></h1>
+<p><strong>Author:</strong> Michael Franke</p>
+<p>In this tutorial, we will fit a non-linear regression, implemented as a multi-layer perceptron.
+We will see how the use of modules from PyTorch’s neural network package `torch.nn` helps us implement the model efficiently.</p>
+<section id="packages-global-parameters">
+<h2>Packages &amp; global parameters<a class="headerlink" href="#packages-global-parameters" title="Permalink to this heading">#</a></h2>
+<p>We will need to import the `torch` package for the main functionality.
+In addition to the previous sheet, In order to have a convenient, we will use PyTorch’s `DataLoader` and `Dataset` in order to feed our training data to the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="true-model-training-data">
+<h2>True model &amp; training data<a class="headerlink" href="#true-model-training-data" title="Permalink to this heading">#</a></h2>
+<p>The “true model” is a constructed non-linear function <span class="math notranslate nohighlight">\(y = f(x)\)</span>.
+Here is its definition and a plot to show what the “ground truth” looks like.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## ground-truth model</span>
+<span class="c1">##################################################</span>
+
+<span class="k">def</span> <span class="nf">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+
+<span class="c1"># create linear sequence (x) and apply goalFun (y)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># plot the function</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span> <span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span> <span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/354a305df7ad1e04a5113de937c1ddac4d8aa3165e75bbba6fe70092a83dbc33.png" src="../_images/354a305df7ad1e04a5113de937c1ddac4d8aa3165e75bbba6fe70092a83dbc33.png" />
+</div>
+</div>
+<p>The training data consists of 100 pairs of  <span class="math notranslate nohighlight">\((x,y)\)</span> values.
+Each pair is generated by first sampling an <span class="math notranslate nohighlight">\(x\)</span> value from a uniform distribution.
+For each sampled <span class="math notranslate nohighlight">\(x\)</span>, we compute the value of the target function <span class="math notranslate nohighlight">\(f(x)\)</span> and add Gaussian noise to it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## generate training data (with noise)</span>
+<span class="c1">##################################################</span>
+
+<span class="n">nObs</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># number of observations</span>
+
+<span class="c1"># get noise around y observations</span>
+<span class="n">yNormal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">yNoise</span>  <span class="o">=</span> <span class="n">yNormal</span><span class="o">.</span><span class="n">sample</span><span class="p">([</span><span class="n">nObs</span><span class="p">])</span>
+
+<span class="c1"># get observations</span>
+<span class="n">xObs</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">([</span><span class="n">nObs</span><span class="p">])</span><span class="o">-</span><span class="mi">5</span>    <span class="c1"># uniform from [-5,5]</span>
+<span class="n">yObs</span> <span class="o">=</span> <span class="n">xObs</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">xObs</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">xObs</span><span class="p">)</span> <span class="o">+</span> <span class="n">yNoise</span>
+
+<span class="c1"># plot the data</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;xObs&#39;</span> <span class="p">:</span> <span class="n">xObs</span><span class="p">,</span> <span class="s1">&#39;yObs&#39;</span> <span class="p">:</span> <span class="n">yObs</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;yObs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d96ca2fc1555ca6d824a0b01bbba5c2506a188397e10bcd5c21d81e2ce397bbf.png" src="../_images/d96ca2fc1555ca6d824a0b01bbba5c2506a188397e10bcd5c21d81e2ce397bbf.png" />
+</div>
+</div>
+</section>
+<section id="defining-the-mlp-using-pytorchs-built-in-modules">
+<h2>Defining the MLP using PyTorch’s built-in modules<a class="headerlink" href="#defining-the-mlp-using-pytorchs-built-in-modules" title="Permalink to this heading">#</a></h2>
+<p>As before (sheet 4.1), our model maps a single scalar <span class="math notranslate nohighlight">\(x\)</span> onto another scalar <span class="math notranslate nohighlight">\(y\)</span>.
+We use a 3-layer MLP, each hidden layer with dimension 10:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## network dimension parameters</span>
+<span class="c1">##################################################</span>
+
+<span class="n">nInput</span>  <span class="o">=</span> <span class="mi">1</span>
+<span class="n">nHidden</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">nOutput</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>PyTorch defines a special-purpose class called `nn.Module` from which pre-defined neural networks or custom-made networks inherit the structure and basic functionality.
+Below, we define our feed-forward neural network as a class extending `nn.Module`.
+Minimally, we have to define two functions for this to work:</p>
+<ol class="arabic simple">
+<li><p>the <strong>initialization</strong> function `_<sub>init</sub>__` which defines which variables (mostly, but not exclusively: parameters) our model has (using `nn.Linear` instantiates a linear layer with all the trainable parameters (weights and biases) implicitly);</p></li>
+<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values (recall the function `singleForwardPass` from sheet 4.1; PyTorch automatically batches the computation implicitly).</p></li>
+</ol>
+<p>Since PyTorch allows flexibility in how to define neural network modules, we look at two variants below, one explicit and one more concise.
+They should implement the exact same model and work the same way eventually.</p>
+<section id="more-explicit-definition-nn-module">
+<h3>More explicit definition NN module<a class="headerlink" href="#more-explicit-definition-nn-module" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## set up multi-layer perceptron w/ PyTorch</span>
+<span class="c1">##    -- explicit version --</span>
+<span class="c1">##################################################</span>
+
+<span class="k">class</span> <span class="nc">MLPexplicit</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Multi-layer perceptron for non-linear regression.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLPexplicit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nInput</span>  <span class="o">=</span> <span class="n">nInput</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span> <span class="o">=</span> <span class="n">nHidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nOutput</span> <span class="o">=</span> <span class="n">nOutput</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nInput</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nOutput</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span>    <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear2</span><span class="p">(</span><span class="n">h1</span><span class="p">))</span>
+        <span class="n">h3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear3</span><span class="p">(</span><span class="n">h2</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear4</span><span class="p">(</span><span class="n">h3</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="n">mlpExplicit</span> <span class="o">=</span> <span class="n">MLPexplicit</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can access the current parameter values of this model instance like so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mlpExplicit</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.7162]
+ [ 0.3054]
+ [ 0.5023]
+ [-0.364 ]
+ [-0.0214]
+ [-0.5991]
+ [-0.7676]
+ [ 0.1173]
+ [-0.9104]
+ [-0.8084]]
+[ 0.9982  0.0229 -0.9914 -0.1927  0.487   0.1257  0.4986 -0.7426  0.7583
+ -0.2647]
+[[-3.055e-01  3.130e-02  2.002e-01 -2.435e-01 -1.218e-01 -1.474e-01
+  -2.876e-01  1.764e-01  2.490e-01  2.100e-03]
+ [ 1.892e-01 -1.904e-01  6.000e-04 -2.335e-01  1.297e-01  4.140e-02
+  -1.482e-01 -7.110e-02 -8.120e-02 -1.094e-01]
+ [-1.195e-01 -2.148e-01  3.310e-02  1.756e-01 -1.996e-01 -2.229e-01
+   1.505e-01 -1.807e-01 -8.000e-02  1.660e-01]
+ [-8.970e-02 -8.230e-02 -1.320e-01  2.171e-01 -4.820e-02 -2.780e-02
+  -4.950e-02  7.720e-02  2.308e-01 -2.290e-01]
+ [-1.457e-01  1.950e-01 -1.230e-01 -1.210e-02  1.476e-01 -2.768e-01
+  -2.990e-02 -2.439e-01 -1.290e-01 -1.570e-01]
+ [-1.483e-01  2.570e-02  1.859e-01 -1.860e-02  8.390e-02  4.660e-02
+   3.138e-01  3.088e-01  5.340e-02 -7.930e-02]
+ [-1.121e-01 -5.410e-02  1.632e-01  2.295e-01  2.396e-01  2.227e-01
+  -2.530e-01  1.595e-01 -2.933e-01  2.430e-02]
+ [ 9.330e-02 -1.497e-01  1.490e-02  1.334e-01 -5.120e-02 -2.379e-01
+   2.000e-04  2.877e-01  1.530e-01  3.062e-01]
+ [ 1.574e-01  8.640e-02  2.192e-01  2.398e-01 -2.757e-01  1.054e-01
+   1.015e-01  1.359e-01 -1.480e-02 -6.500e-03]
+ [ 5.510e-02  1.240e-02 -1.559e-01 -9.350e-02  1.210e-02 -1.320e-02
+  -2.500e-01  1.674e-01  5.770e-02 -2.701e-01]]
+[-0.28   -0.2966  0.1204 -0.0055  0.068  -0.1341 -0.2334 -0.2019 -0.119
+ -0.2133]
+[[-0.0344 -0.2099  0.2962 -0.0606 -0.3138  0.2037  0.2599 -0.2678  0.0954
+   0.066 ]
+ [-0.296   0.1794  0.238  -0.1659  0.17   -0.0864  0.2431  0.0091 -0.1223
+  -0.2202]
+ [ 0.1794 -0.0054 -0.0117  0.0105  0.2139  0.175   0.1593  0.2047 -0.213
+  -0.2088]
+ [-0.038  -0.3097 -0.1158 -0.2379 -0.2893 -0.308   0.2778  0.0506 -0.2043
+   0.1834]
+ [ 0.1747  0.0571 -0.0163 -0.0682 -0.129  -0.0885 -0.1488  0.0473  0.1942
+   0.0344]
+ [-0.3096 -0.1078  0.2341  0.0812 -0.1202 -0.0568  0.1159  0.1804 -0.0568
+   0.0194]
+ [ 0.0972 -0.1097 -0.0774 -0.0234 -0.2052 -0.0326  0.1652 -0.017   0.1867
+   0.2162]
+ [ 0.2547 -0.3039  0.2102  0.0243 -0.2842  0.0757 -0.0434  0.2334  0.154
+   0.1896]
+ [ 0.0174  0.1017 -0.005  -0.0147  0.2275 -0.0719 -0.0507 -0.0448  0.3158
+   0.1767]
+ [-0.2565 -0.0234  0.1479  0.2945 -0.1515 -0.261  -0.1538 -0.2376  0.1796
+  -0.1584]]
+[ 0.3048 -0.1691  0.1527  0.0358  0.0532  0.101  -0.1896 -0.0022 -0.2609
+ -0.1464]
+[[ 0.1555  0.1687  0.3115  0.1524 -0.2821 -0.0936 -0.1559  0.0102 -0.1415
+   0.1817]]
+[-0.1016]
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.2.1: Inspect the model’s parameters and their initial values</span></strong></p>
+<ol class="arabic simple" start="0">
+<li><p>[Just for yourself.] Make sure that you understand what these parameters are by mapping these onto the parameters of the custom-made model from sheet 4.1. (Hint: the order of the presentation in this print-out is the order in which the components occur in the computation of the forward pass.)</p></li>
+<li><p>Guess how the weights of the slope matrices are initialized (roughly). Same for the intercept vectors.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="more-concise-definition-of-nn-module">
+<h3>More concise definition of NN module<a class="headerlink" href="#more-concise-definition-of-nn-module" title="Permalink to this heading">#</a></h3>
+<p>Here is another, more condensed definition of the same NN model, which uses the `nn.Sequantial` function to neatly chain components, thus defining the model parameters and the forward pass in one swoop.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## set up multi-layer perceptron w/ PyTorch</span>
+<span class="c1">##    -- condensed version --</span>
+<span class="c1">##################################################</span>
+
+<span class="k">class</span> <span class="nc">MLPcondensed</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Multi-layer perceptron for non-linear regression.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<span class="n">mlpCondensed</span> <span class="o">=</span> <span class="n">MLPcondensed</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here you can select which one to use in the following.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># which model to use from here onwards</span>
+<span class="c1"># model = mlpExplicit</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlpCondensed</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="preparing-the-training-data">
+<h2>Preparing the training data<a class="headerlink" href="#preparing-the-training-data" title="Permalink to this heading">#</a></h2>
+<p>Data pre-processing is a tedious job, but an integral part of machine learning.
+In order to have a clean interface between data processing and modeling, we would ideally like to have a common data format to feed data into any kind of model.
+That also makes sharing and reusing data sets much less painful.
+For this purpose, PyTorch provides two data primitives: `torch.utils.data.Dataset` and `torch.utils.data.DataLoader`.
+The class <strong>Dataset</strong> stores the training data (in a reusable format).
+The class <strong>DataLoader</strong> takes a `dataset` object as input and returns an iterable to enable easy access to the training data.</p>
+<p>To define a `Dataset` object, we have to specify two key functions:</p>
+<ol class="arabic simple">
+<li><p>the `_<sub>len</sub>__` function, which tells subsequent applications how many data points there are; and</p></li>
+<li><p>the `_<sub>getitem</sub>__` function, which takes an index as input and outputs the data point corresponding to that index.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## representing train data as a Dataset object</span>
+<span class="c1">##################################################</span>
+
+<span class="k">class</span> <span class="nc">nonLinearRegressionData</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom &#39;Dataset&#39; object for our regression data.</span>
+<span class="sd">    Must implement these functions: __init__, __len__, and __getitem__.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xObs</span><span class="p">,</span> <span class="n">yObs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xObs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xObs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xObs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yObs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yObs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yObs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xObs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">xObs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">yObs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+<span class="c1"># instantiate Dataset object for current training data</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">nonLinearRegressionData</span><span class="p">(</span><span class="n">xObs</span><span class="p">,</span> <span class="n">yObs</span><span class="p">)</span>
+
+<span class="c1"># instantiate DataLoader</span>
+<span class="c1">#    we use the 4 batches of 25 observations each (full data  has 100 observations)</span>
+<span class="c1">#    we also shuffle the data</span>
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span> <span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can test the iterable that we create, just to inspect how the data will be delivered later on:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In: &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Out:&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>In:  tensor([ 1.3828, -1.5540,  4.7408,  1.2476,  4.4112,  0.6601,  0.3932, -2.5595,
+        -0.6360, -2.8668,  4.7704,  3.7725,  3.4049, -3.7961, -0.2344, -4.2058,
+        -1.9234, -3.2896,  2.5081,  2.1769, -2.8967,  3.2554,  0.5577,  2.2621,
+        -3.5312])
+Out: tensor([  21.1964,  -14.1183,   75.1349,   10.4310,   88.7715,   41.5962,
+          10.8885,   10.1166,  -12.2414,  -33.0621,   80.0496,   39.4490,
+          40.6922,  -74.2503,  -16.9134, -112.5062,   15.8564,  -69.8026,
+         -19.7569,  -10.9068,   -3.3683,   33.5449,   35.4243,  -34.1715,
+         -68.2611]) 
+
+In:  tensor([-2.5585e+00, -1.5232e+00,  4.9897e+00, -4.7488e-03, -1.1030e+00,
+        -2.9388e+00, -1.5989e+00,  4.0657e+00, -4.0635e+00,  4.8487e+00,
+         2.1542e+00,  2.5189e+00, -3.3402e+00,  2.4760e+00,  2.8843e+00,
+        -4.7447e+00,  1.6738e+00,  1.6872e-01, -2.0779e+00, -2.7700e+00,
+         3.6921e+00, -2.0048e+00, -1.3819e+00,  2.0519e+00,  3.4938e-01])
+Out: tensor([ -15.7838,  -26.1753,   98.2247,   26.9904,  -28.8237,  -29.7076,
+          -6.4436,   97.0686, -108.6754,  104.0133,  -18.6621,  -22.2836,
+         -55.6281,  -26.3065,    6.3598, -109.7286,   -4.6981,   -0.3503,
+           1.8797,   -0.1744,   55.1923,   25.1901,  -13.9514,  -27.8320,
+          34.6641]) 
+
+In:  tensor([-1.7982, -2.3786, -3.4968,  1.9667, -1.0364,  2.9216,  1.5580,  2.3318,
+         2.0294, -4.5495,  1.9434,  0.2134, -3.2214, -3.6137, -4.4637, -1.9185,
+         1.2278,  0.2785, -2.1322, -3.9876,  3.1617, -1.2628,  1.3051, -2.9396,
+         3.7625])
+Out: tensor([ -16.6213,    5.4903,  -75.9469,  -12.8497,  -15.2615,   16.9521,
+           5.6745,  -20.6827,   -9.4707, -108.6720,  -18.3693,    9.0777,
+         -67.6207,  -90.9294, -123.1380,   13.4198,   27.2869,    2.1350,
+          -1.4973, -106.7678,   33.8070,  -31.4955,   11.8766,  -22.6697,
+          55.0992]) 
+
+In:  tensor([-0.2786,  4.7119, -0.3200,  3.9973, -2.0390, -2.8214,  0.4267,  2.7361,
+        -3.9797,  3.5863, -0.9006, -0.9271, -1.7847,  4.9021, -4.1716, -1.0884,
+        -0.6948,  1.5614,  3.5475, -1.1978,  2.6971,  0.8780,  1.7582, -2.6990,
+         1.5671])
+Out: tensor([ -13.7211,  103.9179,   -6.7414,   78.8237,    3.5796,  -12.3277,
+          30.2857,  -18.2537, -106.1096,   53.9126,  -31.4487,   -9.8114,
+          11.3264,   81.8970, -114.7183,  -18.6803,  -28.0432,    4.3099,
+          42.3780,   -7.9575,  -15.2780,   29.7949,  -23.6074,   -9.2604,
+           1.5238]) 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="training-the-model">
+<h2>Training the model<a class="headerlink" href="#training-the-model" title="Permalink to this heading">#</a></h2>
+<p>We can now train the model similar to how we did this before.
+Note that we need to slightly reshape the input data to have the model compute the batched input correctly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
+<span class="c1">## training the model</span>
+<span class="c1">##################################################</span>
+
+<span class="c1"># Define the loss function and optimizer</span>
+<span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">nTrainSteps</span> <span class="o">=</span> <span class="mi">50000</span>
+
+<span class="c1"># Run the training loop</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nTrainSteps</span><span class="p">):</span>
+
+  <span class="c1"># Set current loss value</span>
+  <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+  <span class="c1"># Iterate over the DataLoader for training data</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="c1"># Get inputs</span>
+    <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="c1"># Zero the gradients</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="c1"># Perform forward pass (make sure to supply the input in the right way)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="c1"># Compute loss</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+    <span class="c1"># Perform backward pass</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="c1"># Perform optimization</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="c1"># Print statistics</span>
+    <span class="n">current_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loss after epoch </span><span class="si">%5d</span><span class="s1">: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span>
+            <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_loss</span><span class="p">))</span>
+      <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># Process is complete.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training process has finished.&#39;</span><span class="p">)</span>
+
+<span class="n">yPred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">o</span><span class="p">]))</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">xObs</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="c1"># plot the data</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;xObs&#39;</span> <span class="p">:</span> <span class="n">xObs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                  <span class="s1">&#39;yObs&#39;</span> <span class="p">:</span> <span class="n">yObs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                  <span class="s1">&#39;yPred&#39;</span><span class="p">:</span> <span class="n">yPred</span><span class="p">})</span>
+<span class="n">dWide</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yObs&#39;</span><span class="p">,</span> <span class="s1">&#39;yPred&#39;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">dWide</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">hue</span> <span class="o">=</span> <span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss after epoch  2500: 3863.520
+Loss after epoch  5000: 3267.784
+Loss after epoch  7500: 2239.946
+Loss after epoch 10000: 1658.311
+Loss after epoch 12500: 895.697
+Loss after epoch 15000: 686.850
+Loss after epoch 17500: 512.686
+Loss after epoch 20000: 451.440
+Loss after epoch 22500: 429.563
+Loss after epoch 25000: 418.115
+Loss after epoch 27500: 410.994
+Loss after epoch 30000: 406.424
+Loss after epoch 32500: 403.176
+Loss after epoch 35000: 400.792
+Loss after epoch 37500: 399.390
+Loss after epoch 40000: 397.837
+Loss after epoch 42500: 396.263
+Loss after epoch 45000: 394.663
+Loss after epoch 47500: 393.568
+Loss after epoch 50000: 392.571
+Training process has finished.
+</pre></div>
+</div>
+<img alt="../_images/680c6098b12e051be24cae1a7d6501085d7eb6e5b0c1eab48a3d46704687d41b.png" src="../_images/680c6098b12e051be24cae1a7d6501085d7eb6e5b0c1eab48a3d46704687d41b.png" />
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.2.2: Explore the model’s behavior</span></strong></p>
+<ol class="arabic simple" start="0">
+<li><p>[Just for yourself.] Make sure you understand <em>every line</em> in this last code block. Ask if anything is unclear.</p></li>
+<li><p>Above we used the DataLoader to train in 4 mini-batches. Change it so that there is only one batch containing all the data. Change the `shuffle` parameter so that data is not shuffled. Run the model and check if you observe any notable differences. Explain what your observations. (If you do not see anything, explain why you don’t. You might pay attention to the results of training)</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "kernels"
+        },
+        kernelOptions: {
+            name: "kernels",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'kernels'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packages-global-parameters">Packages &amp; global parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#true-model-training-data">True model &amp; training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-mlp-using-pytorchs-built-in-modules">Defining the MLP using PyTorch’s built-in modules</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-explicit-definition-nn-module">More explicit definition NN module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-concise-definition-of-nn-module">More concise definition of NN module</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-training-data">Preparing the training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
