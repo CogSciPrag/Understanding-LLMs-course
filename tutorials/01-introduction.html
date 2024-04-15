@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Practical set-up &#8212; Understanding LLMs</title>
+    <title>Practical set-up &amp; Training data &#8212; Understanding LLMs</title>
   
   
   
@@ -415,7 +415,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -426,11 +428,25 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Practical set-up</h1>
+    <h1>Practical set-up & Training data</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-requirements">Installing requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#colab">Colab</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-installation">Local installation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -440,9 +456,67 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="practical-set-up">
-<h1>Practical set-up<a class="headerlink" href="#practical-set-up" title="Permalink to this heading">#</a></h1>
-<p>This page will contain materials for the first tutorial session. Stay tuned!</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="practical-set-up-training-data">
+<h1>Practical set-up &amp; Training data<a class="headerlink" href="#practical-set-up-training-data" title="Permalink to this heading">#</a></h1>
+<p>This page will contains materials for the first tutorial session (April 19th).</p>
+<p>The learning goals for the first tutorial are:</p>
+<ul class="simple">
+<li><p>preparing the Python requirements for practical exercises in the upcoming tutorials,</p></li>
+<li><p>test-running a few lines of code,</p></li>
+<li><p>familiarization with a few coding best practices,</p></li>
+<li><p>understanding key processing steps and terms of the first building block for training any language model – the training data.</p></li>
+</ul>
+<p><strong>Please try to complete the first block of this tutorial sheet (i.e., installation of requirements) AHEAD of the tutorial session</strong>, ideally, while you have a stable internet connection. This way we can try to solve any problems that might have come up with the installation during the tutorial on Friday.</p>
+<section id="installing-requirements">
+<h2>Installing requirements<a class="headerlink" href="#installing-requirements" title="Permalink to this heading">#</a></h2>
+<p>Throughout the semester, we will use Python, PyTorch and various packages for practical work. Both the in-tutorial exercise sheets and homework will require you to execute Python code yourself.
+Please follow the steps below to set up the requirements (i.e., most packages required for completing exercises) that we will use in the course. We will have to install more packages as we go during the semester, though.</p>
+<p>You can do so either on your own machine, or by using <a class="reference external" href="https://colab.research.google.com/">Google Colab</a>. You can easily access the latter option by pressing the Colab icon at the top of the webook’s page. Depending on your choice, please follow the respective requirement installation steps below.</p>
+<section id="colab">
+<h3>Colab<a class="headerlink" href="#colab" title="Permalink to this heading">#</a></h3>
+<p>The advantage of using Colab is that you don’t need to install software on your own machine; i.e., it is a safer option if you are not very comfortable with using Python on your own machine. Colab is a  platform provided by Google for free, and it also provides limited access to GPU computation (which will be useful fpor working with actual language models). Using it only requires a Google account.</p>
+<p>For using a GPU on Colab, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save. Please note that the provided Colab computational resources are free, so please be mindful when using them. Further, Colab monitors GPU usage, so if it is used a lot very frequently, the user might not be able to access GPU run times for a while.</p>
+<p>Colab already provides Python as well as a number of basic packages. If you choose to use it, you will only need to install the more specific packages. Note that you will have to so <em>every time</em> you open a new Colab runtime. To test that you can access requirements for the class, please open this notebook in Colab (see above), uncomment and run the following line:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install torch transformers sentencepiece datasets langchain torchrl llama-index bertviz </span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="local-installation">
+<h3>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this heading">#</a></h3>
+<p>Using your computer for local execution of all practical exercises might be a more advanced option. If you do so, we strongly encourage you to create an environment (e.g., with Conda) before installing any packages. Furthermore, ideally, check if you have a GPU suitable for deep learning because using a GPU will significantly speed up the work with language models. You can do so by checking your computer specs and finding out whether your GPU works with CUDA, MPS or ROCm. If you don’t have a suitable GPU, you can use Colab for tasks that require GPU access. Finally, please note that we will download some pretrained models and some datasets which will occupy some of your local storage.</p>
+<p>If you choose to use your own machine, please do the following steps:</p>
+<ul class="simple">
+<li><p>install Python &gt;= 3.9</p></li>
+<li><p>create an environment (optional but recommended)</p></li>
+<li><p>download the requirements file <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/tutorials/files/requirements.txt">here</a></p></li>
+<li><p>if you have a deep learning supporting GPU:</p>
+<ul>
+<li><p>please check <a class="reference external" href="https://pytorch.org/get-started/locally/">here</a> which PyTorch version you need in order to use the GPU</p></li>
+<li><p>please modify the first line of the requirements file to reflect the PyTorch version suitable for your machine</p></li>
+<li><p>please install the remaining requirements from the requirements file (e.g., run: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> once pip is available in your environment; adjust path to file if needed)</p></li>
+</ul>
+</li>
+<li><p>if you do NOT have a deep learning supporting GPU:</p>
+<ul>
+<li><p>please modify the first line to the requirements file to be: <code class="docutils literal notranslate"><span class="pre">pytorch</span></code></p></li>
+<li><p>please install the requirements from the requirements file (e.g., run: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> once pip is available in your environment; adjust path to file if needed)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="verifying-requirement-installation">
+<h2>Verifying requirement installation<a class="headerlink" href="#verifying-requirement-installation" title="Permalink to this heading">#</a></h2>
+<p>Stay tuned!</p>
+</section>
+<section id="understanding-training-data">
+<h2>Understanding training data<a class="headerlink" href="#understanding-training-data" title="Permalink to this heading">#</a></h2>
+<p>Stay tuned!</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -454,16 +528,16 @@ document.write(`
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "speakers39"
         },
         kernelOptions: {
-            name: "python3",
+            name: "speakers39",
             path: "./tutorials"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'speakers39'</script>
 
                 </article>
               
@@ -481,6 +555,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-requirements">Installing requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#colab">Colab</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-installation">Local installation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
