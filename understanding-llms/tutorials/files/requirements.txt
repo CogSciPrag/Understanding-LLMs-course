@@ -1,0 +1,12 @@
+torch
+numpy
+matplotlib
+transformers
+sentencepiece
+datasets
+langchain
+torchrl
+llama-index
+bertviz
+ipykernel
+wikipedia
