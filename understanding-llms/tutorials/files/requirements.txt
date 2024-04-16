@@ -1,5 +1,4 @@
-python==3.9
-pytorch-cuda==11.6
+torch
 numpy
 matplotlib
 transformers
@@ -9,3 +8,5 @@ langchain
 torchrl
 llama-index
 bertviz
+ipykernel
+wikipedia
