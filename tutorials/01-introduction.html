@@ -447,6 +447,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices-for-writing-code">Best practices for writing code</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
 </ul>
             </nav>
@@ -473,7 +474,7 @@ document.write(`
 <section id="installing-requirements">
 <h2>Installing requirements<a class="headerlink" href="#installing-requirements" title="Permalink to this heading">#</a></h2>
 <p>Throughout the semester, we will use Python, PyTorch and various packages for practical work. Both the in-tutorial exercise sheets and homework will require you to execute Python code yourself.
-Please follow the steps below to set up the requirements (i.e., most packages required for completing exercises) that we will use in the course. We will have to install more packages as we go during the semester, though.</p>
+Please follow the steps below to set up the requirements (i.e., most packages required for completing exercises) that we will use in the course. We will most likely install more packages as we go during the semester, though.</p>
 <p>You can do so either on your own machine, or by using <a class="reference external" href="https://colab.research.google.com/">Google Colab</a>. You can easily access the latter option by pressing the Colab icon at the top of the webook’s page. Depending on your choice, please follow the respective requirement installation steps below.</p>
 <section id="colab">
 <h3>Colab<a class="headerlink" href="#colab" title="Permalink to this heading">#</a></h3>
@@ -482,7 +483,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <p>Colab already provides Python as well as a number of basic packages. If you choose to use it, you will only need to install the more specific packages. Note that you will have to so <em>every time</em> you open a new Colab runtime. To test that you can access requirements for the class, please open this notebook in Colab (see above), uncomment and run the following line:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install torch transformers sentencepiece datasets langchain torchrl llama-index bertviz </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install datasets langchain torchrl llama-index bertviz wikipedia</span>
 </pre></div>
 </div>
 </div>
@@ -499,13 +500,12 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <li><p>if you have a deep learning supporting GPU:</p>
 <ul>
 <li><p>please check <a class="reference external" href="https://pytorch.org/get-started/locally/">here</a> which PyTorch version you need in order to use the GPU</p></li>
-<li><p>please modify the second line of the requirements file to reflect the PyTorch version suitable for your machine</p></li>
-<li><p>please install the remaining requirements from the requirements file (e.g., run: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> once pip is available in your environment; adjust path to file if needed)</p></li>
+<li><p>please modify the first line of the requirements file to reflect the PyTorch version suitable for your machine (if needed)</p></li>
+<li><p>please install the requirements from the requirements file (e.g., run: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> once pip is available in your environment; adjust path to file if needed)</p></li>
 </ul>
 </li>
 <li><p>if you do NOT have a deep learning supporting GPU:</p>
 <ul>
-<li><p>please modify the second line to the requirements file to be: <code class="docutils literal notranslate"><span class="pre">pytorch</span></code></p></li>
 <li><p>please install the requirements from the requirements file (e.g., run: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> once pip is available in your environment; adjust path to file if needed)</p></li>
 </ul>
 </li>
@@ -514,6 +514,94 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </section>
 <section id="verifying-requirement-installation">
 <h2>Verifying requirement installation<a class="headerlink" href="#verifying-requirement-installation" title="Permalink to this heading">#</a></h2>
+<p>Please run the following code cells to make sure that the key requirements were installed successfully. If you errors occur and you cannot solve them ahead of the tutorial, please don’t be shy and let us know in the first tutorial!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<span class="kn">from</span> <span class="nn">langchain.tools</span> <span class="kn">import</span> <span class="n">WikipediaQueryRun</span>
+<span class="kn">from</span> <span class="nn">langchain_community.utilities</span> <span class="kn">import</span> <span class="n">WikipediaAPIWrapper</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># check available computation device</span>
+<span class="c1"># if you have a local GPU or if you are using a GPU on Colab, the following code should return &quot;CUDA&quot;</span>
+<span class="c1"># if you are on Mac and have an &gt; M1 chip, the following code should return &quot;MPS&quot;</span>
+<span class="c1"># otherwise, it should return &quot;CPU&quot;</span>
+
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># test PyTorch</span>
+
+<span class="c1"># randomly initialize a tensor of shape (5, 3)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of tensor x:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Device of tensor x:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># initialize a tensor of shape (5, 3) with ones</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># multiply x and y</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># testing LangChain</span>
+
+<span class="c1"># run a Wikipedia query, searching for the article &quot;Attention is all you need&quot;</span>
+<span class="c1"># NB: requires an internet connection</span>
+<span class="n">wikipedia</span> <span class="o">=</span> <span class="n">WikipediaQueryRun</span><span class="p">(</span><span class="n">api_wrapper</span><span class="o">=</span><span class="n">WikipediaAPIWrapper</span><span class="p">())</span>
+<span class="n">wikipedia</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Attention is all you need&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># testing the package transformers which provides pre-trained language models</span>
+<span class="c1"># and excellent infrastructure around them</span>
+
+<span class="c1"># download (if not available yet) and load GPT-2 tokenizer</span>
+<span class="n">tokenizer_gpt2</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Attention is all you need&quot;</span>
+<span class="c1"># tokenize the text (i.e., convert the string into a tensor of token IDs)</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer_gpt2</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">,</span> 
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Input IDs:&quot;</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="best-practices-for-writing-code">
+<h2>Best practices for writing code<a class="headerlink" href="#best-practices-for-writing-code" title="Permalink to this heading">#</a></h2>
 <p>Stay tuned!</p>
 </section>
 <section id="understanding-training-data">
@@ -531,16 +619,16 @@ Please follow the steps below to set up the requirements (i.e., most packages re
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "speakers39"
+            mode: "python"
         },
         kernelOptions: {
-            name: "speakers39",
+            name: "python3",
             path: "./tutorials"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'speakers39'</script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               
@@ -591,6 +679,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices-for-writing-code">Best practices for writing code</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
 </ul>
   </nav></div>
