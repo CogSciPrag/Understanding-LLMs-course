@@ -448,7 +448,12 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices-for-writing-code">Best practices for writing code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-concepts">Core concepts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#main-training-data-processing-steps">Main training data processing steps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-documentation">Dataset documentation</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -526,11 +531,6 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The cache for model files in Transformers v4.22.0 has been updated. Migrating your old cache. This is a one-time only operation. You can interrupt this and resume the migration later on by calling `transformers.utils.move_cache()`.
-</pre></div>
-</div>
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e28f8c617f504b7f8540013b980362b0", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -548,11 +548,6 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <span class="k">else</span><span class="p">:</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Device: cpu
 </pre></div>
 </div>
 </div>
@@ -577,27 +572,6 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.7460, 0.7034, 0.8912],
-        [0.2328, 0.4722, 0.5892],
-        [0.0167, 0.5969, 0.5472],
-        [0.4784, 0.8627, 0.7594],
-        [0.8009, 0.5393, 0.1019]])
-Shape of tensor x: torch.Size([5, 3])
-Device of tensor x: cpu
-tensor([[1., 1., 1.],
-        [1., 1., 1.],
-        [1., 1., 1.],
-        [1., 1., 1.],
-        [1., 1., 1.]])
-tensor([[0.7460, 0.7034, 0.8912],
-        [0.2328, 0.4722, 0.5892],
-        [0.0167, 0.5969, 0.5472],
-        [0.4784, 0.8627, 0.7594],
-        [0.8009, 0.5393, 0.1019]])
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -607,11 +581,6 @@ tensor([[0.7460, 0.7034, 0.8912],
 <span class="c1"># NB: requires an internet connection</span>
 <span class="n">wikipedia</span> <span class="o">=</span> <span class="n">WikipediaQueryRun</span><span class="p">(</span><span class="n">api_wrapper</span><span class="o">=</span><span class="n">WikipediaAPIWrapper</span><span class="p">())</span>
 <span class="n">wikipedia</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Attention is all you need&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Page: Attention Is All You Need\nSummary: &quot;Attention Is All You Need&quot; is a landmark 2017 research paper by Google. Authored by eight scientists, it was responsible for expanding 2014 attention mechanisms proposed by Bahdanau et. al. into a new deep learning architecture known as the transformer. The paper is considered by some to be a founding document for modern artificial intelligence, as transformers became the main architecture of large language models. At the time, the focus of the research was on improving Seq2seq techniques for machine translation, but even in their paper the authors saw the potential for other tasks like question answering and for what is now called multimodal Generative AI.\nThe paper\&#39;s title is a reference to the song &quot;All You Need Is Love&quot; by the Beatles.As of 2024, the paper has been cited more than 100,000 times.\n\n\n\nPage: All You Need Is Kill\nSummary: All You Need Is Kill is a Japanese science fiction light novel by Hiroshi Sakurazaka with illustrations by Yoshitoshi Abe. The book was published in Japanese by Shueisha under their Super Dash Bunko imprint in December 2004, and was later released in English by Viz Media under their Haikasoru imprint. All You Need Is Kill follows a soldier named Keiji Kiriya, who, after dying in a battle with extraterrestrials, is caught in a time loop that makes him live the same day repeatedly, allowing Kiriya to improve his fighting skills.\nA manga adaptation, written by Ryōsuke Takeuchi and illustrated by Takeshi Obata, was serialized in Shueisha\&#39;s Weekly Young Jump magazine between January and May 2014 and was also published by Viz Media in its Weekly Shonen Jump magazine. In November 2014, the Viz translation was released in a collected edition that included the entire series. A separate graphic novel adaptation, written by Nick Mamatas and illustrated by Lee Ferguson, was released in North America in May 2014. A film adaptation from director Doug Liman starring Tom Cruise and Emily Blunt, titled Edge of Tomorrow, was released in May 2014. The English-language film tie-in edition of the novel also uses this title.\nThe novel was Sakurazaka\&#39;s breakthrough science fiction novel, earning wide praise from fellow novelists including Yasutaka Tsutsui and Chōhei Kanbayashi and was entered in contention for the Best Japanese Long Work in the 36th Seiun Awards in 2005.\n\nPage: All You Need Is Love\nSummary: &quot;All You Need Is Love&quot; is a song by the English rock band the Beatles that was released as a non-album single in July 1967. It was written by John Lennon and credited to the Lennon–McCartney partnership. The song was Britain\&#39;s contribution to Our World, the first live global television link, for which the band were filmed performing it at EMI Studios in London on 25 June. The programme was broadcast via satellite and seen by an audience of over 400 million in 25 countries. Lennon\&#39;s lyrics were deliberately simplistic, to allow for the show\&#39;s international audience, and captured the utopian ideals associated with the Summer of Love. The single topped sales charts in Britain, the United States and many other countries, and became an anthem for the counterculture\&#39;s embrace of flower power philosophy.\nOur World coincided with the height of the Beatles\&#39; popularity and influence, following the release of their album Sgt. Pepper\&#39;s Lonely Hearts Club Band. Rather than perform the song entirely live, the group played to a pre-recorded backing track. With an orchestral arrangement by George Martin, the song begins with a portion of the French national anthem and ends with musical quotations from works such as Glenn Miller\&#39;s &quot;In the Mood&quot;, &quot;Greensleeves&quot;, Bach\&#39;s Invention No. 8 in F major, and the Beatles\&#39; 1963 hit &quot;She Loves You&quot;. Adding to the broadcast\&#39;s festive atmosphere, the studio was adorned with signs and streamers and filled with guests dressed in psychedelic attire, including members of the Rolling Stones, the Who and the Small Faces. Brian Epstein, the Beatles\&#39; manager, &#39;
 </pre></div>
 </div>
 </div>
@@ -634,20 +603,314 @@ tensor([[0.7460, 0.7034, 0.8912],
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Input IDs: {&#39;input_ids&#39;: tensor([[8086, 1463,  318,  477,  345,  761]]), &#39;attention_mask&#39;: tensor([[1, 1, 1, 1, 1, 1]])}
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="best-practices-for-writing-code">
 <h2>Best practices for writing code<a class="headerlink" href="#best-practices-for-writing-code" title="Permalink to this heading">#</a></h2>
-<p>Stay tuned!</p>
+<p>There is a lot of debate around best practices for writing, documenting and formatting Python code and their actual implementation in daily practice, and many people have different personal preferences. We are not committing to a particular side in this debate, but we do care about a few general aspects:</p>
+<ul class="simple">
+<li><p>working with clean code</p></li>
+<li><p>working with understandable code (i.e., commented, with understandable variable names etc)</p></li>
+<li><p>producing well-documented projects (e.g., supplied with relevant READMEs etc). Think: your work should be structured such that you could look at it in a year and be able to immediately what you did, how and why.</p></li>
+</ul>
+<p>There are a few de facto standard <em>formatting</em> practices that help to keep Python code crisp and clean. Please take a look at these and adhere to these as much as you can (as so will we):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pep8.org/">PEP8</a>: style guide for Python code defining e.g., variable naming conventions, how many spaces to use for indentation, how long single lines should be etc.</p>
+<ul>
+<li><p>Here is an overview <a class="reference external" href="https://www.youtube.com/watch?v=D4_s3q038I0">video</a> of some of the PEP8 conventions</p></li>
+<li><p>There is handy software that reformats your code for you according to some of these conventions. Such software is often seamlessly integrated in IDEs. This includes for instance <em>Black</em> or <em>Ruff</em> Python formatters. They can be installed as extensions in, e.g., Visual Studio Code.</p></li>
+</ul>
+</li>
+<li><p><em>docstrings</em> are comments (strings) that document a specific code object and always directly follow the definition of the object (e.g., directly after <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">fct(...)</span></code>). They specify the functionality, inputs, outputs and their types. Again, there are slightly different formatting styles for docstrings; please try to be consistent about your formatting.</p>
+<ul>
+<li><p>One example style of docstrings is <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard"><em>numpydoc</em></a>; you might see that the provided code might often use such docstrings.</p></li>
+</ul>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># example: bad formatting</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
+
+<span class="c1"># example: better formatting</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># example: bad docstring</span>
+
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;a+b&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># example: better docstring</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add two numbers.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    a: int</span>
+<span class="sd">        First number.</span>
+<span class="sd">    b: int</span>
+<span class="sd">        Second number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int: Sum of a and b.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are also some hints regarding structuring larger projects and e.g. GitHub repositories (just fyi):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://djnavarro.net/slides-project-structure/#1">project structure</a></p></li>
+<li><p><a class="reference external" href="https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/">writing good READMEs</a></p></li>
+<li><p><a class="reference external" href="https://vimeo.com/412835411">tidy collaboration and git</a></p></li>
+</ul>
+<p>These best practices will be useful to you beyond this class and possibly even beyond your studies when collaborating on other coding projects within teams or even by yourself. We do our best to stick to these guidelines ourselves and kindly urge you to do the same when submitting assignments and possibly projects.</p>
 </section>
 <section id="understanding-training-data">
 <h2>Understanding training data<a class="headerlink" href="#understanding-training-data" title="Permalink to this heading">#</a></h2>
-<p>Stay tuned!</p>
+<p>One of the critical building blocks of any language model (be it an n-gram model or GPT-4) is the <strong>training data</strong>. The contents of the training data determine, for instance, which tokens (e.g., words) the model “sees” during training, how often each of them occurs, which language the model learns, but also which potential <em>biases</em> the model might inherit (more on this in lecture 9).</p>
+<p>The goals of this part of the sheet are:</p>
+<ul class="simple">
+<li><p>introduce core terms and concepts that we might be using throughout the class, and that are often used in NLP papers</p></li>
+<li><p>understand core data processing steps used before training LMs</p></li>
+<li><p>try hands-on loading a dataset and performing basic preprocessing steps</p></li>
+</ul>
+<p>Tasks:</p>
+<ul class="simple">
+<li><p>read the sections below, try to understand each concept and ask yourself whether you have already heard it, and if so, in which context</p></li>
+<li><p>complete the exercises</p></li>
+<li><p>complete the coding exercises where you can load and process a dataset yourself.</p></li>
+</ul>
+<section id="core-concepts">
+<h3>Core concepts<a class="headerlink" href="#core-concepts" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>(training) data / dataset</strong> (in the context of LMs): a collection of text data which is used as input to the LM in order to optimize its parameters, so that, ideally, the model learns to perform well on its target task; that is, to predict fluent text. Generalization to other machine learning models: the type of input data might be different (e.g., images and labels for image classification models) but the purpose is the same. Data and dataset are mostly used interchangeably.</p>
+<ul>
+<li><p><strong>corpus</strong> [ling.]: “A corpus is a collection of pieces of language text in electronic form, selected according to external criteria to represent, as far as possible, a language or language variety as a source of data for linguistic research.” <a class="reference external" href="https://user.phil.hhu.de/~bontcheva/SS10CTCL/CTCL-IntroNotes.pdf">source</a> For the purposes of NLP, the term corpus is often used interchangeably with the term dataset, especially when referring to collections of literary texts (e.g., the Books corpus) or when sourced from corpora created in linguistics.</p>
+<ul>
+<li><p>well-known linguistic corpora are, e.g.: the <a class="reference external" href="http://icame.uib.no/brown/bcm.html">Brown corpus</a>, the British National Corpus <a class="reference external" href="http://www.natcorp.ox.ac.uk/">BNC</a>.</p></li>
+</ul>
+</li>
+<li><p><strong>test / validation data</strong> (general ML concept): the full dataset is sually split into the <em>training data</em> (used to optimize the model), and the held-out <em>validation data</em> and <em>test data</em> (called dataset splits). Validation data is often used to optimize aspects of the model architecture (so-called hyperparameters like optimizer, drop out rate etc). This split is sometimes ommited if no hyperparameter tuning is done. Test data is then used to assess the model’s performance on <em>unseen</em> data. That is, it is used to approximately answer the question: How well will my trained model perform on completely new inputs? In the context of LMs, all dataset splits are texts.</p></li>
+</ul>
+</li>
+<li><p><strong>cleaning &amp; preprocessing</strong>: this is the step when “raw” data (e.g., from the web) is processed so as to massage the data into a format that is optimal for the NLP task which we want to accomplish. This can include, for instance, removing markup tags, lower-casing data, splitting it into single sentences etc.</p></li>
+<li><p><strong>annotation</strong>: this step refers to enriching “raw” data with additional information like judgements about the quality of data, “gold standard” demonstrations of a task (e.g., gold standard answer to a question) etc, usually provided by humans. This is done generate high-quality training datasets which cannot be obtained otherwise.</p>
+<ul>
+<li><p>most prominently, human annotation is often used in the process of fine-tuning LLMs with RLHF (more on this in lecture 5).</p></li>
+</ul>
+</li>
+<li><p><strong>token</strong>: minimal unit of text which is mapped onto a numerical representation to be readable for the LM. Different types of tokens have been used: single words, single characters, and recently mostly sub-word parts.</p>
+<ul>
+<li><p>tokenization is the process of converting a string to a list or tensor of tokens.</p></li>
+<li><p>tokenization will be discussed in more detail in the session of week 3.</p></li>
+</ul>
+</li>
+<li><p><strong>vocabulary</strong>: the set of unique tokens used by a particular LM-tookenizer pair. For example, in case of the Llama-2 model, the vocabulary consists of ~32 000 tokens.</p></li>
+<li><p><strong>embedding</strong>: a vector representation of a single token (e.g., word2vec). These vector representations are learned in a way optimizing the next token prediction task and, intuitively, can be understood as approximating (some aspects of) the meaning of a word.</p></li>
+<li><p><strong>batch</strong>: a set of input sampes (i.e., texts) that is passed through the LM during training simultaneously, in parallel, during one training step, before updating the internal model parameters. The <strong>batch size</strong> refers to the number of input samples in the set. The batch size is a common hyperparameter of the LM architectures and might have a significant effect on set up requirements (a large batch size requires a lot of memory) and the model performance (because model parameters are updated based on the training signal from the entire batch).</p></li>
+<li><p><strong>epoch</strong>: an interation over the entire training dataset. Often a model is trained for several epochs, i.e., training iterates over the training set several times.</p></li>
+</ul>
+<p>We will likely extend this list and learn about more important aspects as we go on with the class, but this should already equip you with a good foundation for understanding the parts of the LM literature related to data.</p>
+</section>
+<section id="main-training-data-processing-steps">
+<h3>Main training data processing steps<a class="headerlink" href="#main-training-data-processing-steps" title="Permalink to this heading">#</a></h3>
+<p>Before beginning to train the LM, the following steps are commonly completed:</p>
+<ol class="arabic simple">
+<li><p>acquiring the training data: this step involves downloading or collecting the data of your choice onto the machine which will be used for training. Nowadays many datasets for various tasks can be downloaded from <a class="reference external" href="https://huggingface.co/datasets">HuggingFace</a> or are made available in GitHub repositories.</p></li>
+<li><p>exploring and understanding the dataset: it is important to understand what kinds of texts, from which sources, on which topics, with what sentence length, … the dataset contains. This is crucial because the model will pick up on features of the dataset in a way that might be difficult to fully anticipate (which is good if the features are, e.g., gramamticality of sentences, but bad if it is toxic language).</p></li>
+<li><p>creating the desired combination: nowadays training datasets might consist of a mix of different smaller datasets. See the exercise below for more details.</p></li>
+<li><p>cleaning: this step involves filtering out or converting non-machine readable or undesired characters, often lower-casing, removal of punctuation or digits or so-called stop-words (very common words like “a”, “and”). However, the last three steps are not very common any more for state-of-the-art LLM training.</p></li>
+<li><p>splitting the dataset into train, validation, test splits</p></li>
+<li><p>prepairing the training split: training texts are often shuffled and sometimes split into shorter texts. Specifically, splitting is required if the length of a text exceeds the maximal <em>context window size</em> of the transformer model (i.e., the maximal number of tokens a model can process). In this case, texts are often split into shorter slightly overlapping chunks.</p></li>
+<li><p>tokenizing: converting the single texts into lists of tokens, i.e., into lists of numerical IDs. More on tokenization in the session of week 3.</p></li>
+<li><p>batching: to speed up training, the model is often fed multiple texts at the same time (i.e., at each training step). To create these batches, often additional steps are needed to ensure that several tokenized texts (i.e., several lists with token IDs) can be represented as one input tensor. These steps are either restricting texts to a maximal common length (and cutting off the rest) or <em>padding</em> all the texts to the same length. More on this in the tokenization session.</p></li>
+</ol>
+<p><a class="reference external" href="https://www.geeksforgeeks.org/natural-language-processing-nlp-pipeline/">This article</a> provides a great more detailed overview of the steps 1-4 and provides insights into traditional approaches (e.g., feature engineering) which are more common for task-specific models than for foundation language models.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 1.1.: Massaging a Twitter dataset</span></strong></p>
+<p>Below are a few code blocks for implementing some data processing steps on an example dataset of <a class="reference external" href="https://huggingface.co/datasets/zeroshot/twitter-financial-news-sentiment">tweets about financial news</a>, downloaded from HuggingFace. We will use the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> <a class="reference external" href="https://huggingface.co/docs/datasets/en/tutorial">package</a> to work with the dataset. Originally, the dataset is intended for sentiment classification, but we will just use the tweets from the column “text”.</p>
+<ol class="arabic simple">
+<li><p>Please go through the code and complete it in slots which say “#### YOUR CODE HERE”. Refer to the comments and hints for instructions about what the code is supposed to do. Make sure to try to understand every line!</p></li>
+<li><p>What is prominent about the dataset? Are the processing steps adequate if you wanted to train a Twitter bot which could write tweets on this data?</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># 1. load dataset, only training split</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+    <span class="s2">&quot;zeroshot/twitter-financial-news-sentiment&quot;</span><span class="p">,</span>
+    <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 2. understand dataset</span>
+<span class="c1"># print first 5 examples</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># print the columns of the dataset</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+
+<span class="c1"># get the number of examples in the dataset</span>
+<span class="n">dataset_size</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset size: </span><span class="si">{</span><span class="n">dataset_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># compute the tweet lengths (in words, i.e., split by whitespace)</span>
+<span class="c1"># plot them and compute the average tweet length</span>
+<span class="n">tweets</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+<span class="n">tweet_lengths</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">average_tweet_length</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average tweet length: </span><span class="si">{</span><span class="n">average_tweet_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># plot a histogram of the tweet lengths</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Tweet length&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. clean tweets: remove non-alphabetic characters</span>
+<span class="c1"># Hint: you can easily google how to remove non-alphabetic characters in Python</span>
+
+
+<span class="k">def</span> <span class="nf">clean_tweet</span><span class="p">(</span><span class="n">tweet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove non-alphabetic or non-space characters from a tweet.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    tweet: str</span>
+<span class="sd">        Tweet to clean.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cleaned_tweet: str</span>
+<span class="sd">        Cleaned tweet without non-alphabetic symbols.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tweet</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="p">)</span>  
+    <span class="k">return</span> <span class="n">tweet</span>
+
+<span class="c1"># apply the preprocessing function to all tweets</span>
+<span class="n">cleaned_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">clean_tweet</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># look at a few examples of clean tweets</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cleaned_dataset</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5. split dataset into training and testing set</span>
+
+<span class="c1"># select the proportion of the dataset that should be used for training</span>
+<span class="c1"># and the proportion that should be used for testing</span>
+<span class="c1"># commonly train : test is around 80:20</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">dataset_size</span><span class="p">)</span>  <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">test_size</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, Test size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># split the dataset into training and testing set</span>
+<span class="c1"># this will create two new sub-datasets with the keys &quot;train&quot; and &quot;test&quot;</span>
+<span class="n">cleaned_dataset_split</span> <span class="o">=</span> <span class="n">cleaned_dataset</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>  
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 7-8. Tokenize and batch the dataset with wrappers provided by the datasets package</span>
+<span class="c1"># for tokeinization, we use the GPT-2 tokenizer (more details for what is going on</span>
+<span class="c1"># under the hood of these wrappers is to come in the next sessions)</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">tokenization</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper around the tokenizer to tokenize the text of an example.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    example: dict</span>
+<span class="sd">        Example tweet from the dataset. Key &quot;text&quot; contains the tweet.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Tokenized tweet with token IDs and an attention mask.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="c1">### YOUR CODE HERE ###</span>
+        <span class="p">)</span>
+
+<span class="c1"># apply the tokenization function to the train dataset</span>
+<span class="n">preprocessed_train_dataset</span> <span class="o">=</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenization</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># datasets provides a handy method to format the dataset for training models with PyTorch</span>
+<span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> 
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">format</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># finally, to see what the preprocessed dataset looks like </span>
+<span class="c1"># we iterate over the dataset for a few steps, as we would do in training</span>
+<span class="c1"># note: usually a DataLoader would be used to iterate over the dataset for training</span>
+<span class="c1"># we will cover this in the next sessions</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">preprocessed_train_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>NOTE</strong>: if you are building your own dataset instead of e.g. loading it via <code class="docutils literal notranslate"><span class="pre">datasets</span></code>, PyTorch provides a class <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> which is easily customizable and essentially allows to explicitly implement functionality that is tucked away in the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> package. Working with it is covered in sheet 2.3 (for next week!).</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 1.2.: Understanding The Pile</span></strong></p>
+<p>To make things more specific, consider <a class="reference external" href="https://arxiv.org/pdf/2101.00027.pdf">The Pile dataset (Gao et al., 2020)</a>. Read trough the abstract and section 1 (Introduction), look at Table 1 (if needed, glimpse at other sections describing what the single names stand for), read section 5.2.
+The following exercises are meant to foster understanding and critical thinking about training datasets. Please try to answer the following questions to yourself:</p>
+<ol class="arabic simple">
+<li><p>Which language(s) does The Pile mainly consist of? If an LM is trained on The Pile as it is, how would you expect the LM will perform when completing a text in, e.g., Hungarian?</p></li>
+<li><p>What is the difference between The Pile and Common Crawl? Why was The Pile introduced?</p></li>
+<li><p>What does the “epochs” column in Table 1 refer to? What is the idea behind it?</p></li>
+<li><p>What kind of data is missing from the mix reported in Table 1? Would do you think the effect of adding such data would be on an LM trained with the data?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="dataset-documentation">
+<h3>Dataset documentation<a class="headerlink" href="#dataset-documentation" title="Permalink to this heading">#</a></h3>
+<p>Although datasets are a crucial part of the NLP pipeline, unfortunately, there are very few or no established practices for <em>documenting</em> shared datasets or <em>reporting</em> the datasets which are used to traing published models. This results in issues of reproducibility of the training because details about the data are unknown, biases of models due to under- or misrepresentation in the data and other issues. This paper (a completely optional read) provides an overview as well as suggestions for improving the situation in the area of machine learning:</p>
+<p><a class="reference external" href="https://dl.acm.org/doi/pdf/10.1145/3351095.3372829">Jo &amp; Gebru (2020). Lessons from Archives: Strategies for Collecting Sociocultural Data in Machine Learning</a></p>
+</section>
 </section>
 </section>
 
@@ -721,7 +984,12 @@ tensor([[0.7460, 0.7034, 0.8912],
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices-for-writing-code">Best practices for writing code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-training-data">Understanding training data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-concepts">Core concepts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#main-training-data-processing-steps">Main training data processing steps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-documentation">Dataset documentation</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
