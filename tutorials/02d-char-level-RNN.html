@@ -478,11 +478,7 @@ To be able to have a manageable (quick to train, evaluate, inspect) case study, 
 <span class="c1">##################################################</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">unicodedata</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -494,7 +490,8 @@ To be able to have a manageable (quick to train, evaluate, inspect) case study, 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -511,28 +508,30 @@ We load it and define a few useful variables for later use.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
 <span class="c1">## read and inspect the data</span>
 <span class="c1">##################################################</span>
-<span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/michael-franke/npNLG/main/neural_pragmatic_nlg/05-RNNs/names-data.json&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
-    <span class="n">namesData</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span>
+    <span class="s2">&quot;https://raw.githubusercontent.com/michael-franke/npNLG/main/neural_pragmatic_nlg/05-RNNs/names-data.json&quot;</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">url</span><span class="p">:</span>
+    <span class="n">names_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
 <span class="c1"># # local import</span>
 <span class="c1"># with open(&#39;names-data.json&#39;) as dataFile:</span>
-<span class="c1">#     namesData = json.load(dataFile)</span>
+<span class="c1">#     names_data = json.load(dataFile)</span>
 
-<span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">namesData</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="n">n_categories</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+<span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">names_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">n_categories</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
 
 <span class="c1"># we use all ASCII letters as the vocabulary (plus tokens [EOS], [SOS])</span>
 <span class="n">all_letters</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="s2">&quot; .,;&#39;-&quot;</span>
-<span class="n">n_letters</span>   <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_letters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="c1"># all letter plus [EOS] and [SOS] token</span>
-<span class="n">SOSIndex</span>    <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span>
-<span class="n">EOSIndex</span>    <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">2</span>
+<span class="n">n_letters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_letters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>  <span class="c1"># all letter plus [EOS] and [SOS] token</span>
+<span class="n">SOSIndex</span> <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">EOSIndex</span> <span class="o">=</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">2</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>The data consists of two things:
 a list of strings, called “categories”, contains all the categories (languages) for which we have data;
-a dictionary, called “namesData”, contains a list of names for each category.</p>
+a dictionary, called “names_data”, contains a list of names for each category.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.1: Inspect the data</span></strong></p>
 <ol class="arabic simple" start="0">
@@ -551,19 +550,19 @@ Look at the code and try to answer the exercise question of how this split is re
 <span class="c1">##################################################</span>
 
 <span class="n">train_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-<span class="n">test_data</span>  <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">split_percentage</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">namesData</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-    <span class="n">total_size</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-    <span class="n">test_size</span>     <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_size</span><span class="o">/</span><span class="n">split_percentage</span><span class="p">)</span>
-    <span class="n">train_size</span>    <span class="o">=</span> <span class="n">total_size</span> <span class="o">-</span> <span class="n">test_size</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">names_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="n">total_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">test_size</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_size</span> <span class="o">/</span> <span class="n">split_percentage</span><span class="p">)</span>
+    <span class="n">train_size</span> <span class="o">=</span> <span class="n">total_size</span> <span class="o">-</span> <span class="n">test_size</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">total_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">)</span>
-    <span class="n">indices</span>       <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_size</span><span class="p">)]</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_size</span><span class="p">)]</span>
     <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
     <span class="n">train_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">train_size</span><span class="p">]</span>
-    <span class="n">test_indices</span>  <span class="o">=</span> <span class="n">indices</span><span class="p">[(</span><span class="n">train_size</span><span class="o">+</span><span class="mi">1</span><span class="p">):(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
-    <span class="n">train_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_indices</span><span class="p">]</span>
-    <span class="n">test_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>  <span class="o">=</span> <span class="p">[</span><span class="n">namesData</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_indices</span><span class="p">]</span>
+    <span class="n">test_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[(</span><span class="n">train_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">train_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">names_data</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_indices</span><span class="p">]</span>
+    <span class="n">test_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">names_data</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">test_indices</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -621,16 +620,14 @@ The inclusion of dropout introduces a random element in the model during trainin
 <span class="c1">## define RNN</span>
 <span class="c1">##################################################</span>
 
+
 <span class="k">class</span> <span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span>
-                             <span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span>
-                             <span class="n">output_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">output_size</span><span class="p">,</span>
-                             <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -644,7 +641,7 @@ The inclusion of dropout introduces a random element in the model during trainin
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
 
-    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">init_hidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -660,21 +657,23 @@ The inclusion of dropout introduces a random element in the model during trainin
 <section id="helper-functions-for-training">
 <h2>Helper functions for training<a class="headerlink" href="#helper-functions-for-training" title="Permalink to this heading">#</a></h2>
 <p>For training, we will present the model with randomly sampled single items.
-This is why we define a ’randomTrainingPair’ function which returns, well, a random training pair (category and name).</p>
+This is why we define a ’random_training_pair’ function which returns, well, a random training pair (category and name).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
 <span class="c1">## helper functions for training</span>
 <span class="c1">##################################################</span>
 
+
 <span class="c1"># Random item from a list</span>
-<span class="k">def</span> <span class="nf">randomChoice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">random_choice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
 
+
 <span class="c1"># Get a random category and random line from that category</span>
-<span class="k">def</span> <span class="nf">randomTrainingPair</span><span class="p">():</span>
-    <span class="n">category</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
-    <span class="n">line</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">random_training_pair</span><span class="p">():</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">random_choice</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">random_choice</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">category</span><span class="p">,</span> <span class="n">line</span>
 </pre></div>
 </div>
@@ -682,27 +681,29 @@ This is why we define a ’randomTrainingPair’ function which returns, well, a
 </div>
 <p>We also need to make sure that the training and test data are in a format that the model understands.
 So, this is where we use vector representations for the categories and sequences of characters.
-For sequences of characters we distinguish those used as input to the model (’inputTensor’) and those used in training as what needs to be predicted (’targetTensor’).</p>
+For sequences of characters we distinguish those used as input to the model (’input_tensor’) and those used in training as what needs to be predicted (’target_tensor’).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># One-hot vector for category</span>
-<span class="k">def</span> <span class="nf">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
     <span class="n">li</span> <span class="o">=</span> <span class="n">categories</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_categories</span><span class="p">)</span>
     <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">tensor</span>
 
+
 <span class="c1"># One-hot matrix of first to last letters (not including [EOS]) for input</span>
 <span class="c1"># The first input is always [SOS]</span>
-<span class="k">def</span> <span class="nf">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
-    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
     <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">SOSIndex</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
         <span class="n">letter</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">]</span>
-        <span class="n">tensor</span><span class="p">[</span><span class="n">li</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">letter</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">tensor</span><span class="p">[</span><span class="n">li</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">letter</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">tensor</span>
 
-<span class="k">def</span> <span class="nf">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">target_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
     <span class="n">letter_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">])</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))]</span>
     <span class="n">letter_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOSIndex</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">letter_indexes</span><span class="p">)</span>
@@ -714,12 +715,12 @@ For sequences of characters we distinguish those used as input to the model (’
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make category, input, and target tensors from a random category, line pair</span>
-<span class="k">def</span> <span class="nf">randomTrainingExample</span><span class="p">():</span>
-    <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">randomTrainingPair</span><span class="p">()</span>
-    <span class="n">category_tensor</span> <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
-    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
+<span class="k">def</span> <span class="nf">random_training_example</span><span class="p">():</span>
+    <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">random_training_pair</span><span class="p">()</span>
+    <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
 </pre></div>
 </div>
 </div>
@@ -727,18 +728,18 @@ For sequences of characters we distinguish those used as input to the model (’
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.4: Understand the representational format </span></strong></p>
 <ol class="arabic simple">
-<li><p>Write a doc-string for the function ’randomTrainingExample’ that is short but completely explanatory regarding the format and meaning of its output.</p></li>
+<li><p>Write a doc-string for the function ’random_training_example’ that is short but completely explanatory regarding the format and meaning of its output.</p></li>
 </ol>
 </div></blockquote>
 <p>We use this timing function to keep track of training time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">timeSince</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">time_since</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">since</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">-=</span> <span class="n">m</span> <span class="o">*</span> <span class="mi">60</span>
-    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">m </span><span class="si">%d</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">m </span><span class="si">%d</span><span class="s2">s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -754,11 +755,12 @@ For sequences of characters we distinguish those used as input to the model (’
 <span class="c1">## single training pass</span>
 <span class="c1">##################################################</span>
 
+
 <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">):</span>
     <span class="c1"># reshape target tensor</span>
     <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># get a fresh hidden layer</span>
-    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">init_hidden</span><span class="p">()</span>
     <span class="c1"># reset cumulative loss</span>
     <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
@@ -773,7 +775,7 @@ For sequences of characters we distinguish those used as input to the model (’
     <span class="c1"># perform optimization</span>
     <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
     <span class="c1"># return prediction and loss</span>
-    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="c1"># / input_line_tensor.size(0)</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>  <span class="c1"># / input_line_tensor.size(0)</span>
 </pre></div>
 </div>
 </div>
@@ -799,12 +801,12 @@ For sequences of characters we distinguish those used as input to the model (’
 <span class="n">print_every</span> <span class="o">=</span> <span class="mi">5000</span>
 <span class="n">plot_every</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">all_losses</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># will be reset every &#39;plot_every&#39; iterations</span>
+<span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># will be reset every &#39;plot_every&#39; iterations</span>
 
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_iters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="o">*</span><span class="n">randomTrainingExample</span><span class="p">())</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="o">*</span><span class="n">random_training_example</span><span class="p">())</span>
     <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span>
 
     <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">plot_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -812,35 +814,35 @@ For sequences of characters we distinguish those used as input to the model (’
         <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">rolling_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_losses</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="n">print_every</span><span class="o">*</span><span class="p">(</span><span class="nb">iter</span><span class="o">//</span><span class="n">print_every</span><span class="p">):])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d%%</span><span class="s1">) </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeSince</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
-                                     <span class="nb">iter</span><span class="p">,</span>
-                                     <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-                                     <span class="n">rolling_mean</span><span class="p">))</span>
+        <span class="n">rolling_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_losses</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="n">print_every</span> <span class="o">*</span> <span class="p">(</span><span class="nb">iter</span> <span class="o">//</span> <span class="n">print_every</span><span class="p">)</span> <span class="p">:])</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d%%</span><span class="s2">) </span><span class="si">%.4f</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">time_since</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">iter</span><span class="p">,</span> <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">rolling_mean</span><span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0m 8s (5000 5%) 19.7095
-0m 18s (10000 10%) 18.9236
-0m 27s (15000 15%) 18.5409
-0m 36s (20000 20%) 18.2693
-0m 44s (25000 25%) 18.0792
-0m 53s (30000 30%) 17.9295
-1m 2s (35000 35%) 17.8005
-1m 11s (40000 40%) 17.7098
-1m 20s (45000 45%) 17.6422
-1m 28s (50000 50%) 17.5712
-1m 37s (55000 55%) 17.4996
-1m 46s (60000 60%) 17.4391
-1m 54s (65000 65%) 17.3925
-2m 3s (70000 70%) 17.3458
-2m 12s (75000 75%) 17.3080
-2m 21s (80000 80%) 17.2738
-2m 29s (85000 85%) 17.2379
-2m 38s (90000 90%) 17.2074
-2m 47s (95000 95%) 17.1815
-2m 56s (100000 100%) 17.1523
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0m 16s (5000 5%) 19.7382
+0m 32s (10000 10%) 18.8840
+0m 48s (15000 15%) 18.4567
+1m 3s (20000 20%) 18.1525
+1m 19s (25000 25%) 17.9657
+1m 35s (30000 30%) 17.8321
+1m 51s (35000 35%) 17.7116
+2m 7s (40000 40%) 17.6139
+2m 25s (45000 45%) 17.5286
+2m 42s (50000 50%) 17.4547
+2m 58s (55000 55%) 17.3905
+3m 15s (60000 60%) 17.3327
+3m 34s (65000 65%) 17.2782
+3m 53s (70000 70%) 17.2393
+4m 12s (75000 75%) 17.1918
+4m 29s (80000 80%) 17.1508
+4m 47s (85000 85%) 17.1184
+5m 4s (90000 90%) 17.0946
+5m 22s (95000 95%) 17.0668
+5m 40s (100000 100%) 17.0446
 </pre></div>
 </div>
 </div>
@@ -859,7 +861,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/fcc909ff03fd7eb52373d66b0047cceb9ecec82f95097ce5cdb7bae0dba64d2c.png" src="../_images/fcc909ff03fd7eb52373d66b0047cceb9ecec82f95097ce5cdb7bae0dba64d2c.png" />
+<img alt="../_images/3681277ff35613a46aefc2214e23e773ad0e3bc2c603ee414305c843ade4c057.png" src="../_images/3681277ff35613a46aefc2214e23e773ad0e3bc2c603ee414305c843ade4c057.png" />
 </div>
 </div>
 <blockquote>
@@ -880,18 +882,20 @@ We can use them to compare the model’s performance on the training and test da
 <span class="c1">## evaluation</span>
 <span class="c1">##################################################</span>
 
+
 <span class="k">def</span> <span class="nf">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="n">category_tensor</span>    <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
-    <span class="n">input_line_tensor</span>  <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">targetTensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">hidden</span>             <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
-    <span class="n">surprisal</span>          <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">init_hidden</span><span class="p">()</span>
+    <span class="n">surprisal</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
         <span class="n">surprisal</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="k">return</span><span class="p">(</span><span class="n">surprisal</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">surprisal</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
 
 <span class="k">def</span> <span class="nf">get_surprisal_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="n">surprisl_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -904,25 +908,27 @@ We can use them to compare the model’s performance on the training and test da
         <span class="c1"># training</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">category</span><span class="p">]:</span>
             <span class="n">item_surpr</span> <span class="o">=</span> <span class="n">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-            <span class="n">surprisl</span>  <span class="o">+=</span> <span class="n">item_surpr</span>
-            <span class="n">surp_avg</span>  <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">perplxty</span>  <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">surprisl</span> <span class="o">+=</span> <span class="n">item_surpr</span>
+            <span class="n">surp_avg</span> <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">perplxty</span> <span class="o">+=</span> <span class="n">item_surpr</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
         <span class="n">n_items</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
 
-        <span class="n">surprisl_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">surprisl</span> <span class="o">/</span><span class="n">n_items</span><span class="p">)</span>
-        <span class="n">surp_avg_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">surp_avg</span> <span class="o">/</span> <span class="n">n_items</span><span class="p">)</span>
-        <span class="n">perplxty_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">perplxty</span> <span class="o">/</span> <span class="n">n_items</span><span class="p">)</span>
+        <span class="n">surprisl_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">surprisl</span> <span class="o">/</span> <span class="n">n_items</span>
+        <span class="n">surp_avg_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">surp_avg</span> <span class="o">/</span> <span class="n">n_items</span>
+        <span class="n">perplxty_dict</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">perplxty</span> <span class="o">/</span> <span class="n">n_items</span>
 
-    <span class="k">return</span><span class="p">(</span><span class="n">surprisl_dict</span><span class="p">,</span> <span class="n">surp_avg_dict</span><span class="p">,</span> <span class="n">perplxty_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">surprisl_dict</span><span class="p">,</span> <span class="n">surp_avg_dict</span><span class="p">,</span> <span class="n">perplxty_dict</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">makeDF</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">make_df</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">):</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">)</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
     <span class="n">p</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">,</span> <span class="s2">&quot;surp_scaled&quot;</span><span class="p">,</span> <span class="s2">&quot;perplexity&quot;</span><span class="p">]</span>
-    <span class="k">return</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span>
 
-<span class="n">surprisal_test</span>  <span class="o">=</span> <span class="n">makeDF</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">test_data</span><span class="p">))</span>
-<span class="n">surprisal_train</span> <span class="o">=</span> <span class="n">makeDF</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">train_data</span><span class="p">))</span>
+
+<span class="n">surprisal_test</span> <span class="o">=</span> <span class="n">make_df</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">test_data</span><span class="p">))</span>
+<span class="n">surprisal_train</span> <span class="o">=</span> <span class="n">make_df</span><span class="p">(</span><span class="n">get_surprisal_dataset</span><span class="p">(</span><span class="n">train_data</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">mean surprisal (test):&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">surprisal_test</span><span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">mean surprisal (train):&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">surprisal_train</span><span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">]))</span>
@@ -930,9 +936,9 @@ We can use them to compare the model’s performance on the training and test da
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean surprisal (test): 18.016745242671462
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean surprisal (test): 18.66250513351783
 
-mean surprisal (train): 16.636244877269675
+mean surprisal (train): 16.595255817163405
 </pre></div>
 </div>
 </div>
@@ -956,31 +962,33 @@ mean surprisal (train): 16.636244877269675
 
 <span class="n">max_length</span> <span class="o">=</span> <span class="mi">20</span>
 
+
 <span class="c1"># make a prediction based on given sequence</span>
 <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">initial_sequence</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_length</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">initial_sequence</span>
 
-    <span class="n">category_tensor</span>    <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
-    <span class="n">input_line_tensor</span>  <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span>
-    <span class="n">hidden</span>             <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+    <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">init_hidden</span><span class="p">()</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="n">initial_sequence</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
 
     <span class="c1"># greedy decoding: choosing the most likely guess</span>
     <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">topi</span> <span class="o">=</span> <span class="n">topi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">topi</span> <span class="o">==</span> <span class="n">EOSIndex</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">+=</span> <span class="n">all_letters</span><span class="p">[</span><span class="n">topi</span><span class="p">]</span>
 
-    <span class="k">return</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
 
 <span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;German&quot;</span><span class="p">,</span> <span class="s2">&quot;Müll&quot;</span><span class="p">))</span>
@@ -990,10 +998,10 @@ mean surprisal (train): 16.636244877269675
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Müllerr
-Müllerr
-Mülligen
-Müllerr
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mülleres
+Mülleres
+Mülleres
+Mülleres
 </pre></div>
 </div>
 </div>
@@ -1009,10 +1017,10 @@ Müllerr
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kauka
-Kauka
-Kauka
-Kauko
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Takis
+Kasay
+Kasay
+Kasay
 </pre></div>
 </div>
 </div>
@@ -1039,8 +1047,8 @@ For instance, we can do this:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13.49710464477539
-18.95446014404297
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>19.864885330200195
+20.674480438232422
 </pre></div>
 </div>
 </div>
@@ -1063,16 +1071,16 @@ For instance, we can do this:</p>
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "kernels"
+            mode: "python"
         },
         kernelOptions: {
-            name: "kernels",
+            name: "python3",
             path: "./tutorials"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'kernels'</script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               

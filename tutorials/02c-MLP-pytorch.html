@@ -476,7 +476,6 @@ In addition to the previous sheet, In order to have a convenient, we will use Py
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -484,7 +483,8 @@ In addition to the previous sheet, In order to have a convenient, we will use Py
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -500,22 +500,27 @@ Here is its definition and a plot to show what the “ground truth” looks like
 <span class="c1">## ground-truth model</span>
 <span class="c1">##################################################</span>
 
-<span class="k">def</span> <span class="nf">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
 
-<span class="c1"># create linear sequence (x) and apply goalFun (y)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">goal_fun</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a non-linear function that is the &quot;ground truth&quot; for this example.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+
+
+<span class="c1"># create linear sequence (x) and apply goal_fun(y)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">goal_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <span class="c1"># plot the function</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span> <span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span> <span class="p">:</span> <span class="n">y</span><span class="p">})</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x (input)&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y (output)&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x (input)&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y (output)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/354a305df7ad1e04a5113de937c1ddac4d8aa3165e75bbba6fe70092a83dbc33.png" src="../_images/354a305df7ad1e04a5113de937c1ddac4d8aa3165e75bbba6fe70092a83dbc33.png" />
+<img alt="../_images/60b628da9226b484cdac4cbd3f9368fbe843819e7fc5851dd5bd971e2f0bf676.png" src="../_images/60b628da9226b484cdac4cbd3f9368fbe843819e7fc5851dd5bd971e2f0bf676.png" />
 </div>
 </div>
 <p>The training data consists of 100 pairs of  <span class="math notranslate nohighlight">\((x,y)\)</span> values.
@@ -527,25 +532,25 @@ For each sampled <span class="math notranslate nohighlight">\(x\)</span>, we com
 <span class="c1">## generate training data (with noise)</span>
 <span class="c1">##################################################</span>
 
-<span class="n">nObs</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># number of observations</span>
+<span class="n">n_obs</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of observations</span>
 
 <span class="c1"># get noise around y observations</span>
-<span class="n">yNormal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">yNoise</span>  <span class="o">=</span> <span class="n">yNormal</span><span class="o">.</span><span class="n">sample</span><span class="p">([</span><span class="n">nObs</span><span class="p">])</span>
+<span class="n">y_normal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">y_noise</span> <span class="o">=</span> <span class="n">y_normal</span><span class="o">.</span><span class="n">sample</span><span class="p">([</span><span class="n">n_obs</span><span class="p">])</span>
 
 <span class="c1"># get observations</span>
-<span class="n">xObs</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">([</span><span class="n">nObs</span><span class="p">])</span><span class="o">-</span><span class="mi">5</span>    <span class="c1"># uniform from [-5,5]</span>
-<span class="n">yObs</span> <span class="o">=</span> <span class="n">xObs</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">xObs</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">xObs</span><span class="p">)</span> <span class="o">+</span> <span class="n">yNoise</span>
+<span class="n">x_obs</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">([</span><span class="n">n_obs</span><span class="p">])</span> <span class="o">-</span> <span class="mi">5</span>  <span class="c1"># uniform from [-5,5]</span>
+<span class="n">y_obs</span> <span class="o">=</span> <span class="n">goal_fun</span><span class="p">(</span><span class="n">x_obs</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_noise</span>
 
 <span class="c1"># plot the data</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;xObs&#39;</span> <span class="p">:</span> <span class="n">xObs</span><span class="p">,</span> <span class="s1">&#39;yObs&#39;</span> <span class="p">:</span> <span class="n">yObs</span><span class="p">})</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;yObs&#39;</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x_obs&quot;</span><span class="p">:</span> <span class="n">x_obs</span><span class="p">,</span> <span class="s2">&quot;y_obs&quot;</span><span class="p">:</span> <span class="n">y_obs</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x_obs&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_obs&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/d96ca2fc1555ca6d824a0b01bbba5c2506a188397e10bcd5c21d81e2ce397bbf.png" src="../_images/d96ca2fc1555ca6d824a0b01bbba5c2506a188397e10bcd5c21d81e2ce397bbf.png" />
+<img alt="../_images/3298054bcafdb90865ef4b0af632bf9522c7bd4da5d164aaab20e0ddd328ac6e.png" src="../_images/3298054bcafdb90865ef4b0af632bf9522c7bd4da5d164aaab20e0ddd328ac6e.png" />
 </div>
 </div>
 </section>
@@ -559,9 +564,9 @@ We use a 3-layer MLP, each hidden layer with dimension 10:</p>
 <span class="c1">## network dimension parameters</span>
 <span class="c1">##################################################</span>
 
-<span class="n">nInput</span>  <span class="o">=</span> <span class="mi">1</span>
-<span class="n">nHidden</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">nOutput</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">n_input</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">n_hidden</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">n_output</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
@@ -570,8 +575,8 @@ We use a 3-layer MLP, each hidden layer with dimension 10:</p>
 Below, we define our feed-forward neural network as a class extending `nn.Module`.
 Minimally, we have to define two functions for this to work:</p>
 <ol class="arabic simple">
-<li><p>the <strong>initialization</strong> function `_<sub>init</sub>__` which defines which variables (mostly, but not exclusively: parameters) our model has (using `nn.Linear` instantiates a linear layer with all the trainable parameters (weights and biases) implicitly);</p></li>
-<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values (recall the function `singleForwardPass` from sheet 4.1; PyTorch automatically batches the computation implicitly).</p></li>
+<li><p>the <strong>initialization</strong> function `__<sub>init</sub>__` which defines which variables (mostly, but not exclusively: parameters) our model has (using `nn.Linear` instantiates a linear layer with all the trainable parameters (weights and biases) implicitly);</p></li>
+<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values (recall the function `single_forward_pass` from sheet 4.1; PyTorch automatically batches the computation implicitly).</p></li>
 </ol>
 <p>Since PyTorch allows flexibility in how to define neural network modules, we look at two variants below, one explicit and one more concise.
 They should implement the exact same model and work the same way eventually.</p>
@@ -584,29 +589,32 @@ They should implement the exact same model and work the same way eventually.</p>
 <span class="c1">##    -- explicit version --</span>
 <span class="c1">##################################################</span>
 
+
 <span class="k">class</span> <span class="nc">MLPexplicit</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multi-layer perceptron for non-linear regression.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MLPexplicit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nInput</span>  <span class="o">=</span> <span class="n">nInput</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span> <span class="o">=</span> <span class="n">nHidden</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nOutput</span> <span class="o">=</span> <span class="n">nOutput</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nInput</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nHidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nOutput</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span>    <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_input</span> <span class="o">=</span> <span class="n">n_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span> <span class="o">=</span> <span class="n">n_hidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_output</span> <span class="o">=</span> <span class="n">n_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_output</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">h1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-        <span class="n">h2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear2</span><span class="p">(</span><span class="n">h1</span><span class="p">))</span>
-        <span class="n">h3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear3</span><span class="p">(</span><span class="n">h2</span><span class="p">))</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear2</span><span class="p">(</span><span class="n">h1</span><span class="p">))</span>
+        <span class="n">h3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear3</span><span class="p">(</span><span class="n">h2</span><span class="p">))</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear4</span><span class="p">(</span><span class="n">h3</span><span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
 
-<span class="n">mlpExplicit</span> <span class="o">=</span> <span class="n">MLPexplicit</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+
+<span class="n">mlp_explicit</span> <span class="o">=</span> <span class="n">MLPexplicit</span><span class="p">(</span><span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -614,71 +622,71 @@ They should implement the exact same model and work the same way eventually.</p>
 <p>We can access the current parameter values of this model instance like so:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mlpExplicit</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">mlp_explicit</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.7162]
- [ 0.3054]
- [ 0.5023]
- [-0.364 ]
- [-0.0214]
- [-0.5991]
- [-0.7676]
- [ 0.1173]
- [-0.9104]
- [-0.8084]]
-[ 0.9982  0.0229 -0.9914 -0.1927  0.487   0.1257  0.4986 -0.7426  0.7583
- -0.2647]
-[[-3.055e-01  3.130e-02  2.002e-01 -2.435e-01 -1.218e-01 -1.474e-01
-  -2.876e-01  1.764e-01  2.490e-01  2.100e-03]
- [ 1.892e-01 -1.904e-01  6.000e-04 -2.335e-01  1.297e-01  4.140e-02
-  -1.482e-01 -7.110e-02 -8.120e-02 -1.094e-01]
- [-1.195e-01 -2.148e-01  3.310e-02  1.756e-01 -1.996e-01 -2.229e-01
-   1.505e-01 -1.807e-01 -8.000e-02  1.660e-01]
- [-8.970e-02 -8.230e-02 -1.320e-01  2.171e-01 -4.820e-02 -2.780e-02
-  -4.950e-02  7.720e-02  2.308e-01 -2.290e-01]
- [-1.457e-01  1.950e-01 -1.230e-01 -1.210e-02  1.476e-01 -2.768e-01
-  -2.990e-02 -2.439e-01 -1.290e-01 -1.570e-01]
- [-1.483e-01  2.570e-02  1.859e-01 -1.860e-02  8.390e-02  4.660e-02
-   3.138e-01  3.088e-01  5.340e-02 -7.930e-02]
- [-1.121e-01 -5.410e-02  1.632e-01  2.295e-01  2.396e-01  2.227e-01
-  -2.530e-01  1.595e-01 -2.933e-01  2.430e-02]
- [ 9.330e-02 -1.497e-01  1.490e-02  1.334e-01 -5.120e-02 -2.379e-01
-   2.000e-04  2.877e-01  1.530e-01  3.062e-01]
- [ 1.574e-01  8.640e-02  2.192e-01  2.398e-01 -2.757e-01  1.054e-01
-   1.015e-01  1.359e-01 -1.480e-02 -6.500e-03]
- [ 5.510e-02  1.240e-02 -1.559e-01 -9.350e-02  1.210e-02 -1.320e-02
-  -2.500e-01  1.674e-01  5.770e-02 -2.701e-01]]
-[-0.28   -0.2966  0.1204 -0.0055  0.068  -0.1341 -0.2334 -0.2019 -0.119
- -0.2133]
-[[-0.0344 -0.2099  0.2962 -0.0606 -0.3138  0.2037  0.2599 -0.2678  0.0954
-   0.066 ]
- [-0.296   0.1794  0.238  -0.1659  0.17   -0.0864  0.2431  0.0091 -0.1223
-  -0.2202]
- [ 0.1794 -0.0054 -0.0117  0.0105  0.2139  0.175   0.1593  0.2047 -0.213
-  -0.2088]
- [-0.038  -0.3097 -0.1158 -0.2379 -0.2893 -0.308   0.2778  0.0506 -0.2043
-   0.1834]
- [ 0.1747  0.0571 -0.0163 -0.0682 -0.129  -0.0885 -0.1488  0.0473  0.1942
-   0.0344]
- [-0.3096 -0.1078  0.2341  0.0812 -0.1202 -0.0568  0.1159  0.1804 -0.0568
-   0.0194]
- [ 0.0972 -0.1097 -0.0774 -0.0234 -0.2052 -0.0326  0.1652 -0.017   0.1867
-   0.2162]
- [ 0.2547 -0.3039  0.2102  0.0243 -0.2842  0.0757 -0.0434  0.2334  0.154
-   0.1896]
- [ 0.0174  0.1017 -0.005  -0.0147  0.2275 -0.0719 -0.0507 -0.0448  0.3158
-   0.1767]
- [-0.2565 -0.0234  0.1479  0.2945 -0.1515 -0.261  -0.1538 -0.2376  0.1796
-  -0.1584]]
-[ 0.3048 -0.1691  0.1527  0.0358  0.0532  0.101  -0.1896 -0.0022 -0.2609
- -0.1464]
-[[ 0.1555  0.1687  0.3115  0.1524 -0.2821 -0.0936 -0.1559  0.0102 -0.1415
-   0.1817]]
-[-0.1016]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[-0.0076]
+ [-0.8415]
+ [ 0.9536]
+ [-0.6464]
+ [-0.9964]
+ [-0.7288]
+ [ 0.1196]
+ [-0.462 ]
+ [-0.8668]
+ [-0.9444]]
+[-0.5211  0.0849  0.5    -0.2557  0.9653 -0.4786  0.5713  0.6843  0.2133
+  0.342 ]
+[[-0.0769 -0.2313  0.0227  0.2852  0.0166  0.2986 -0.0292  0.1179  0.2564
+  -0.2944]
+ [ 0.1009  0.0552 -0.0447  0.2081  0.2009 -0.033  -0.1969  0.1945 -0.1427
+   0.0546]
+ [-0.2106 -0.1128  0.0149  0.237   0.095   0.2698 -0.0059 -0.1793 -0.2842
+   0.2865]
+ [-0.1744 -0.0109 -0.1259 -0.1426  0.0955 -0.3025 -0.1744 -0.2543  0.2068
+  -0.0964]
+ [ 0.0934 -0.0013 -0.2462 -0.2037 -0.0994  0.2537 -0.1462 -0.2201  0.1222
+   0.2095]
+ [-0.107  -0.253   0.1784  0.1452 -0.0968  0.1959  0.0706 -0.0282 -0.2097
+   0.1417]
+ [-0.0523  0.2028  0.2256  0.1229 -0.1682  0.0451  0.0309  0.1407  0.1962
+   0.0854]
+ [ 0.2872 -0.0421  0.3001  0.0915 -0.0519 -0.2862 -0.1163 -0.2389 -0.0924
+   0.2941]
+ [ 0.2323  0.0592  0.212  -0.071  -0.0909  0.1527  0.0588 -0.2353 -0.0547
+   0.0211]
+ [ 0.1491  0.2182  0.2239  0.2984 -0.1006 -0.1116 -0.0044  0.251  -0.0451
+   0.2208]]
+[ 0.039  -0.0528  0.3162  0.0257  0.0663 -0.2846  0.0646  0.2537 -0.1269
+  0.2371]
+[[ 0.3099  0.2536 -0.0446  0.1587  0.0044 -0.255  -0.074  -0.1321  0.2919
+  -0.1839]
+ [-0.1293  0.0429  0.2682  0.2615  0.0671 -0.2576 -0.1129  0.0199 -0.0655
+  -0.043 ]
+ [-0.1449  0.1796  0.0972 -0.1241  0.2595 -0.151  -0.1908  0.286  -0.2029
+   0.2647]
+ [ 0.1574 -0.3025  0.2976  0.1041  0.0947  0.0225  0.0479 -0.0493 -0.2154
+  -0.2965]
+ [-0.2934  0.0936 -0.3114 -0.2956  0.2425  0.1305 -0.046  -0.1408  0.0655
+   0.023 ]
+ [-0.0155  0.1967  0.2333 -0.179   0.      0.0348  0.074   0.2954 -0.2073
+  -0.2232]
+ [ 0.1136 -0.0556 -0.0454  0.315   0.2971  0.0509  0.1394  0.2337  0.0912
+  -0.256 ]
+ [-0.1774  0.2738  0.0386 -0.034   0.2706 -0.0666 -0.2664  0.0419 -0.1732
+   0.0622]
+ [ 0.2011  0.276  -0.0453 -0.1481 -0.0383 -0.2165  0.1897 -0.1638  0.1007
+  -0.2027]
+ [-0.3049  0.2323  0.0017  0.2579  0.0675  0.1464 -0.1149  0.195  -0.1961
+  -0.2143]]
+[ 0.2373 -0.0853  0.016   0.1031  0.1161 -0.1396  0.0505  0.2276 -0.2393
+  0.1518]
+[[ 0.2711  0.1264 -0.2712 -0.2633  0.1861 -0.2758  0.0348 -0.2591 -0.3013
+   0.2468]]
+[0.2455]
 </pre></div>
 </div>
 </div>
@@ -701,26 +709,29 @@ They should implement the exact same model and work the same way eventually.</p>
 <span class="c1">##    -- condensed version --</span>
 <span class="c1">##################################################</span>
 
+
 <span class="k">class</span> <span class="nc">MLPcondensed</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multi-layer perceptron for non-linear regression.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="n">mlpCondensed</span> <span class="o">=</span> <span class="n">MLPcondensed</span><span class="p">(</span><span class="n">nInput</span><span class="p">,</span> <span class="n">nHidden</span><span class="p">,</span> <span class="n">nOutput</span><span class="p">)</span>
+
+<span class="n">mlp_condensed</span> <span class="o">=</span> <span class="n">MLPcondensed</span><span class="p">(</span><span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -730,7 +741,7 @@ They should implement the exact same model and work the same way eventually.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># which model to use from here onwards</span>
 <span class="c1"># model = mlpExplicit</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">mlpCondensed</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlp_condensed</span>
 </pre></div>
 </div>
 </div>
@@ -756,29 +767,31 @@ The class <strong>DataLoader</strong> takes a `dataset` object as input and retu
 <span class="c1">## representing train data as a Dataset object</span>
 <span class="c1">##################################################</span>
 
-<span class="k">class</span> <span class="nc">nonLinearRegressionData</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+
+<span class="k">class</span> <span class="nc">NonLinearRegressionData</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Custom &#39;Dataset&#39; object for our regression data.</span>
 <span class="sd">    Must implement these functions: __init__, __len__, and __getitem__.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xObs</span><span class="p">,</span> <span class="n">yObs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xObs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xObs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xObs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">yObs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yObs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yObs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_obs</span><span class="p">,</span> <span class="n">y_obs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_obs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_obs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_obs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_obs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_obs</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xObs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_obs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="n">xObs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">yObs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x_obs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">y_obs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
 
 <span class="c1"># instantiate Dataset object for current training data</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">nonLinearRegressionData</span><span class="p">(</span><span class="n">xObs</span><span class="p">,</span> <span class="n">yObs</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">NonLinearRegressionData</span><span class="p">(</span><span class="n">x_obs</span><span class="p">,</span> <span class="n">y_obs</span><span class="p">)</span>
 
 <span class="c1"># instantiate DataLoader</span>
 <span class="c1">#    we use the 4 batches of 25 observations each (full data  has 100 observations)</span>
 <span class="c1">#    we also shuffle the data</span>
-<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span> <span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -788,52 +801,51 @@ The class <strong>DataLoader</strong> takes a `dataset` object as input and retu
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
     <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In: &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Out:&quot;</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In: </span><span class="si">{</span><span class="nb">input</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Out:</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>In:  tensor([ 1.3828, -1.5540,  4.7408,  1.2476,  4.4112,  0.6601,  0.3932, -2.5595,
-        -0.6360, -2.8668,  4.7704,  3.7725,  3.4049, -3.7961, -0.2344, -4.2058,
-        -1.9234, -3.2896,  2.5081,  2.1769, -2.8967,  3.2554,  0.5577,  2.2621,
-        -3.5312])
-Out: tensor([  21.1964,  -14.1183,   75.1349,   10.4310,   88.7715,   41.5962,
-          10.8885,   10.1166,  -12.2414,  -33.0621,   80.0496,   39.4490,
-          40.6922,  -74.2503,  -16.9134, -112.5062,   15.8564,  -69.8026,
-         -19.7569,  -10.9068,   -3.3683,   33.5449,   35.4243,  -34.1715,
-         -68.2611]) 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>In: tensor([-4.4495, -2.5819, -4.7650,  0.1632, -2.3451, -1.6135, -1.6223,  0.1976,
+         3.7169,  3.3746,  4.5931, -2.8005, -0.0434, -1.8540,  0.0562, -4.4078,
+         2.9046,  3.4005, -0.7086, -2.1871,  3.0338, -4.3793, -4.7298,  1.7743,
+        -3.4155])
+Out:tensor([-121.5500,    7.0789, -133.6013,    2.2198,  -21.6659,   -1.4612,
+          -5.7734,    1.6199,   61.5975,   43.4716,   65.3842,   -1.3931,
+          -6.2188,   -0.4141,    0.6194, -131.9025,   20.4001,   46.9520,
+         -43.0037,   18.1146,   23.4007,  -94.9994, -147.4500,  -23.9163,
+         -52.8589])
 
-In:  tensor([-2.5585e+00, -1.5232e+00,  4.9897e+00, -4.7488e-03, -1.1030e+00,
-        -2.9388e+00, -1.5989e+00,  4.0657e+00, -4.0635e+00,  4.8487e+00,
-         2.1542e+00,  2.5189e+00, -3.3402e+00,  2.4760e+00,  2.8843e+00,
-        -4.7447e+00,  1.6738e+00,  1.6872e-01, -2.0779e+00, -2.7700e+00,
-         3.6921e+00, -2.0048e+00, -1.3819e+00,  2.0519e+00,  3.4938e-01])
-Out: tensor([ -15.7838,  -26.1753,   98.2247,   26.9904,  -28.8237,  -29.7076,
-          -6.4436,   97.0686, -108.6754,  104.0133,  -18.6621,  -22.2836,
-         -55.6281,  -26.3065,    6.3598, -109.7286,   -4.6981,   -0.3503,
-           1.8797,   -0.1744,   55.1923,   25.1901,  -13.9514,  -27.8320,
-          34.6641]) 
+In: tensor([ 2.2630, -4.0369,  0.3773,  0.2532,  4.5453,  4.2955, -1.3915,  2.7552,
+        -0.6925, -2.3938, -1.6076,  1.6834, -2.8546,  3.2283,  3.8123,  3.3403,
+         0.9574, -2.0644, -3.9521,  0.0436,  2.2180,  2.3797, -4.7454, -3.7530,
+        -2.8264])
+Out:tensor([ -32.3442, -122.4230,   14.2478,    1.3011,  104.4167,  102.6514,
+          -2.1359,    1.3875,  -32.5973,   16.5617,  -16.8176,    5.5437,
+          -4.1630,   23.9920,   55.6051,   41.1025,   38.8970,   18.9164,
+         -87.8666,   15.2518,   -6.0591,  -15.5863, -125.6087,  -90.5321,
+         -10.3973])
 
-In:  tensor([-1.7982, -2.3786, -3.4968,  1.9667, -1.0364,  2.9216,  1.5580,  2.3318,
-         2.0294, -4.5495,  1.9434,  0.2134, -3.2214, -3.6137, -4.4637, -1.9185,
-         1.2278,  0.2785, -2.1322, -3.9876,  3.1617, -1.2628,  1.3051, -2.9396,
-         3.7625])
-Out: tensor([ -16.6213,    5.4903,  -75.9469,  -12.8497,  -15.2615,   16.9521,
-           5.6745,  -20.6827,   -9.4707, -108.6720,  -18.3693,    9.0777,
-         -67.6207,  -90.9294, -123.1380,   13.4198,   27.2869,    2.1350,
-          -1.4973, -106.7678,   33.8070,  -31.4955,   11.8766,  -22.6697,
-          55.0992]) 
+In: tensor([-3.9640,  0.6017,  0.6880,  0.9468, -1.4264, -1.0024,  4.7179,  3.5653,
+         2.5318,  1.0374,  4.7767,  0.7110, -0.6955, -2.7494,  4.0279, -0.5396,
+         3.4075,  0.9538, -4.6411, -1.8022, -0.9450,  3.4118,  2.7496,  2.6096,
+        -0.6654])
+Out:tensor([ -77.7501,   27.7172,   36.9245,   16.8191,   -6.6196,  -23.5388,
+          88.0235,   45.1277,   -6.0365,   30.0066,   76.0195,   42.6423,
+         -11.5127,  -24.7764,   69.8224,  -21.5756,   46.9476,   37.1051,
+        -119.4592,    1.4126,  -21.1727,   47.0679,    1.6114,   -5.0246,
+         -37.5510])
 
-In:  tensor([-0.2786,  4.7119, -0.3200,  3.9973, -2.0390, -2.8214,  0.4267,  2.7361,
-        -3.9797,  3.5863, -0.9006, -0.9271, -1.7847,  4.9021, -4.1716, -1.0884,
-        -0.6948,  1.5614,  3.5475, -1.1978,  2.6971,  0.8780,  1.7582, -2.6990,
-         1.5671])
-Out: tensor([ -13.7211,  103.9179,   -6.7414,   78.8237,    3.5796,  -12.3277,
-          30.2857,  -18.2537, -106.1096,   53.9126,  -31.4487,   -9.8114,
-          11.3264,   81.8970, -114.7183,  -18.6803,  -28.0432,    4.3099,
-          42.3780,   -7.9575,  -15.2780,   29.7949,  -23.6074,   -9.2604,
-           1.5238]) 
+In: tensor([ 2.9079,  4.1315,  0.0575, -2.4921, -2.7523,  4.3927, -3.9023, -2.3946,
+        -4.3009, -0.0370,  0.2317,  4.1652,  3.1014, -4.9101, -3.1524,  4.2815,
+         4.0928, -0.2689,  1.6177, -3.7121, -4.7293, -4.5396,  3.4614,  0.2180,
+         1.3488])
+Out:tensor([  20.1371,   82.1433,    3.2099,   20.7502,   -4.5580,   83.6555,
+        -113.4812,    1.6265, -104.7873,   10.2406,   30.3842,   67.8441,
+          10.0513, -140.1428,  -47.4315,   72.9185,   66.8981,  -13.1600,
+           5.2063,  -89.8697, -129.4619, -118.5045,   51.6166,    5.1447,
+          -5.2186])
 </pre></div>
 </div>
 </div>
@@ -852,79 +864,80 @@ Note that we need to slightly reshape the input data to have the model compute t
 <span class="c1"># Define the loss function and optimizer</span>
 <span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
-<span class="n">nTrainSteps</span> <span class="o">=</span> <span class="mi">50000</span>
+<span class="n">n_train_steps</span> <span class="o">=</span> <span class="mi">50000</span>
 
 <span class="c1"># Run the training loop</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nTrainSteps</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_train_steps</span><span class="p">):</span>
 
-  <span class="c1"># Set current loss value</span>
-  <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="c1"># Set current loss value</span>
+    <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-  <span class="c1"># Iterate over the DataLoader for training data</span>
-  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="c1"># Get inputs</span>
-    <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span>
-    <span class="c1"># Zero the gradients</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="c1"># Perform forward pass (make sure to supply the input in the right way)</span>
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-    <span class="c1"># Compute loss</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-    <span class="c1"># Perform backward pass</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="c1"># Perform optimization</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="c1"># Print statistics</span>
-    <span class="n">current_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="c1"># Iterate over the DataLoader for training data</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># Get inputs</span>
+        <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># Zero the gradients</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="c1"># Perform forward pass (make sure to supply the input in the right way)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="c1"># Compute loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="c1"># Perform backward pass</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="c1"># Perform optimization</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="c1"># Print statistics</span>
+        <span class="n">current_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loss after epoch </span><span class="si">%5d</span><span class="s1">: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span>
-            <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_loss</span><span class="p">))</span>
-      <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss after epoch </span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current_loss</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <span class="c1"># Process is complete.</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training process has finished.&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training process has finished.&quot;</span><span class="p">)</span>
 
-<span class="n">yPred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">o</span><span class="p">]))</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">xObs</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">o</span><span class="p">]))</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">x_obs</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
 <span class="c1"># plot the data</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;xObs&#39;</span> <span class="p">:</span> <span class="n">xObs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                  <span class="s1">&#39;yObs&#39;</span> <span class="p">:</span> <span class="n">yObs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-                  <span class="s1">&#39;yPred&#39;</span><span class="p">:</span> <span class="n">yPred</span><span class="p">})</span>
-<span class="n">dWide</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yObs&#39;</span><span class="p">,</span> <span class="s1">&#39;yPred&#39;</span><span class="p">])</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">dWide</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;xObs&#39;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">hue</span> <span class="o">=</span> <span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">goalFun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;x_obs&quot;</span><span class="p">:</span> <span class="n">x_obs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="s2">&quot;y_obs&quot;</span><span class="p">:</span> <span class="n">y_obs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="s2">&quot;y_pred&quot;</span><span class="p">:</span> <span class="n">y_pred</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">d_wide</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">id_vars</span><span class="o">=</span><span class="s2">&quot;x_obs&quot;</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y_obs&quot;</span><span class="p">,</span> <span class="s2">&quot;y_pred&quot;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d_wide</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x_obs&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">goal_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss after epoch  2500: 3863.520
-Loss after epoch  5000: 3267.784
-Loss after epoch  7500: 2239.946
-Loss after epoch 10000: 1658.311
-Loss after epoch 12500: 895.697
-Loss after epoch 15000: 686.850
-Loss after epoch 17500: 512.686
-Loss after epoch 20000: 451.440
-Loss after epoch 22500: 429.563
-Loss after epoch 25000: 418.115
-Loss after epoch 27500: 410.994
-Loss after epoch 30000: 406.424
-Loss after epoch 32500: 403.176
-Loss after epoch 35000: 400.792
-Loss after epoch 37500: 399.390
-Loss after epoch 40000: 397.837
-Loss after epoch 42500: 396.263
-Loss after epoch 45000: 394.663
-Loss after epoch 47500: 393.568
-Loss after epoch 50000: 392.571
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss after epoch  2500: 2956.298
+Loss after epoch  5000: 1596.497
+Loss after epoch  7500: 740.628
+Loss after epoch 10000: 522.447
+Loss after epoch 12500: 473.209
+Loss after epoch 15000: 450.191
+Loss after epoch 17500: 441.309
+Loss after epoch 20000: 436.642
+Loss after epoch 22500: 433.959
+Loss after epoch 25000: 432.140
+Loss after epoch 27500: 430.475
+Loss after epoch 30000: 428.987
+Loss after epoch 32500: 427.638
+Loss after epoch 35000: 425.664
+Loss after epoch 37500: 424.004
+Loss after epoch 40000: 422.595
+Loss after epoch 42500: 419.309
+Loss after epoch 45000: 417.816
+Loss after epoch 47500: 416.479
+Loss after epoch 50000: 415.121
 Training process has finished.
 </pre></div>
 </div>
-<img alt="../_images/680c6098b12e051be24cae1a7d6501085d7eb6e5b0c1eab48a3d46704687d41b.png" src="../_images/680c6098b12e051be24cae1a7d6501085d7eb6e5b0c1eab48a3d46704687d41b.png" />
+<img alt="../_images/d60c81e82fd532e149203562194e08e71aebdc7a74483c1b811ca55c5e0139cb.png" src="../_images/d60c81e82fd532e149203562194e08e71aebdc7a74483c1b811ca55c5e0139cb.png" />
 </div>
 </div>
 <blockquote>
@@ -946,16 +959,16 @@ Training process has finished.
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "kernels"
+            mode: "python"
         },
         kernelOptions: {
-            name: "kernels",
+            name: "python3",
             path: "./tutorials"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'kernels'</script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               

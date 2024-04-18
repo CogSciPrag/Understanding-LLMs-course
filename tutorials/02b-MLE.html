@@ -482,7 +482,8 @@ Finally, we use the `warnings` package to suppress all warning messages in the n
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -490,16 +491,16 @@ Finally, we use the `warnings` package to suppress all warning messages in the n
 </section>
 <section id="true-distribution-training-data">
 <h2>True distribution &amp; training data<a class="headerlink" href="#true-distribution-training-data" title="Permalink to this heading">#</a></h2>
-<p>The “true distribution” that generates the data is a normal distribution with a mean (location) stored in the variable `trueLocation`.
+<p>The “true distribution” that generates the data is a normal distribution with a mean (location) stored in the variable `true_location`.
 (We keep the scale parameter (standard deviation) fixed at a known value of 1.)
 The `torch.distributions` package contains ready-made probability distributions for sampling.
-So, here we define the true distribution, and take `nObs` samples from it, the set of which we call “training data”.</p>
+So, here we define the true distribution, and take `n_obs` samples from it, the set of which we call “training data”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nObs</span>           <span class="o">=</span> <span class="mi">10000</span>
-<span class="n">trueLocation</span>   <span class="o">=</span> <span class="mi">0</span> <span class="c1"># mean of a normal</span>
-<span class="n">trueDist</span>       <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">trueLocation</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-<span class="n">trainData</span>      <span class="o">=</span> <span class="n">trueDist</span><span class="o">.</span><span class="n">sample</span><span class="p">([</span><span class="n">nObs</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_obs</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">true_location</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># mean of a normal</span>
+<span class="n">true_dist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">true_location</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">true_dist</span><span class="o">.</span><span class="n">sample</span><span class="p">([</span><span class="n">n_obs</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -508,13 +509,13 @@ So, here we define the true distribution, and take `nObs` samples from it, the s
 The empirical mean need not be identical to the true mean!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">empirical_mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trainData</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Empirical mean (mean of training data): </span><span class="si">%.5f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">empirical_mean</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">empirical_mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Empirical mean (mean of training data): </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">empirical_mean</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Empirical mean (mean of training data): 0.00424
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Empirical mean (mean of training data): -0.00150
 </pre></div>
 </div>
 </div>
@@ -522,13 +523,13 @@ The empirical mean need not be identical to the true mean!</p>
 <p>Here is a density plot of the training data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">trainData</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/cbd860bd9ae1f52bf94fd4175f9455ddf9a7cb818e63d2f3729729ca8e3ac835.png" src="../_images/cbd860bd9ae1f52bf94fd4175f9455ddf9a7cb818e63d2f3729729ca8e3ac835.png" />
+<img alt="../_images/a6e68074d057bbcad6721126bea6cf914df7327fc649e2f6f60d6c8f0d1aafc9.png" src="../_images/a6e68074d057bbcad6721126bea6cf914df7327fc649e2f6f60d6c8f0d1aafc9.png" />
 </div>
 </div>
 </section>
@@ -545,7 +546,7 @@ Since we want to “massage it” through updating, we must tell PyTorch that it
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">location</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span> <span class="n">location</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -564,8 +565,8 @@ To instantiate it, we need to tell it two things:</p>
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.0000001</span>
-<span class="n">opt</span>          <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">([</span><span class="n">location</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="n">learningRate</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0000001</span>
+<span class="n">opt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">([</span><span class="n">location</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -618,13 +619,13 @@ Goodness can be measured in many ways.
 Here we consider the likelihood: how likely is the training data under the current model?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span>     <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">trainData</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">train_data</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(19263.4629, grad_fn=&lt;NegBackward0&gt;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(19274.0312, grad_fn=&lt;NegBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -639,8 +640,8 @@ This is the so-called backpropagation step.</p>
 <p>Concretely, at the outset, the gradient information for `location` is “NONE”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (initial)                = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (initial) = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (initial)                = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (initial) = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -655,14 +656,14 @@ Gradient information (initial) = None
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after backprop)                = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after backprop) = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after backprop)                = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after backprop) = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Value (after backprop)                = 1.0
-Gradient information (after backprop) = 9957.587890625
+Gradient information (after backprop) = 10015.0458984375
 </pre></div>
 </div>
 </div>
@@ -676,14 +677,14 @@ It knows which parameters to update (we told it), so the relevant update functio
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after step)                = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after step) = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after step)                = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after step) = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Value (after step)                = 0.9990042412109374
-Gradient information (after step) = 9957.587890625
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Value (after step)                = 0.9989984954101563
+Gradient information (after step) = 10015.0458984375
 </pre></div>
 </div>
 </div>
@@ -697,13 +698,13 @@ This zero-ing of the gradients is again something we do holistically (for all pa
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">opt</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after zero-ing)                = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after zero-ing) = </span><span class="si">{</span><span class="w"> </span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (after zero-ing)                = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient information (after zero-ing) = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">grad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Value (after zero-ing)                = 0.9990042412109374
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Value (after zero-ing)                = 0.9989984954101563
 Gradient information (after zero-ing) = None
 </pre></div>
 </div>
@@ -713,20 +714,25 @@ Gradient information (after zero-ing) = None
 </section>
 <section id="training-loop">
 <h2>Training loop<a class="headerlink" href="#training-loop" title="Permalink to this heading">#</a></h2>
-<p>After having gone through our cycle of parameter updating step-by-step, let’s iterate this in a training loop consisting of `nTrainingSteps`.</p>
+<p>After having gone through our cycle of parameter updating step-by-step, let’s iterate this in a training loop consisting of `n_training_steps`.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nTrainingSteps</span><span class="o">=</span> <span class="mi">10000</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">%5s</span><span class="s1"> </span><span class="si">%24s</span><span class="s1"> </span><span class="si">%15s</span><span class="s1"> </span><span class="si">%15s</span><span class="s1">&#39;</span> <span class="o">%</span>
-      <span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;estimate&quot;</span><span class="p">,</span> <span class="s2">&quot;diff. target&quot;</span><span class="p">)</span> <span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrainingSteps</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_training_steps</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%24s</span><span class="s2"> </span><span class="si">%15s</span><span class="s2"> </span><span class="si">%15s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;estimate&quot;</span><span class="p">,</span> <span class="s2">&quot;diff. target&quot;</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_training_steps</span><span class="p">):</span>
     <span class="n">prediction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">loss</span>       <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">trainData</span><span class="p">))</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">train_data</span><span class="p">))</span>
     <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5d</span><span class="s1"> </span><span class="si">%24.3f</span><span class="s1"> </span><span class="si">%15.5f</span><span class="s1"> </span><span class="si">%15.5f</span><span class="s1">&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
-               <span class="nb">abs</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">empirical_mean</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%5d</span><span class="s2"> </span><span class="si">%24.3f</span><span class="s2"> </span><span class="si">%15.5f</span><span class="s2"> </span><span class="si">%15.5f</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+                <span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">empirical_mean</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
     <span class="n">opt</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 </pre></div>
@@ -734,39 +740,37 @@ Gradient information (after zero-ing) = None
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> step                     loss        estimate    diff. target
-  500                16128.701         0.60805         0.60381
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 1000                14976.062         0.37038         0.36614
- 1500                14552.243         0.22626         0.22202
- 2000                14396.406         0.13887         0.13463
- 2500                14339.106         0.08588         0.08163
- 3000                14318.038         0.05374         0.04950
- 3500                14310.291         0.03426         0.03002
- 4000                14307.441         0.02244         0.01820
- 4500                14306.396         0.01528         0.01104
- 5000                14306.009         0.01093         0.00669
- 5500                14305.868         0.00830         0.00406
- 6000                14305.816         0.00670         0.00246
- 6500                14305.797         0.00573         0.00149
- 7000                14305.789         0.00515         0.00090
- 7500                14305.785         0.00479         0.00055
- 8000                14305.787         0.00457         0.00033
- 8500                14305.785         0.00444         0.00020
- 9000                14305.784         0.00436         0.00012
- 9500                14305.786         0.00432         0.00007
-10000                14305.786         0.00429         0.00004
+  500                16102.988         0.60579         0.60729
+ 1000                14937.011         0.36674         0.36825
+ 1500                14508.284         0.22179         0.22330
+ 2000                14350.645         0.13390         0.13540
+ 2500                14292.682         0.08060         0.08211
+ 3000                14271.368         0.04828         0.04979
+ 3500                14263.533         0.02869         0.03019
+ 4000                14260.650         0.01680         0.01831
+ 4500                14259.591         0.00960         0.01110
+ 5000                14259.201         0.00523         0.00673
+ 5500                14259.059         0.00258         0.00408
+ 6000                14259.006         0.00097         0.00248
+ 6500                14258.986        -0.00000         0.00150
+ 7000                14258.979        -0.00059         0.00091
+ 7500                14258.977        -0.00095         0.00055
+ 8000                14258.977        -0.00117         0.00033
+ 8500                14258.977        -0.00130         0.00020
+ 9000                14258.975        -0.00138         0.00012
+ 9500                14258.976        -0.00143         0.00007
+10000                14258.976        -0.00146         0.00005
 </pre></div>
 </div>
 </div>
 </div>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.2.1: Explore the optimization process</span></strong></p>
-<p>This exercise is intended to make you play around with the parameters of the training procedure, namely `learningRate` and `nTrainingSteps`, and to develop a feeling for what they do. There is not necessarily a single “true” solution. Report the values that you found to work best for each of the following cases:</p>
+<p>This exercise is intended to make you play around with the parameters of the training procedure, namely `learning_rate` and `n_training_steps`, and to develop a feeling for what they do. There is not necessarily a single “true” solution. Report the values that you found to work best for each of the following cases:</p>
 <ol class="arabic simple">
 <li><p>Change the initial value of the parameter `location` to -5000.</p></li>
-<li><p>Revert to initial conditions. Change the true mean (parameter `trueLocation`) to 5000.</p></li>
-<li><p>Revert to initial conditions. Use only 100 samples for the training set (using variable `nObs`).</p></li>
+<li><p>Revert to initial conditions. Change the true mean (parameter `true_location`) to 5000.</p></li>
+<li><p>Revert to initial conditions. Use only 100 samples for the training set (using variable `n_obs`).</p></li>
 </ol>
 </div></blockquote>
 </section>
@@ -781,16 +785,16 @@ Gradient information (after zero-ing) = None
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "kernels"
+            mode: "python"
         },
         kernelOptions: {
-            name: "kernels",
+            name: "python3",
             path: "./tutorials"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'kernels'</script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               
