@@ -690,7 +690,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <section id="core-concepts">
 <h3>Core concepts<a class="headerlink" href="#core-concepts" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>(training) data / dataset</strong> (in the context of LMs): a collection of text data which is used as input to the LM in order to optimize its parameters, so that, ideally, the model learns to perform well on its target task; that is, to predict fluent text. Generalization to other machine learning models: the type of input data might be different (e.g., images and labels for image classification models) but the purpose is the same. Data and dataset are mostly used interchangeably.</p>
+<li><p><strong>(training) data / dataset</strong> (in the context of LMs): a collection of text data which is used as input to the LM in order to optimize its parameters, so that, ideally, the model learns to perform well on its target task; that is, to predict fluent text. Anything from a single sentence to a book can be considered data; but since learning statistics of natural language is very difficult, usually very large collections of texts (i.e., very large datasets) are used to train LMs. Generalization to other machine learning models: the type of input data might be different (e.g., images and labels for image classification models) but the purpose is the same. Data and dataset are mostly used interchangeably.</p>
 <ul>
 <li><p><strong>corpus</strong> [ling.]: “A corpus is a collection of pieces of language text in electronic form, selected according to external criteria to represent, as far as possible, a language or language variety as a source of data for linguistic research.” <a class="reference external" href="https://user.phil.hhu.de/~bontcheva/SS10CTCL/CTCL-IntroNotes.pdf">source</a> For the purposes of NLP, the term corpus is often used interchangeably with the term dataset, especially when referring to collections of literary texts (e.g., the Books corpus) or when sourced from corpora created in linguistics.</p>
 <ul>
@@ -706,9 +706,10 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <li><p>most prominently, human annotation is often used in the process of fine-tuning LLMs with RLHF (more on this in lecture 5).</p></li>
 </ul>
 </li>
-<li><p><strong>token</strong>: minimal unit of text which is mapped onto a numerical representation to be readable for the LM. Different types of tokens have been used: single words, single characters, and recently mostly sub-word parts.</p>
+<li><p><strong>token</strong>: minimal unit of text which is mapped onto a numerical representation to be readable for the LM. Different types of tokens have been used: single words, single characters, and recently mostly sub-word parts. Note that unique minimal units are assigned different tokens; whenever such a unit occurs in a particular context, the same numerical representation (i.e., token ID) is assigned to that unit. Therefore, the notion of a token in NLP is not completely equivalent to the notion in lingusitics (and there are no types in NLP as opposed to linguistics).</p>
 <ul>
 <li><p>tokenization is the process of converting a string to a list or tensor of tokens.</p></li>
+<li><p>part of tokenization for training transformers is also creating <em>attention masks</em> which “mask” certain tokens for the model (i.e., hide it from the model during training). This is done to train models to predict next words based only on preceding context.</p></li>
 <li><p>tokenization will be discussed in more detail in the session of week 3.</p></li>
 </ul>
 </li>
@@ -870,6 +871,8 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <span class="n">preprocessed_train_dataset</span> <span class="o">=</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenization</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># datasets provides a handy method to format the dataset for training models with PyTorch</span>
+<span class="c1"># specifically, it makes sure that dataset samples that are loaded from the</span>
+<span class="c1"># dataset are PyTorch tensors. It also selects columns to be used.</span>
 <span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span>
     <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> 
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
