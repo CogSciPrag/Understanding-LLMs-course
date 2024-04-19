@@ -556,7 +556,7 @@ For each sampled <span class="math notranslate nohighlight">\(x\)</span>, we com
 </section>
 <section id="defining-the-mlp-using-pytorchs-built-in-modules">
 <h2>Defining the MLP using PyTorch’s built-in modules<a class="headerlink" href="#defining-the-mlp-using-pytorchs-built-in-modules" title="Permalink to this heading">#</a></h2>
-<p>As before (sheet 4.1), our model maps a single scalar <span class="math notranslate nohighlight">\(x\)</span> onto another scalar <span class="math notranslate nohighlight">\(y\)</span>.
+<p>As before (sheet 2.2), our model maps a single scalar <span class="math notranslate nohighlight">\(x\)</span> onto another scalar <span class="math notranslate nohighlight">\(y\)</span>.
 We use a 3-layer MLP, each hidden layer with dimension 10:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -576,7 +576,7 @@ Below, we define our feed-forward neural network as a class extending `nn.Module
 Minimally, we have to define two functions for this to work:</p>
 <ol class="arabic simple">
 <li><p>the <strong>initialization</strong> function `__<sub>init</sub>__` which defines which variables (mostly, but not exclusively: parameters) our model has (using `nn.Linear` instantiates a linear layer with all the trainable parameters (weights and biases) implicitly);</p></li>
-<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values (recall the function `single_forward_pass` from sheet 4.1; PyTorch automatically batches the computation implicitly).</p></li>
+<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values.</p></li>
 </ol>
 <p>Since PyTorch allows flexibility in how to define neural network modules, we look at two variants below, one explicit and one more concise.
 They should implement the exact same model and work the same way eventually.</p>
@@ -694,7 +694,7 @@ They should implement the exact same model and work the same way eventually.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.2.1: Inspect the model’s parameters and their initial values</span></strong></p>
 <ol class="arabic simple" start="0">
-<li><p>[Just for yourself.] Make sure that you understand what these parameters are by mapping these onto the parameters of the custom-made model from sheet 4.1. (Hint: the order of the presentation in this print-out is the order in which the components occur in the computation of the forward pass.)</p></li>
+<li><p>[Just for yourself.] Make sure that you understand what these parameters are by mapping these onto the parameters of the custom-made model from sheet 2.2. (Hint: the order of the presentation in this print-out is the order in which the components occur in the computation of the forward pass.)</p></li>
 <li><p>Guess how the weights of the slope matrices are initialized (roughly). Same for the intercept vectors.</p></li>
 </ol>
 </div></blockquote>
@@ -758,8 +758,8 @@ The class <strong>Dataset</strong> stores the training data (in a reusable forma
 The class <strong>DataLoader</strong> takes a `dataset` object as input and returns an iterable to enable easy access to the training data.</p>
 <p>To define a `Dataset` object, we have to specify two key functions:</p>
 <ol class="arabic simple">
-<li><p>the `_<sub>len</sub>__` function, which tells subsequent applications how many data points there are; and</p></li>
-<li><p>the `_<sub>getitem</sub>__` function, which takes an index as input and outputs the data point corresponding to that index.</p></li>
+<li><p>the `__<sub>len</sub>__` function, which tells subsequent applications how many data points there are; and</p></li>
+<li><p>the `__<sub>getitem</sub>__` function, which takes an index as input and outputs the data point corresponding to that index.</p></li>
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">

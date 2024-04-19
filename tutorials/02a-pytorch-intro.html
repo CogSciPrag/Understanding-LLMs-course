@@ -646,8 +646,8 @@ The function `torch.rand()` populates a tensor of the given size with random num
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.9902, 0.2502, 0.9539],
-        [0.4214, 0.0140, 0.6043]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.6004, 0.1671, 0.2114],
+        [0.4924, 0.5919, 0.0054]])
 </pre></div>
 </div>
 </div>
@@ -803,6 +803,7 @@ type support.</p>
 </div>
 </div>
 </div>
+<p><strong>NOTE</strong>: weights of a language model are, at the end, also represented as tensors. The data type of a tensor determines how much memory the tensor occupies. In the context of a language model, this means that, depending on the data type of the weights, more or less memory (e.g., on the GPU) is required in order to be able to use the model. Note that often weights of pretrained available models (i.e., weights of an already trained model that can be used to predict text) are available in <code class="docutils literal notranslate"><span class="pre">torch.float16</span></code>. We will see where to see this and how to change the dtype when loading a pretrained model in the next sheets.</p>
 </section>
 <section id="attributes-of-a-tensor">
 <h2>Attributes of a tensor<a class="headerlink" href="#attributes-of-a-tensor" title="Permalink to this heading">#</a></h2>
@@ -948,6 +949,38 @@ tensor([[0],
         [2],
         [3]])
 tensor([[0, 1, 2, 3]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are also the functions <code class="docutils literal notranslate"><span class="pre">.squeeze()</span></code> and <code class="docutils literal notranslate"><span class="pre">.unsqueeze()</span></code> that remove or add the dimension of size 1 at a given location of a tensor:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="c1"># we can remove dimension of size 1 at a given position</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="c1"># or remove all dimensions of size 1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0],
+        [1],
+        [2],
+        [3]])
+tensor([[[0],
+         [1],
+         [2],
+         [3]]])
+tensor([[0],
+        [1],
+        [2],
+        [3]])
+tensor([0, 1, 2, 3])
 </pre></div>
 </div>
 </div>
