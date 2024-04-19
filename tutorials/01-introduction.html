@@ -467,7 +467,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="practical-set-up-training-data">
 <h1>Practical set-up &amp; Training data<a class="headerlink" href="#practical-set-up-training-data" title="Permalink to this heading">#</a></h1>
-<p>This page will contains materials for the first tutorial session (April 19th).</p>
+<p>This page contains materials for the first tutorial session (April 19th).</p>
 <p>The learning goals for the first tutorial are:</p>
 <ul class="simple">
 <li><p>preparing the Python requirements for practical exercises in the upcoming tutorials,</p></li>
@@ -483,7 +483,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <p>You can do so either on your own machine, or by using <a class="reference external" href="https://colab.research.google.com/">Google Colab</a>. You can easily access the latter option by pressing the Colab icon at the top of the webook’s page. Depending on your choice, please follow the respective requirement installation steps below.</p>
 <section id="colab">
 <h3>Colab<a class="headerlink" href="#colab" title="Permalink to this heading">#</a></h3>
-<p>The advantage of using Colab is that you don’t need to install software on your own machine; i.e., it is a safer option if you are not very comfortable with using Python on your own machine. Colab is a  platform provided by Google for free, and it also provides limited access to GPU computation (which will be useful fpor working with actual language models). Using it only requires a Google account.</p>
+<p>The advantage of using Colab is that you don’t need to install software on your own machine; i.e., it is a safer option if you are not very comfortable with using Python on your own machine. Colab is a  platform provided by Google for free, and it also provides limited access to GPU computation (which will be useful for working with language models). Using it only requires a Google account.</p>
 <p>For using a GPU on Colab, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save. Please note that the provided Colab computational resources are free, so please be mindful when using them. Further, Colab monitors GPU usage, so if it is used a lot very frequently, the user might not be able to access GPU run times for a while.</p>
 <p>Colab already provides Python as well as a number of basic packages. If you choose to use it, you will only need to install the more specific packages. Note that you will have to so <em>every time</em> you open a new Colab runtime. To test that you can access requirements for the class, please open this notebook in Colab (see above), uncomment and run the following line:</p>
 <div class="cell docutils container">
@@ -519,7 +519,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </section>
 <section id="verifying-requirement-installation">
 <h2>Verifying requirement installation<a class="headerlink" href="#verifying-requirement-installation" title="Permalink to this heading">#</a></h2>
-<p>Please run the following code cells to make sure that the key requirements were installed successfully. If you errors occur and you cannot solve them ahead of the tutorial, please don’t be shy and let us know in the first tutorial!</p>
+<p>Please run the following code cells to make sure that the key requirements were installed successfully. If errors occur and you cannot solve them ahead of the tutorial, please don’t be shy and let us know in the first tutorial!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
@@ -588,11 +588,11 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.7664, 0.7876, 0.7659],
-        [0.0237, 0.3793, 0.1387],
-        [0.6521, 0.7649, 0.8927],
-        [0.2339, 0.5204, 0.6495],
-        [0.3352, 0.3182, 0.8642]], device=&#39;mps:0&#39;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.5939, 0.3543, 0.3700],
+        [0.0861, 0.2669, 0.8983],
+        [0.8552, 0.7585, 0.8869],
+        [0.8246, 0.4094, 0.6112],
+        [0.1241, 0.2636, 0.9520]], device=&#39;mps:0&#39;)
 Shape of tensor x: torch.Size([5, 3])
 Device of tensor x: mps:0
 tensor([[1., 1., 1.],
@@ -600,19 +600,19 @@ tensor([[1., 1., 1.],
         [1., 1., 1.],
         [1., 1., 1.],
         [1., 1., 1.]], device=&#39;mps:0&#39;)
-tensor([[0.7664, 0.7876, 0.7659],
-        [0.0237, 0.3793, 0.1387],
-        [0.6521, 0.7649, 0.8927],
-        [0.2339, 0.5204, 0.6495],
-        [0.3352, 0.3182, 0.8642]], device=&#39;mps:0&#39;)
-tensor([[2.3199, 2.3199, 2.3199, 2.3199, 2.3199],
-        [0.5417, 0.5417, 0.5417, 0.5417, 0.5417],
-        [2.3097, 2.3097, 2.3097, 2.3097, 2.3097],
-        [1.4038, 1.4038, 1.4038, 1.4038, 1.4038],
-        [1.5176, 1.5176, 1.5176, 1.5176, 1.5176]], device=&#39;mps:0&#39;)
-tensor([[2.0113, 2.0113, 2.0113],
-        [2.7703, 2.7703, 2.7703],
-        [3.3110, 3.3110, 3.3110]], device=&#39;mps:0&#39;)
+tensor([[0.5939, 0.3543, 0.3700],
+        [0.0861, 0.2669, 0.8983],
+        [0.8552, 0.7585, 0.8869],
+        [0.8246, 0.4094, 0.6112],
+        [0.1241, 0.2636, 0.9520]], device=&#39;mps:0&#39;)
+tensor([[1.3182, 1.3182, 1.3182, 1.3182, 1.3182],
+        [1.2513, 1.2513, 1.2513, 1.2513, 1.2513],
+        [2.5007, 2.5007, 2.5007, 2.5007, 2.5007],
+        [1.8452, 1.8452, 1.8452, 1.8452, 1.8452],
+        [1.3396, 1.3396, 1.3396, 1.3396, 1.3396]], device=&#39;mps:0&#39;)
+tensor([[2.4839, 2.4839, 2.4839],
+        [2.0526, 2.0526, 2.0526],
+        [3.7185, 3.7185, 3.7185]], device=&#39;mps:0&#39;)
 </pre></div>
 </div>
 </div>
@@ -625,6 +625,11 @@ tensor([[2.0113, 2.0113, 2.0113],
 <span class="c1"># NB: requires an internet connection</span>
 <span class="n">wikipedia</span> <span class="o">=</span> <span class="n">WikipediaQueryRun</span><span class="p">(</span><span class="n">api_wrapper</span><span class="o">=</span><span class="n">WikipediaAPIWrapper</span><span class="p">())</span>
 <span class="n">wikipedia</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Attention is all you need&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Page: Attention Is All You Need\nSummary: &quot;Attention Is All You Need&quot; is a landmark 2017 research paper by Google. Authored by eight scientists, it was responsible for expanding 2014 attention mechanisms proposed by Bahdanau et al. into a new deep learning architecture known as the transformer. The paper is considered by some to be a founding document for modern artificial intelligence, as transformers became the main architecture of large language models. At the time, the focus of the research was on improving Seq2seq techniques for machine translation, but even in their paper the authors saw the potential for other tasks like question answering and for what is now called multimodal Generative AI.\nThe paper\&#39;s title is a reference to the song &quot;All You Need Is Love&quot; by the Beatles.\nAs of 2024, the paper has been cited more than 100,000 times.\n\n\n\nPage: All You Need Is Kill\nSummary: All You Need Is Kill is a Japanese science fiction light novel by Hiroshi Sakurazaka with illustrations by Yoshitoshi Abe. The book was published in Japanese by Shueisha under their Super Dash Bunko imprint in December 2004, and was later released in English by Viz Media under their Haikasoru imprint. All You Need Is Kill follows a soldier named Keiji Kiriya, who, after dying in a battle with extraterrestrials, is caught in a time loop that makes him live the same day repeatedly, allowing Kiriya to improve his fighting skills.\nA manga adaptation, written by Ryōsuke Takeuchi and illustrated by Takeshi Obata, was serialized in Shueisha\&#39;s Weekly Young Jump magazine between January and May 2014 and was also published by Viz Media in its Weekly Shonen Jump magazine. In November 2014, the Viz translation was released in a collected edition that included the entire series. A separate graphic novel adaptation, written by Nick Mamatas and illustrated by Lee Ferguson, was released in North America in May 2014. A film adaptation from director Doug Liman starring Tom Cruise and Emily Blunt, titled Edge of Tomorrow, was released in May 2014. The English-language film tie-in edition of the novel also uses this title.\nThe novel was Sakurazaka\&#39;s breakthrough science fiction novel, earning wide praise from fellow novelists including Yasutaka Tsutsui and Chōhei Kanbayashi and was entered in contention for the Best Japanese Long Work in the 36th Seiun Awards in 2005.\n\nPage: All You Need Is Love\nSummary: &quot;All You Need Is Love&quot; is a song by the English rock band the Beatles that was released as a non-album single in July 1967. It was written by John Lennon and credited to the Lennon–McCartney partnership. The song was Britain\&#39;s contribution to Our World, the first live global television link, for which the band were filmed performing it at EMI Studios in London on 25 June. The programme was broadcast via satellite and seen by an audience of over 400 million in 25 countries. Lennon\&#39;s lyrics were deliberately simplistic, to allow for the show\&#39;s international audience, and captured the utopian ideals associated with the Summer of Love. The single topped sales charts in Britain, the United States and many other countries, and became an anthem for the counterculture\&#39;s embrace of flower power philosophy.\nOur World coincided with the height of the Beatles\&#39; popularity and influence, following the release of their album Sgt. Pepper\&#39;s Lonely Hearts Club Band. Rather than perform the song entirely live, the group played to a pre-recorded backing track. With an orchestral arrangement by George Martin, the song begins with a portion of the French national anthem and ends with musical quotations from works such as Glenn Miller\&#39;s &quot;In the Mood&quot;, &quot;Greensleeves&quot;, Bach\&#39;s Invention No. 8 in F major, and the Beatles\&#39; 1963 hit &quot;She Loves You&quot;. Adding to the broadcast\&#39;s festive atmosphere, the studio was adorned with signs and streamers and filled with guests dressed in psychedelic attire, including members of the Rolling Stones, the Who and the Small Faces. Brian Epstein, the Beatles\&#39; manager, &#39;
 </pre></div>
 </div>
 </div>
@@ -647,6 +652,15 @@ tensor([[2.0113, 2.0113, 2.0113],
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/micha/miniforge3/envs/npNLG/lib/python3.10/site-packages/huggingface_hub/utils/_hf_folder.py:95: UserWarning: A token has been found in `/Users/micha/.huggingface/token`. This is the old path where tokens were stored. The new location is `/Users/micha/.cache/huggingface/token` which is configurable using `HF_HOME` environment variable. Your token has been copied to this new location. You can now safely delete the old token file manually or use `huggingface-cli logout`.
+  warnings.warn(
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8e549447cfc342df98fbb69e103038a5", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Input IDs: {&#39;input_ids&#39;: tensor([[8086, 1463,  318,  477,  345,  761]], device=&#39;mps:0&#39;), &#39;attention_mask&#39;: tensor([[1, 1, 1, 1, 1, 1]], device=&#39;mps:0&#39;)}
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="best-practices-for-writing-code">
@@ -655,7 +669,7 @@ tensor([[2.0113, 2.0113, 2.0113],
 <ul class="simple">
 <li><p>working with clean code</p></li>
 <li><p>working with understandable code (i.e., commented, with understandable variable names etc)</p></li>
-<li><p>producing well-documented projects (e.g., supplied with relevant READMEs etc). Think: your work should be structured such that you could look at it in a year and be able to immediately what you did, how and why.</p></li>
+<li><p>producing well-documented projects (e.g., supplied with relevant READMEs etc). Think: your work should be structured such that you could look at it in a year and be able to immediately know what you did, how and why.</p></li>
 </ul>
 <p>There are a few de facto standard <em>formatting</em> practices that help to keep Python code crisp and clean. Please take a look at these and adhere to these as much as you can (as so will we):</p>
 <ul class="simple">
@@ -671,6 +685,14 @@ tensor([[2.0113, 2.0113, 2.0113],
 </ul>
 </li>
 </ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">veery_long_function_with_lots_of_arguments</span><span class="p">(</span> <span class="n">argument1</span><span class="p">,</span> <span class="n">argument2</span><span class="p">,</span> <span class="n">argument3</span><span class="p">,</span> <span class="n">argument4</span><span class="p">,</span> <span class="n">argument1</span><span class="p">,</span> <span class="n">argument2</span><span class="p">,</span> <span class="n">argument3</span><span class="p">,</span> <span class="n">argument4</span><span class="p">,):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># example: bad formatting</span>
