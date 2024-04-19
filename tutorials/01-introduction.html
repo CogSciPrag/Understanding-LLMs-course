@@ -551,6 +551,11 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Device: mps
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -566,9 +571,48 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
-<span class="c1"># multiply x and y</span>
+<span class="c1"># multiply x and y in a pointwise manner</span>
 <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+<span class="c1"># note that to do a matrix multiplication between x and y, we need to transpose</span>
+<span class="c1"># either matrix x or y because the inner dimensions must match</span>
+<span class="n">z1</span> <span class="o">=</span> <span class="n">x</span> <span class="o">@</span> <span class="n">y</span><span class="o">.</span><span class="n">T</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">z1</span><span class="p">)</span>
+
+<span class="c1"># or:</span>
+<span class="n">z2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+<span class="c1"># and note that the result of z1 and z2 are not the same and have different shapes</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.7664, 0.7876, 0.7659],
+        [0.0237, 0.3793, 0.1387],
+        [0.6521, 0.7649, 0.8927],
+        [0.2339, 0.5204, 0.6495],
+        [0.3352, 0.3182, 0.8642]], device=&#39;mps:0&#39;)
+Shape of tensor x: torch.Size([5, 3])
+Device of tensor x: mps:0
+tensor([[1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.]], device=&#39;mps:0&#39;)
+tensor([[0.7664, 0.7876, 0.7659],
+        [0.0237, 0.3793, 0.1387],
+        [0.6521, 0.7649, 0.8927],
+        [0.2339, 0.5204, 0.6495],
+        [0.3352, 0.3182, 0.8642]], device=&#39;mps:0&#39;)
+tensor([[2.3199, 2.3199, 2.3199, 2.3199, 2.3199],
+        [0.5417, 0.5417, 0.5417, 0.5417, 0.5417],
+        [2.3097, 2.3097, 2.3097, 2.3097, 2.3097],
+        [1.4038, 1.4038, 1.4038, 1.4038, 1.4038],
+        [1.5176, 1.5176, 1.5176, 1.5176, 1.5176]], device=&#39;mps:0&#39;)
+tensor([[2.0113, 2.0113, 2.0113],
+        [2.7703, 2.7703, 2.7703],
+        [3.3110, 3.3110, 3.3110]], device=&#39;mps:0&#39;)
 </pre></div>
 </div>
 </div>
@@ -727,7 +771,11 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <li><p>acquiring the training data: this step involves downloading or collecting the data of your choice onto the machine which will be used for training. Nowadays many datasets for various tasks can be downloaded from <a class="reference external" href="https://huggingface.co/datasets">HuggingFace</a> or are made available in GitHub repositories.</p></li>
 <li><p>exploring and understanding the dataset: it is important to understand what kinds of texts, from which sources, on which topics, with what sentence length, … the dataset contains. This is crucial because the model will pick up on features of the dataset in a way that might be difficult to fully anticipate (which is good if the features are, e.g., gramamticality of sentences, but bad if it is toxic language).</p></li>
 <li><p>creating the desired combination: nowadays training datasets might consist of a mix of different smaller datasets. See the exercise below for more details.</p></li>
-<li><p>cleaning: this step involves filtering out or converting non-machine readable or undesired characters, often lower-casing, removal of punctuation or digits or so-called stop-words (very common words like “a”, “and”). However, the last three steps are not very common any more for state-of-the-art LLM training.</p></li>
+<li><p>cleaning: this step involves filtering out or converting non-machine readable or undesired characters, often lower-casing, removal of punctuation or digits or so-called stop-words (very common words like “a”, “and”). However, the last three steps are not very common any more for state-of-the-art LLM training.</p>
+<ol class="arabic simple">
+<li><p>TODO: explain why the last steps are not very common anymore.</p></li>
+</ol>
+</li>
 <li><p>splitting the dataset into train, validation, test splits</p></li>
 <li><p>prepairing the training split: training texts are often shuffled and sometimes split into shorter texts. Specifically, splitting is required if the length of a text exceeds the maximal <em>context window size</em> of the transformer model (i.e., the maximal number of tokens a model can process). In this case, texts are often split into shorter slightly overlapping chunks.</p></li>
 <li><p>tokenizing: converting the single texts into lists of tokens, i.e., into lists of numerical IDs. More on tokenization in the session of week 3.</p></li>
@@ -739,7 +787,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <p>Below are a few code blocks for implementing some data processing steps on an example dataset of <a class="reference external" href="https://huggingface.co/datasets/zeroshot/twitter-financial-news-sentiment">tweets about financial news</a>, downloaded from HuggingFace. We will use the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> <a class="reference external" href="https://huggingface.co/docs/datasets/en/tutorial">package</a> to work with the dataset. Originally, the dataset is intended for sentiment classification, but we will just use the tweets from the column “text”.</p>
 <ol class="arabic simple">
 <li><p>Please go through the code and complete it in slots which say “#### YOUR CODE HERE”. Refer to the comments and hints for instructions about what the code is supposed to do. Make sure to try to understand every line!</p></li>
-<li><p>What is prominent about the dataset? Are the processing steps adequate if you wanted to train a Twitter bot which could write tweets on this data?</p></li>
+<li><p>What is prominent about the dataset? Are the processing steps adequate if you wanted to train a Twitter bot which could write tweets on this data? Specifically, do you think the resulting cleaned sentences are sensible, good training examples to learn to generate text, and, more specifically, tweets?</p></li>
 </ol>
 </div></blockquote>
 <div class="cell docutils container">
@@ -780,7 +828,7 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. clean tweets: remove non-alphabetic characters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. clean tweets: remove non-alphabetic or non-space characters</span>
 <span class="c1"># Hint: you can easily google how to remove non-alphabetic characters in Python</span>
 
 
@@ -905,7 +953,7 @@ The following exercises are meant to foster understanding and critical thinking 
 <li><p>Which language(s) does The Pile mainly consist of? If an LM is trained on The Pile as it is, how would you expect the LM will perform when completing a text in, e.g., Hungarian?</p></li>
 <li><p>What is the difference between The Pile and Common Crawl? Why was The Pile introduced?</p></li>
 <li><p>What does the “epochs” column in Table 1 refer to? What is the idea behind it?</p></li>
-<li><p>What kind of data is missing from the mix reported in Table 1? Would do you think the effect of adding such data would be on an LM trained with the data?</p></li>
+<li><p>What kind of data is missing from the mix reported in Table 1? What do you think the effect of adding such data would be on an LM trained with the data?</p></li>
 </ol>
 </div></blockquote>
 </section>
