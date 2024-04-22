@@ -172,7 +172,7 @@ const thebe_selector_output = ".output, .cell_output"
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Practical set-up &amp; Training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
 <ul class="current nav bd-sidenav">
@@ -533,7 +533,7 @@ We load it and define a few useful variables for later use.</p>
 a list of strings, called “categories”, contains all the categories (languages) for which we have data;
 a dictionary, called “names_data”, contains a list of names for each category.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.1: Inspect the data</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.1: Inspect the data</span></strong></p>
 <ol class="arabic simple" start="0">
 <li><p>[Just for yourself.] Find out what’s in the data set. How any different countries do we have? How many names per country? Are all names unique in a given country? Do the names sound typical to your ears for the given countries?</p></li>
 </ol>
@@ -590,7 +590,7 @@ Polish 139 125 14
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.2: Explain the train-test split</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.2: Explain the train-test split</span></strong></p>
 <ol class="arabic simple">
 <li><p>How is the original data information split into training and test set? (E.g., what amount of data is allocated to each part?; is the split exclusive and exhaustive?; how is it determined which item goes where?)</p></li>
 </ol>
@@ -648,7 +648,7 @@ The inclusion of dropout introduces a random element in the model during trainin
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.3: Inspect the model</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.3: Inspect the model</span></strong></p>
 <ol class="arabic simple" start="0">
 <li><p>[Just for yourself.] Make sure that you understand the model architecture and its implementation. E.g., do you agree that this code implements the model graph shown above? Can you think of slight alterations to the model which might also work?</p></li>
 </ol>
@@ -726,7 +726,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.4: Understand the representational format </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.4: Understand the representational format </span></strong></p>
 <ol class="arabic simple">
 <li><p>Write a doc-string for the function ’random_training_example’ that is short but completely explanatory regarding the format and meaning of its output.</p></li>
 </ol>
@@ -865,7 +865,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.5: Investigate the training regime </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.5: Investigate the training regime </span></strong></p>
 <ol class="arabic simple">
 <li><p>What exactly is the loss function here? What are we training the model on: perplexity, average surprisal, or yet something else?</p></li>
 </ol>
@@ -944,7 +944,7 @@ mean surprisal (train): 16.595255817163405
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.5: Interpret the evaluation metric </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.6: Interpret the evaluation metric </span></strong></p>
 <ol class="arabic simple">
 <li><p>What do these two last numbers represent? What’s better: a higher or lower value? What do the two numbers tell us when we compare them?</p></li>
 </ol>
@@ -954,6 +954,7 @@ mean surprisal (train): 16.595255817163405
 <h2>Inference<a class="headerlink" href="#inference" title="Permalink to this heading">#</a></h2>
 <p>Let’s also explore the trained model’s predictions to compare them against our own intuitions of what might be typical names in a given country.</p>
 <p>Here’s a function that takes a country and an initial string, and it outputs a model prediction for how to continue that string.</p>
+<p>Note that for each prediction step with the model, the model is embedded under <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code>. This setting means that gradients are not computed during the forward passes through the model. This setting is recommended for <em>inference</em> (for any neural net), i.e., when you don’t want to train the model anymore (only use it for generating predictions). This allows to increase computational effiency and save memory.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
@@ -976,7 +977,8 @@ mean surprisal (train): 16.595255817163405
     <span class="n">name</span> <span class="o">=</span> <span class="n">initial_sequence</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
 
     <span class="c1"># greedy decoding: choosing the most likely guess</span>
     <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1026,7 +1028,7 @@ Kasay
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.6: Explore the model’s predictions </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.7: Explore the model’s predictions </span></strong></p>
 <ol class="arabic simple">
 <li><p>Play around with these prediction functions for a country or several of which you have robust intuitions about how names from that country might sound. Report on one feature that speaks in favor of the model, and one that suggests that the model is not perfect (or seriously flawed).</p></li>
 <li><p>Is the prediction function as implemented in this subsection stochastic or not?</p></li>
@@ -1054,7 +1056,7 @@ For instance, we can do this:</p>
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.7: Category prediction with Bayes rule </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.4.8: Category prediction with Bayes rule </span></strong></p>
 <ol class="arabic simple">
 <li><p>Use the model as a speaker likelihood function to compute, via Bayes rule, the probability <span class="math notranslate nohighlight">\(P(category\mid name)\)</span> for the names “Dovesky”, “Jackson” and “Satoshi”. Compare the results against those obtained by the RNN-based classifier reported in <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html">this tutorial</a> (all the way at the end).</p></li>
 </ol>

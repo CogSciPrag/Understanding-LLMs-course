@@ -173,7 +173,7 @@ const thebe_selector_output = ".output, .cell_output"
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Practical set-up &amp; Training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
 <ul class="current nav bd-sidenav">
@@ -451,7 +451,11 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-training-data">Preparing the training data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-pytorch-layers-and-utils-optional">Outlook: PyTorch layers and utils [optional]</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-outlook-pytorch-autograd-and-computational-graph-optional">Advanced outlook: PyTorch Autograd and computational graph [optional]</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -576,7 +580,7 @@ Below, we define our feed-forward neural network as a class extending `nn.Module
 Minimally, we have to define two functions for this to work:</p>
 <ol class="arabic simple">
 <li><p>the <strong>initialization</strong> function `__<sub>init</sub>__` which defines which variables (mostly, but not exclusively: parameters) our model has (using `nn.Linear` instantiates a linear layer with all the trainable parameters (weights and biases) implicitly);</p></li>
-<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values.</p></li>
+<li><p>the <strong>forward pass</strong> which takes the model’s input and computes the corresponding prediction given the current parameter values. Instatiating the forward pass is critical because it is designed to also implicitly compute and save gradients of single computations that constitute the neural network with respect to the current input, so that they can be later used for the <strong>backward pass</strong> (i.e., for training).</p></li>
 </ol>
 <p>Since PyTorch allows flexibility in how to define neural network modules, we look at two variants below, one explicit and one more concise.
 They should implement the exact same model and work the same way eventually.</p>
@@ -692,7 +696,7 @@ They should implement the exact same model and work the same way eventually.</p>
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.2.1: Inspect the model’s parameters and their initial values</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.1: Inspect the model’s parameters and their initial values</span></strong></p>
 <ol class="arabic simple" start="0">
 <li><p>[Just for yourself.] Make sure that you understand what these parameters are by mapping these onto the parameters of the custom-made model from sheet 2.2. (Hint: the order of the presentation in this print-out is the order in which the components occur in the computation of the forward pass.)</p></li>
 <li><p>Guess how the weights of the slope matrices are initialized (roughly). Same for the intercept vectors.</p></li>
@@ -941,12 +945,53 @@ Training process has finished.
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.2.2: Explore the model’s behavior</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.2: Explore the model’s behavior</span></strong></p>
 <ol class="arabic simple" start="0">
 <li><p>[Just for yourself.] Make sure you understand <em>every line</em> in this last code block. Ask if anything is unclear.</p></li>
 <li><p>Above we used the DataLoader to train in 4 mini-batches. Change it so that there is only one batch containing all the data. Change the `shuffle` parameter so that data is not shuffled. Run the model and check if you observe any notable differences. Explain what your observations. (If you do not see anything, explain why you don’t. You might pay attention to the results of training)</p></li>
 </ol>
 </div></blockquote>
+<section id="outlook-pytorch-layers-and-utils-optional">
+<h3>Outlook: PyTorch layers and utils [optional]<a class="headerlink" href="#outlook-pytorch-layers-and-utils-optional" title="Permalink to this heading">#</a></h3>
+<p>PyTorch provides vast functionality around neural networks. Next to the <code class="docutils literal notranslate"><span class="pre">nn.Linear()</span></code> layer (a linear layer) and the <code class="docutils literal notranslate"><span class="pre">nn.ReLU()</span></code> (ReLU activation function, implemented as a separate ‘layer’) which we have seen in the MLP above, PyTorch implements many other commonly used neural network layers. These different layers can be stacked to create your own custom architectures. Furthermore, PyTorch provides all other building blocks for neural networks like other activation functions, utilities for ‘engineering tricks’ that make training neural nets more stable and efficient etc.</p>
+<p>The main overview and documentation for all these useful things can be found <a class="reference external" href="https://pytorch.org/docs/stable/nn.html">here</a>. Understanding documentation of useful packages is a core skill for working with code; therefore, the exercise below provides an opportunity to practice this skill and find out more about some treats of PyTorch which are particularly useful for working with language modeling.</p>
+<p><strong>NB</strong>: some of the following concepts might be somewhat unclear right now; they should become more clear as the class advances and we learn, e.g., about tokenization. The idea of this and the next part of this sheet is mainly to point your attention to useful things that exist, so that, when needed or when you want to learn more, you will know where to start looking. Therefore, these to parts are <em>optional</em>.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.3: Define functionality of PyTorch utilities</span></strong></p>
+<p>Please look at the documentation references above and, for youself, write down short (intuitive) definitions of what the following building blocks are (layer or activation function or something else), how / why / what for / where you think they could be used in the context of language modeling.</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GELU</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.LogSoftmax</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GRU</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GRUCell</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.Embedding</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.CosineSimilarity</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.CrossEntropyLoss</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clip_grad_value_</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weight_norm</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rnn.pad_sequence</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rnn.pad_packed_sequence</span></code>:</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="advanced-outlook-pytorch-autograd-and-computational-graph-optional">
+<h3>Advanced outlook: PyTorch Autograd and computational graph [optional]<a class="headerlink" href="#advanced-outlook-pytorch-autograd-and-computational-graph-optional" title="Permalink to this heading">#</a></h3>
+<p>The main working horse behind training neural networks is the chain rule of differentiation. This is the basic rule of calculus that allows to compute exactly the gradient of the complecated function that is a neural net with respect to the current input. This gradient, in turn, allows to compute the value by which each weight of the net should be updated in order to improve on the target task (e.g., predicting the next word).</p>
+<p>However, computing the gradient even for a simple network like the one above for each training input can become difficult and tedious. Luckily, PyTorch handles this process behind the scenes with the help of <em>autograd</em>, an automatic differentiation technique that computes the gradients with respect to inputs given a <em>computational graph</em>. The computational graph is a directed acyclic graph representation of the computations instatiating the neural net, where nodes are operations (e.g., multiplication) and edges represent the data flow between operations. It is created with the definition of the <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method of the model.</p>
+<p>If you want to dig deeper into how autograd and PyTorch computational graphs work, here are two great blogposts by PyTorch:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pytorch.org/blog/overview-of-pytorch-autograd-engine/">Autograd</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/blog/computational-graphs-constructed-in-pytorch/">Computational graph</a></p></li>
+</ul>
+<p>Other blogposts are also worthwhile reading.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.4: Understanding PyTorch autograd</span></strong></p>
+<ol class="arabic simple">
+<li><p>Try to draw the computational graph (like in Figure 4 of the autograd blogpost) for the function <span class="math notranslate nohighlight">\(f(x) = x^3 - x^2\)</span>.</p></li>
+</ol>
+</div></blockquote>
+</section>
 </section>
 </section>
 
@@ -1021,7 +1066,11 @@ Training process has finished.
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-training-data">Preparing the training data</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">Training the model</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-pytorch-layers-and-utils-optional">Outlook: PyTorch layers and utils [optional]</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-outlook-pytorch-autograd-and-computational-graph-optional">Advanced outlook: PyTorch Autograd and computational graph [optional]</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
