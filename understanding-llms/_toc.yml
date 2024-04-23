@@ -10,6 +10,7 @@ parts:
   - file: tutorials/01-introduction
 - caption: 02 ANNs & RNNs
   chapters:
+  - file: lectures/02-torch-ANNs-RNNs
   - file: tutorials/02a-pytorch-intro
   - file: tutorials/02b-MLE
   - file: tutorials/02c-MLP-pytorch
