@@ -441,7 +441,10 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction-ml-models">Introduction: ML models</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-lms-via-transformers">Working with LMs via 🤗 Transformers</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -475,12 +478,11 @@ document.write(`
 <li><p><strong>fine-tuned</strong> model: this refers to a pretrained model that has been further trained on a <em>task-specific</em>, or, generally curated and therefore, usually smaller, dataset. This step can be thought of as optimizing the model for a particular task, like predicting texts in a particular domain (e.g., movie reviews). This is usually done based on a pretrained model because curated datasets are often too small to learn a task from scratch well.</p></li>
 </ul>
 <p>The term “trained” model will be mostly used as an umbrella terms for both types of models.</p>
-<p>Exercise:</p>
 <blockquote>
-<div><ol class="arabic simple" start="0">
-<li><p>Given examples from the previous sheets, in your own words, describe the difference between training a model and running inference with a model. (Understanding this is absolutely critical; please ask if in doubt)</p></li>
-<li><p>Suppose you want to train the model GPT-2 to generate IMDB movie reviews. In your own words, describe the highlevel steps that you would do to accomplish this task.
-Alternatively, pose this task in context of a paper.</p></li>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.1: ML models workflow </span></strong></p>
+<ol class="arabic simple">
+<li><p>Given examples from the previous sheets, in your own words, describe the difference between <em>training</em> a model and running <em>inference</em> with a model. (Understanding this is absolutely critical; please ask questions if have any doubts!)</p></li>
+<li><p>Suppose you want to train the model GPT-2 to generate IMDB movie reviews. In your own words (few intuitive sentences), describe the highlevel steps that you would do to accomplish this task.</p></li>
 </ol>
 </div></blockquote>
 </section>
@@ -498,20 +500,20 @@ Alternatively, pose this task in context of a paper.</p></li>
 </li>
 <li><p>The (online) HF platform called HuggingFace Hub actually stores trained model weights (also sometimes called checkpoints) and datasets. They are downloaded to the local machine when accessed through the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> or <code class="docutils literal notranslate"><span class="pre">datasets</span></code> package. Available models can be browsed <a class="reference external" href="https://huggingface.co/models">here</a>; available datasets can be browsed <a class="reference external" href="https://huggingface.co/datasets">here</a>.</p>
 <ul>
-<li><p>account</p></li>
+<li><p>In order to <em>upload</em> yourown resources to HF Hub and in order to access some models (inclding LLama-2), you need a free account. It can easily be created on HF. So far, an account is not required for following the class.</p></li>
 </ul>
 </li>
 <li><p>The platform provides much more (feel free to explore! but also try not to feel overwhlemed if you are seeing HF for the first time). Here are some highlights most relevant to the course:</p>
 <ul>
-<li><p>tokenization</p></li>
-<li><p>NLP course</p></li>
-<li><p>metrics</p></li>
-<li><p>[somewhat more advanced] acceleration and parallelization on GPUs and more.</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter1/1">NLP course</a> which includes practical tutorials for common NLP tasks with transformers.</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/evaluate/index"><code class="docutils literal notranslate"><span class="pre">evaluate</span></code></a> package for computing common evaluation metrics (more on this in the next sessions)</p></li>
+<li><p>(more advanced) packages for <a class="reference external" href="https://huggingface.co/docs/accelerate/index">accelerated</a> and parallelized training on GPUs, via parameter-efficient fine-tuning (<a class="reference external" href="https://huggingface.co/docs/peft/index">PEFT</a>) and more.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tokenizers</span></code> <a class="reference external" href="https://huggingface.co/docs/tokenizers/index">package</a>. However, we will only use functionality of pretrained tokenizers which are shipped together with models via transformers.</p></li>
 </ul>
 </li>
 </ul>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.1: Familiarization with HuggingFace </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.2: Familiarization with HuggingFace </span></strong></p>
 <ol class="arabic simple">
 <li><p>Fill me.</p></li>
 </ol>
@@ -525,15 +527,119 @@ Alternatively, pose this task in context of a paper.</p></li>
 </ul>
 </li>
 </ul>
-<p>Fine-tuning: https://huggingface.co/docs/transformers/training</p>
-<p>TODO:</p>
+<section id="working-with-lms-via-transformers">
+<h3>Working with LMs via 🤗 Transformers<a class="headerlink" href="#working-with-lms-via-transformers" title="Permalink to this heading">#</a></h3>
+<p>We will dive right into using the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> package ourselves. The learning goals for the remaining part of the sheett are:</p>
 <ul class="simple">
-<li><p>make clear the use of masking in training (at least on basic level) so that we can use relevant quesiton masking for HW</p></li>
-<li><p>explain explicit configs, heads and tokenizer vs AutoClass</p></li>
+<li><p>learn how to load a pretrained language model</p></li>
+<li><p>learn how to generate a prediction with the model</p></li>
+<li><p>learn about the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> class which allows to train from scratch or fine-tune the model (the following code is inspired by <a class="reference external" href="https://huggingface.co/docs/transformers/training">this</a> tutorial)</p></li>
+</ul>
+<p><strong>NB:</strong> this sheet uses the pretrained <a class="reference external" href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">GPT-2</a>, a causal (decoder-only) transformer model. We have not covered transformers in detail yet, so the set up of the model and some of the required set-up for using it are treated as a blackbox in this sheet. More in-depth explanations will follow the next lecture covering transformers.</p>
+<p>There are two ways of generating predictions with a trained model available on HF. First, we will do so explicitly. The steps are:</p>
+<ul class="simple">
+<li><p>load the pretrained model with its dedicated class</p></li>
+<li><p>tokenize some input text</p></li>
+<li><p>generate predictions with greedy decoding (i.e., under the hood, compute forward passes through the model and retrieve the most likely token, given the previous input)</p></li>
+<li><p>convert the newly generated tokens back into human-readable strings</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+
+<span class="kn">import</span> <span class="nn">transformers</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2LMHeadModel</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define computational device</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define input text</span>
+<span class="n">input_text</span> <span class="o">=</span> <span class="s2">&quot;Natural language processing is &quot;</span>
+
+<span class="c1"># load pretrained model and respective tokenizer</span>
+<span class="c1"># the class GPT2LMHeadModel initialized the &quot;container&quot; for the GPT-2</span>
+<span class="c1"># architecture with an LM head - i.e., an output layer for predicting next tokens</span>
+<span class="c1"># .from_pretrained loads the pretrained weights into the container  </span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<span class="c1"># load pretrained tokenizer belonging to GPT-2 (more on tokenizers next session)</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+
+<span class="c1"># tokenize our input text</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">,</span> 
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tokenized text (input IDs) &quot;</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">)</span>
+
+<span class="c1"># generate predictions</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span>
+<span class="p">)</span>
+<span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alternatively, we can make use of transformer’s <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> – a utility wrapper around these steps which makes it easier for us to generate predictions, without having to manually implement them. HF provides pipelines for many common tasks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># initialize the pipeline with the model of our choice</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+    <span class="c1"># specify task</span>
+    <span class="s1">&#39;text-generation&#39;</span><span class="p">,</span> 
+    <span class="n">model</span><span class="o">=</span><span class="s1">&#39;gpt2&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># run the pipeline with default configs</span>
+<span class="n">greedy_pipe_output</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">input_text</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;generated_text&#39;: &quot;Natural language processing is \xa0very important for translating the words in a sentence or sentence-by-sentence process. (I think more so for your next task.) I&#39;ve been lucky enough to read several other authors on the subject. I hope&quot;}]
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.3: Generating predictions </span></strong></p>
+<ol class="arabic simple">
+<li><p>Come up with a different input string and generate a prediction. Would you consider the output a good prediction?</p></li>
+<li><p>Change the code (explicit or implicit) by adding a few parameters so as to use <em>pure sampling</em> for predicting the output. How do the predictions change? (Hint: see slides for a reminder about decoding schemes and <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.TextGenerationPipeline">docs</a> for practical implementation)</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;truthful_qa&quot;</span><span class="p">,</span> <span class="s2">&quot;generation&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -565,6 +671,11 @@ Alternatively, pose this task in context of a paper.</p></li>
 </div>
 </div>
 </div>
+<p>TODO:</p>
+<ul class="simple">
+<li><p>make clear the use of masking in training (at least on basic level) so that we can use relevant quesiton masking for HW</p></li>
+<li><p>explain explicit configs, heads and tokenizer vs AutoClass</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span>
@@ -672,6 +783,7 @@ Alternatively, pose this task in context of a paper.</p></li>
 </div>
 </section>
 </section>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -719,7 +831,10 @@ Alternatively, pose this task in context of a paper.</p></li>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction-ml-models">Introduction: ML models</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-lms-via-transformers">Working with LMs via 🤗 Transformers</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
