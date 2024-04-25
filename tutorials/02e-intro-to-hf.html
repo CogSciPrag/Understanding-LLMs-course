@@ -65,6 +65,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/02e-intro-to-hf';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Sheet 2.4: Character-level sequence modeling w/ RNNs" href="02d-char-level-RNN.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -172,12 +173,13 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
 </ul>
 
     </div>
@@ -443,6 +445,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction-ml-models">Introduction: ML models</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-lms-via-transformers">Working with LMs via 🤗 Transformers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -515,18 +518,9 @@ document.write(`
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.2: Familiarization with HuggingFace </span></strong></p>
 <ol class="arabic simple">
-<li><p>Fill me.</p></li>
+<li><p>Just for yourself, try to find whether the model BERT is available on HF. If yes, try get a sense of the kind of information that HF provides about available models.</p></li>
 </ol>
 </div></blockquote>
-<ul class="simple">
-<li><p>HF intro so that homework can be worked on</p>
-<ul>
-<li><p>use Trainer to train the model</p></li>
-<li><p>use of DataLoader with datasets</p></li>
-<li><p>setting up finetuning</p></li>
-</ul>
-</li>
-</ul>
 <section id="working-with-lms-via-transformers">
 <h3>Working with LMs via 🤗 Transformers<a class="headerlink" href="#working-with-lms-via-transformers" title="Permalink to this heading">#</a></h3>
 <p>We will dive right into using the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> package ourselves. The learning goals for the remaining part of the sheett are:</p>
@@ -546,6 +540,8 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+<span class="c1"># note: if you are on Colab, you might need to install some requirements</span>
+<span class="c1"># as we did in Sheet 1.1. Otherwise, don&#39;t forget to activate your local environment</span>
 
 <span class="kn">import</span> <span class="nn">transformers</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
@@ -555,6 +551,18 @@ document.write(`
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">DataCollatorForLanguageModeling</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># additioanlly, we need to install accelerate</span>
+<span class="c1"># uncomment and run the following line on Colab or in your environment</span>
+<span class="c1"># !pip install accelerate</span>
+<span class="c1"># NOTE: in a notebook, reloading of the kernel might be required after installation if you get dependency errors with the transformers package</span>
 </pre></div>
 </div>
 </div>
@@ -583,22 +591,18 @@ document.write(`
 <span class="c1"># load pretrained model and respective tokenizer</span>
 <span class="c1"># the class GPT2LMHeadModel initialized the &quot;container&quot; for the GPT-2</span>
 <span class="c1"># architecture with an LM head - i.e., an output layer for predicting next tokens</span>
-<span class="c1"># .from_pretrained loads the pretrained weights into the container  </span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<span class="c1"># .from_pretrained loads the pretrained weights into the container</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="c1"># load pretrained tokenizer belonging to GPT-2 (more on tokenizers next session)</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<span class="c1">##### YOUR CODE HERE ##### (Hint: you have seen how to do this in sheet 1.1)</span>
+<span class="n">tokenizer</span> <span class="o">=</span> 
 
 <span class="c1"># tokenize our input text</span>
-<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
-    <span class="nb">input</span><span class="p">,</span> 
-    <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tokenized text (input IDs) &quot;</span><span class="p">,</span> <span class="n">input_ids</span><span class="p">)</span>
 
 <span class="c1"># generate predictions</span>
-<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-    <span class="n">input_ids</span>
-<span class="p">)</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
 <span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
 <span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
@@ -618,14 +622,7 @@ document.write(`
 
 <span class="c1"># run the pipeline with default configs</span>
 <span class="n">greedy_pipe_output</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">input_text</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
-</pre></div>
-</div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;generated_text&#39;: &quot;Natural language processing is \xa0very important for translating the words in a sentence or sentence-by-sentence process. (I think more so for your next task.) I&#39;ve been lucky enough to read several other authors on the subject. I hope&quot;}]
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greedy pipeline output: &quot;</span><span class="p">,</span> <span class="n">greedy_pipe_output</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -637,21 +634,53 @@ document.write(`
 <li><p>Change the code (explicit or implicit) by adding a few parameters so as to use <em>pure sampling</em> for predicting the output. How do the predictions change? (Hint: see slides for a reminder about decoding schemes and <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.TextGenerationPipeline">docs</a> for practical implementation)</p></li>
 </ol>
 </div></blockquote>
+<p>Another common use of pretrained models is to further fine-tune them on a specific dataset, e.g., to specialize them on generating text of a particular domain, or to train them for a specific task. The latter is often with a task-specific output <em>head</em> – i.e., a different output layer is used. For instance, for classification tasks (like sentiment classification), a classification layer could be trained on a sentiment classification dataset, while keeping the rest of the network fixed from pretraining (or, frozen).</p>
+<p>The following part shows how to fine-tune GPT-2 on a specific corpus – IMDB movie reviews. Specifically, we will make use of the transformers <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> class which provides convenient wrappers around different steps that need to be done in order to train a model. It essentially simplifies the implementation of the single substeps that are summarized under step 3 in the high-level overview of the ML workflow at the beginning of the sheet.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.4: Training steps </span></strong></p>
+<ol class="arabic simple">
+<li><p>As a reminder, try to break down step 3 of the high-level overview step 3 into a pseduo-code style list of concrete steps that are required for the training loop. Then, take a look at sheets 2.2 and 2.3 to compare.</p></li>
+<li><p>As you go through the following code, please complete it in spots which are commented with “### YOUR CODE HERE ###”</p></li>
+</ol>
+</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;truthful_qa&quot;</span><span class="p">,</span> <span class="s2">&quot;generation&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load IMDB dataset</span>
+<span class="c1"># dataset = load_dataset(&quot;truthful_qa&quot;, &quot;generation&quot;)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;stanfordnlp/imdb&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">DataCollatorForLanguageModeling</span>
-
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the pad token of the tokenizer which we loaded above</span>
 <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
+<span class="c1"># set the side on which pad tokens should be added to the input (if required)</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+<span class="c1"># define a function to collate the data into batches and tokenize it</span>
+<span class="c1"># this helper allows to massage the data such that it can be batched into the same </span>
+<span class="c1"># tensor representing a batch of inputs and can be used for training.</span>
+<span class="c1"># specifically it creates *labels* for the model to predict</span>
 <span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="p">):</span>
+<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span>
+        <span class="n">input_text</span><span class="p">,</span> 
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   YOUR TEXT HERE.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    input_text : YOUR TEXT HERE.</span>
+<span class="sd">    max_length : YOUR TEXT HERE.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    YOUR TEXT HERE.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tokenized_input</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
         <span class="n">input_text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span>
         <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
@@ -659,59 +688,67 @@ document.write(`
         <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
     <span class="p">)</span>
-    <span class="c1"># mask padding tokens</span>
+    <span class="c1"># mask padding tokens so that the model doesn&#39;t attend to them</span>
+    <span class="c1"># more on masking next week</span>
     <span class="n">tokenized_input</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tokenized_input</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tokenized_input</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">],</span>
             <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tokenized_input</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]}</span>
 
-<span class="n">tokenized_datasets</span> <span class="o">=</span> <span class="n">massaged_datasets</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-    <span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_columns</span><span class="o">=</span><span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span>
+<span class="n">tokenized_datasets</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_columns</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>TODO:</p>
-<ul class="simple">
-<li><p>make clear the use of masking in training (at least on basic level) so that we can use relevant quesiton masking for HW</p></li>
-<li><p>explain explicit configs, heads and tokenizer vs AutoClass</p></li>
-</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># print a sample of the tokenized dataset</span>
+<span class="n">tokenized_datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># since we don&#39;t want to fully fine-tune the model but rather learn </span>
+<span class="c1"># the basics of the set up, we will only use a small subset of the data</span>
+<span class="n">subsampled_dataset</span> <span class="o">=</span> <span class="n">tokenized_datasets</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">data_collator</span><span class="p">([</span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we inspect what the data_collator does</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">data_collator</span><span class="p">([</span><span class="n">subsampled_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span>
 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> shape: </span><span class="si">{</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tensor </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p><strong>IMPORTANT:</strong> it is key to understand the language modeling objective (i.e., mechanism used to train a model to predict the next token) and how it is implemented in practice. Conceptually, the LM objective is discussed at the beginning of the tutorial. In terms of implementation, the addition of special tokens and shifting happens within each transformers model. You can find and example fro GPT-2 <a class="reference external" href="https://github.com/huggingface/transformers/blob/571dd693b5d20754ecc472030903a94f92cfa9f8/src/transformers/models/gpt2/modeling_gpt2.py#L1100">here</a>. As you can see, the collator function above creates the labels that are used as target for prediction for us. Please make sure that you understand this step and that you would be able to create labels, given an input, yourself.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.4: Training steps </span></strong></p>
+<p>The next cell defines the key configurations of the training in <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code>. These are passed to the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> in order to instantiate a training loop.</p>
+<ol class="arabic simple">
+<li><p>Please use the documentation <a class="reference external" href="https://huggingface.co/docs/transformers/v4.40.1/en/main_classes/trainer#transformers.Trainer">here</a> to write short comments for each relevant line of the following code cell, so that you know what different training parameters there are.</p></li>
+<li><p>What is the size of the training data? What is the size of the test data?</p></li>
+</ol>
+</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
-
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define training arguments</span>
 <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;commonsense_qa_gpt2&quot;</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;imdb_gpt2&quot;</span><span class="p">,</span>
     <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
     <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
-    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
     <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">,</span>
@@ -727,8 +764,8 @@ document.write(`
     <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
     <span class="n">data_collator</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
-    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">subsampled_dataset</span><span class="p">,</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">subsampled_dataset</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -736,15 +773,51 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># run the training of the model</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>Note that we did not explicitly pass a loss function to the training. The Trainer constructs it automatically. However, we could also explicitly define the language modeling loss. For this, we need to overrise the <code class="docutils literal notranslate"><span class="pre">compute_loss()</span></code> method of the Trainer and build a custom Trainer with it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">IMDBTrainer</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">loss</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_outputs</span> <span class="k">else</span> <span class="n">loss</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.5: CrossEntropyLoss [more advanced]</span></strong></p>
+<ol class="arabic simple">
+<li><p>Implement an even more explicit definition of the loss function by using the <code class="docutils literal notranslate"><span class="pre">torch.nn.CrossEntropyLoss()</span></code> and the labels which are passed as part of the inputs instead of using outputs.loss. The respective docs can be found on the PyTorch website. NB: Make sure to correctly shift your labels.</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use explicit trainer</span>
+<span class="n">explicit_trainer</span> <span class="o">=</span> <span class="n">IMDBTrainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">data_collator</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">subsampled_dataset</span><span class="p">,</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">subsampled_dataset</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">explicit_trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we want to inspect the training dynamics by plotting the training and evaluation losses. These can be accessed in the Trainer history. Ideally, both of them should decrease – this would indicate successful optimization. Feel free to play around with training parameters and plot the losses to see what effects different values have.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot the train and evaluation losses</span>
-
 <span class="n">log_history</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">log_history</span>
 
 <span class="c1"># wrangle the trainer logs into a dataframe for easier plotting</span>
@@ -772,15 +845,10 @@ document.write(`
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># run final evaluation to compute test loss</span>
-<span class="n">eval_results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">tokenized_datasets</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">])</span>
-<span class="n">eval_results</span>
-</pre></div>
-</div>
-</div>
-</div>
+</section>
+<section id="outlook">
+<h3>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h3>
+<p>The code above used a GPT-2 specific class, <code class="docutils literal notranslate"><span class="pre">GPT2LMHeadModel</span></code>, to load the model. However, instead of the architecture-specific classes the so called AutoClass can often be used instead. It essentially “infers” the architecture from a configuration file that is retrieved when a model is downloaded from HF. In the next tutorials, you will often see subclasses of this being used. You can find more (optional) information <a class="reference external" href="https://huggingface.co/docs/transformers/model_doc/auto">here</a>.</p>
 </section>
 </section>
 </section>
@@ -815,6 +883,15 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="02d-char-level-RNN.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Sheet 2.4: Character-level sequence modeling w/ RNNs</p>
+      </div>
+    </a>
 </div>
                 </footer>
               
@@ -833,6 +910,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction-ml-models">Introduction: ML models</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface">HuggingFace 🤗</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-lms-via-transformers">Working with LMs via 🤗 Transformers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
