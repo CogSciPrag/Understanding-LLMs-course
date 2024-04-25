@@ -639,7 +639,7 @@ document.write(`
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.4: Training steps </span></strong></p>
 <ol class="arabic simple">
-<li><p>As a reminder, try to break down step 3 of the high-level overview step 3 into a pseduo-code style list of concrete steps that are required for the training loop. Then, take a look at sheets 2.2 and 2.3 to compare.</p></li>
+<li><p>As a reminder, using pseudo-code, list of concrete steps that constitute a single training step in a training loop. Take a look at the training loops in sheets 2.2 and 2.3 to compare your results.</p></li>
 <li><p>As you go through the following code, please complete it in spots which are commented with “### YOUR CODE HERE ###”</p></li>
 </ol>
 </div></blockquote>
@@ -713,7 +713,7 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># since we don&#39;t want to fully fine-tune the model but rather learn </span>
 <span class="c1"># the basics of the set up, we will only use a small subset of the data</span>
-<span class="n">subsampled_dataset</span> <span class="o">=</span> <span class="n">tokenized_datasets</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">))</span>
+<span class="n">subsampled_dataset</span> <span class="o">=</span> <span class="n">tokenized_datasets</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -730,7 +730,7 @@ document.write(`
 </div>
 <p><strong>IMPORTANT:</strong> it is key to understand the language modeling objective (i.e., mechanism used to train a model to predict the next token) and how it is implemented in practice. Conceptually, the LM objective is discussed at the beginning of the tutorial. In terms of implementation, the addition of special tokens and shifting happens within each transformers model. You can find and example fro GPT-2 <a class="reference external" href="https://github.com/huggingface/transformers/blob/571dd693b5d20754ecc472030903a94f92cfa9f8/src/transformers/models/gpt2/modeling_gpt2.py#L1100">here</a>. As you can see, the collator function above creates the labels that are used as target for prediction for us. Please make sure that you understand this step and that you would be able to create labels, given an input, yourself.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.4: Training steps </span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.5: Understanding Trainer </span></strong></p>
 <p>The next cell defines the key configurations of the training in <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code>. These are passed to the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> in order to instantiate a training loop.</p>
 <ol class="arabic simple">
 <li><p>Please use the documentation <a class="reference external" href="https://huggingface.co/docs/transformers/v4.40.1/en/main_classes/trainer#transformers.Trainer">here</a> to write short comments for each relevant line of the following code cell, so that you know what different training parameters there are.</p></li>
@@ -742,8 +742,8 @@ document.write(`
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define training arguments</span>
 <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
     <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;imdb_gpt2&quot;</span><span class="p">,</span>
-    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
-    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
     <span class="n">eval_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -792,7 +792,7 @@ document.write(`
 </div>
 </div>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.5: CrossEntropyLoss [more advanced]</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.6: CrossEntropyLoss [more advanced]</span></strong></p>
 <ol class="arabic simple">
 <li><p>Implement an even more explicit definition of the loss function by using the <code class="docutils literal notranslate"><span class="pre">torch.nn.CrossEntropyLoss()</span></code> and the labels which are passed as part of the inputs instead of using outputs.loss. The respective docs can be found on the PyTorch website. NB: Make sure to correctly shift your labels.</p></li>
 </ol>
