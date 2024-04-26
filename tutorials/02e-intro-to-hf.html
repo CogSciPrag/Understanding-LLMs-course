@@ -662,6 +662,8 @@ document.write(`
 <span class="c1"># this helper allows to massage the data such that it can be batched into the same </span>
 <span class="c1"># tensor representing a batch of inputs and can be used for training.</span>
 <span class="c1"># specifically it creates *labels* for the model to predict</span>
+<span class="c1"># note that the labels are the same as the input, **not** shifted by one token relative to the input</span>
+<span class="c1"># the shifting is done automatically by the HF model class when the automatic loss computation is used</span>
 <span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span>
@@ -728,7 +730,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p><strong>IMPORTANT:</strong> it is key to understand the language modeling objective (i.e., mechanism used to train a model to predict the next token) and how it is implemented in practice. Conceptually, the LM objective is discussed at the beginning of the tutorial. In terms of implementation, the addition of special tokens and shifting happens within each transformers model. You can find and example fro GPT-2 <a class="reference external" href="https://github.com/huggingface/transformers/blob/571dd693b5d20754ecc472030903a94f92cfa9f8/src/transformers/models/gpt2/modeling_gpt2.py#L1100">here</a>. As you can see, the collator function above creates the labels that are used as target for prediction for us. Please make sure that you understand this step and that you would be able to create labels, given an input, yourself.</p>
+<p><strong>IMPORTANT:</strong> it is key to understand the language modeling objective (i.e., mechanism used to train a model to predict the next token) and how it is implemented in practice. Conceptually, the LM objective is discussed at the beginning of the tutorial. In terms of implementation, the addition of special tokens and shifting happens within each transformers model, it is taken care of by the package. You can find and example for GPT-2 <a class="reference external" href="https://github.com/huggingface/transformers/blob/571dd693b5d20754ecc472030903a94f92cfa9f8/src/transformers/models/gpt2/modeling_gpt2.py#L1100">here</a>. As you can see, the collator function above creates the labels that are used as target for prediction for us. Please make sure that you understand this step and that you would be able to create labels, given an input, yourself. Note that if you manually implement the language modeling loss function (e.g., using the CrossEntropyLoss), you will have to do the processing of the inputs and labels yourself.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.5: Understanding Trainer </span></strong></p>
 <p>The next cell defines the key configurations of the training in <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code>. These are passed to the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> in order to instantiate a training loop.</p>
