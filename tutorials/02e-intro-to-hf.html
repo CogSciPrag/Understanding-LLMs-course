@@ -620,9 +620,9 @@ document.write(`
     <span class="n">model</span><span class="o">=</span><span class="s1">&#39;gpt2&#39;</span>
 <span class="p">)</span>
 
-<span class="c1"># run the pipeline with default configs</span>
-<span class="n">greedy_pipe_output</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">input_text</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greedy pipeline output: &quot;</span><span class="p">,</span> <span class="n">greedy_pipe_output</span><span class="p">)</span>
+<span class="c1"># run the pipeline with default configs (note that the default is NOT greedy decoding)</span>
+<span class="n">pipe_output</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">input_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pipeline output: &quot;</span><span class="p">,</span> <span class="n">pipe_output</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
