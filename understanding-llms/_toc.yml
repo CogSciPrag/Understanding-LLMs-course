@@ -14,3 +14,6 @@ parts:
   - file: tutorials/02b-MLE
   - file: tutorials/02c-MLP-pytorch
   - file: tutorials/02d-char-level-RNN
+- caption: Homework
+  chapters:
+  - file: homework/01-language-modeling
