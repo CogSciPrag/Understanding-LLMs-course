@@ -1,6 +1,7 @@
 torch
 numpy
 matplotlib
+accelerate
 transformers
 sentencepiece
 datasets
