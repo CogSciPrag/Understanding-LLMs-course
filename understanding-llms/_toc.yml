@@ -8,7 +8,7 @@ parts:
   chapters:
   - file: lectures/01-introduction
   - file: tutorials/01-introduction
-- caption: 02 ANNs & RNNs
+- caption: 02 ANNs, RNNs & Transformers
   chapters:
   - file: lectures/02-torch-ANNs-RNNs
   - file: tutorials/02a-pytorch-intro
@@ -16,6 +16,7 @@ parts:
   - file: tutorials/02c-MLP-pytorch
   - file: tutorials/02d-char-level-RNN
   - file: tutorials/02e-intro-to-hf
+  - file: lectures/03-LSTMs-Transformers
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
