@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Course overview: Understanding LLMs &#8212; Understanding LLMs</title>
+    <title>LSTMs &amp; Transformers &#8212; Understanding LLMs</title>
   
   
   
@@ -19,53 +19,54 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="_static/design-tabs.js"></script>
+    <script src="../_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'intro';</script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Background" href="lectures/01-introduction.html" />
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/03-LSTMs-Transformers';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Homework 1: Language models (50 points)" href="../homework/01-language-modeling.html" />
+    <link rel="prev" title="Sheet 2.5: Introduction to HuggingFace &amp; LMs" href="../tutorials/02e-intro-to-hf.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -102,7 +103,7 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -141,7 +142,7 @@ const thebe_selector_output = ".output, .cell_output"
 
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="../intro.html">
   
   
   
@@ -152,8 +153,8 @@ const thebe_selector_output = ".output, .cell_output"
       
     
     
-    <img src="_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
-    <script>document.write(`<img src="_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
   
   
 </a></div>
@@ -161,30 +162,30 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
                     Course overview: Understanding LLMs
                 </a>
             </li>
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="lectures/01-introduction.html">Background</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs, RNNs &amp; Transformers</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">LSTMs &amp; Transformers</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
 </ul>
 
     </div>
@@ -256,7 +257,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fintro.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/03-LSTMs-Transformers.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -286,7 +287,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="_sources/intro.md" target="_blank"
+      <li><a href="../_sources/lectures/03-LSTMs-Transformers.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -370,7 +371,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Course overview: Understanding LLMs</h1>
+    <h1>LSTMs & Transformers</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -380,10 +381,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intended-audience">Intended audience</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-formalia">Course formalia</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schedule">Schedule</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-materials">Further materials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-materials">Additional materials</a></li>
 </ul>
             </nav>
         </div>
@@ -395,48 +393,19 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="course-overview-understanding-llms">
-<h1>Course overview: Understanding LLMs<a class="headerlink" href="#course-overview-understanding-llms" title="Permalink to this heading">#</a></h1>
-<p>The course “Understanding LLMs”, taught at Uni Tübingen, focuses on Large Language Models (LLMs) like GPT-x or LLama. It covers topics that will equip participants with a better conceptual and practical understanding of what LLMs are, how they work, and how to understand them. In the course, we will look (among others) at LLM architecture, training &amp; fine-tuning, prompting, mechanistic interpretability of LLMs, LLM agents and different evaluation methods. Participants will be offered both a technical perspective and encouraged to critically think about important topics relevant to cognitive science and society in the context of LLMs.</p>
-<section id="intended-audience">
-<h2>Intended audience<a class="headerlink" href="#intended-audience" title="Permalink to this heading">#</a></h2>
-<p>The course is intended for master students or advanced bachelor students (of, e.g., (computational) linguistics, cognitive science, or computer science) who are interested in language models / NLP / linguistics / AI / interdisciplinary approaches to state-of-the-art technical advances. Prior knowledge of LLMs is not required; prior experience with programming in Python is highly encouraged.</p>
-</section>
-<section id="course-formalia">
-<h2>Course formalia<a class="headerlink" href="#course-formalia" title="Permalink to this heading">#</a></h2>
-<p>In SS 2024, the course consists of a weekly lecture (Tue) and a weekly practical seminar (Fri) which will systematically introduce and cover concepts from the lecture hands-on, in practical worksheets, where participants will work with (small) LMs themselves. This webbbook will host both lecture materials and practical materials.</p>
-<p>The course is intended for 6 ECTS. There will be compulsory homework assignments and a final exam. Optionally, for 9ECTS, students will conduct group projects.</p>
-</section>
-<section id="schedule">
-<h2>Schedule<a class="headerlink" href="#schedule" title="Permalink to this heading">#</a></h2>
-<p>The lecture overview below is <strong>preliminary</strong> and subject to changes.</p>
-<ol class="arabic simple">
-<li><p>Introduction</p></li>
-<li><p>Neural networks and small language models</p></li>
-<li><p>Transformers</p></li>
-<li><p>Large language models, prompting &amp; fine-tuning</p></li>
-<li><p>Probing &amp; attribution</p></li>
-<li><p>Evaluation</p></li>
-<li><p>Mechanistic interpretability</p></li>
-</ol>
-</section>
-<section id="further-materials">
-<h2>Further materials<a class="headerlink" href="#further-materials" title="Permalink to this heading">#</a></h2>
-<p>There are various courses on deep learning, NLP and LLMs out there. To name a few, these are excellent sources for further related materials:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="lstms-transformers">
+<h1>LSTMs &amp; Transformers<a class="headerlink" href="#lstms-transformers" title="Permalink to this heading">#</a></h1>
+<p>Slides from the third lecture introducing a more advanced RNN architecture - LSTMs - and transformers - the architecture behind modern LLMs - can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/03-LSTMs-Transformers.pdf">here</a>.</p>
+<section id="additional-materials">
+<h2>Additional materials<a class="headerlink" href="#additional-materials" title="Permalink to this heading">#</a></h2>
+<p>If you want to dig a bit deeper, here are (optional!) supplementary readings, a general textbook on deep learning and the paper that first introduced backpropagation for training neural networks:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://rycolab.io/classes/llm-s24/">Large Language Models</a> by Ryan Cotterell’s lab</p></li>
-<li><p><a class="reference external" href="https://stanford-cs324.github.io/winter2022/">Large Language Models</a> by Percy Liang’s lab</p></li>
-<li><p><a class="reference external" href="https://michael-franke.github.io/npNLG/000-intro.html">Pragmatic NLG with neural language models</a> by Michael Franke</p></li>
+<li><p><a class="reference external" href="https://deeplearning.cs.cmu.edu/S23/document/readings/LSTM.pdf">Hochreiter &amp; Schmidhuber (1997) Long Short-Term Memory</a></p></li>
+<li><p><a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">Vaswani et al. (2017) Attention is all you need</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1810.04805.pdf">Devlin et al. (2019) BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></p></li>
+<li><p><a class="reference external" href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">Radford et al. (2019) Language Models are Unsupervised Multitask Learners (GPT-2)</a></p></li>
 </ul>
-<p>Andrej Karpathy has an excellent <a class="reference external" href="https://www.youtube.com/watch?v=zjkBMFhNj_g">1h overview video</a>.</p>
-<p>We also highly recommend Brian Christian’s book <a class="reference external" href="https://brianchristian.org/the-alignment-problem/">The Alignment Problem</a> for a more general perspective on AI and computational CogSci.</p>
 </section>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -452,7 +421,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./."
+            path: "./lectures"
         },
         predefinedOutput: true
     }
@@ -469,12 +438,21 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorials/02e-intro-to-hf.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Sheet 2.5: Introduction to HuggingFace &amp; LMs</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="lectures/01-introduction.html"
+       href="../homework/01-language-modeling.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Background</p>
+        <p class="prev-next-title">Homework 1: Language models (50 points)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -493,10 +471,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intended-audience">Intended audience</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#course-formalia">Course formalia</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schedule">Schedule</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-materials">Further materials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-materials">Additional materials</a></li>
 </ul>
   </nav></div>
 
@@ -545,8 +520,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
   </footer>
