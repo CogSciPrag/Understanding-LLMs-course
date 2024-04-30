@@ -577,6 +577,12 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -617,6 +623,11 @@ document.write(`
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 <span class="c1"># print a sample from the dataset</span>
 <span class="c1">### YOUR CODE HERE ####</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;train&#39;, &#39;validation&#39;, &#39;test&#39;])
 </pre></div>
 </div>
 </div>
@@ -703,6 +714,7 @@ document.write(`
             <span class="n">test_split</span><span class="p">,</span>
             <span class="n">tokenizer</span><span class="p">,</span>
             <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+            <span class="n">dataset_split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the dataset object.</span>
@@ -718,11 +730,15 @@ document.write(`
 <span class="sd">        max_length: int</span>
 <span class="sd">            Maximal length of inputs. All inputs will be </span>
 <span class="sd">            truncated or padded to this length.</span>
+<span class="sd">        dataset_split: str</span>
+<span class="sd">            Specifies which split of the dataset to use. </span>
+<span class="sd">            Default is &quot;train&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_split</span> <span class="o">=</span> <span class="n">train_split</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_split</span> <span class="o">=</span> <span class="n">test_split</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="n">max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_split</span> <span class="o">=</span> <span class="n">dataset_split</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -749,6 +765,7 @@ document.write(`
 <span class="sd">            (torch.Tensor).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># retrieve a training sample at the specified index idx</span>
+        <span class="c1"># HINT: note that this might depend on self.dataset_split</span>
         <span class="n">input_text</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
         <span class="n">tokenized_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
             <span class="n">input_text</span><span class="p">,</span>
@@ -801,11 +818,25 @@ document.write(`
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">CommonsenseQADataset</span><span class="p">(</span>
     <span class="c1">### YOUR CODE HERE ####</span>
 <span class="p">)</span>
+<span class="c1"># instantiate test dataset with the downloaded commonsense_qa data</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">CommonsenseQADataset</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ####,</span>
+    <span class="n">dataset_split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span>
+<span class="p">)</span>
 <span class="c1"># create a DataLoader for the dataset</span>
 <span class="c1"># the data loader will automatically batch the data</span>
 <span class="c1"># and iteratively return training examples (question answer pairs) in batches</span>
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">train_dataset</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="c1"># create a DataLoader for the test dataset</span>
+<span class="c1"># reason for separate data loader is that we want to</span>
+<span class="c1"># be able to use a different index for retreiving the test batches</span>
+<span class="c1"># we might also want to use a different batch size etc.</span>
+<span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">test_dataset</span><span class="p">,</span> 
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
     <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
@@ -829,10 +860,15 @@ document.write(`
 <span class="n">epochs</span>  <span class="o">=</span> <span class="mi">1</span>
 <span class="n">train_steps</span> <span class="o">=</span>  <span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span> <span class="o">//</span> <span class="mi">32</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of training steps: &quot;</span><span class="p">,</span> <span class="n">train_steps</span><span class="p">)</span>
+<span class="c1"># number of test steps to perform every 10 training steps</span>
+<span class="c1"># (smaller that the entore test split for reasons of comp. time)</span>
+<span class="n">num_test_steps</span> <span class="o">=</span> <span class="mi">5</span>
+
 <span class="c1"># define optimizer and learning rate</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span> 
 <span class="c1"># define some variables to accumulate the losses</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_losses</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="c1"># iterate over epochs</span>
 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
@@ -862,7 +898,20 @@ document.write(`
         <span class="c1"># evaluate on test set every 10 steps</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, loss </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="c1"># TODO</span>
+            <span class="c1"># track test loss for the evaluation iteration</span>
+            <span class="n">test_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_test_steps</span><span class="p">):</span>
+                <span class="c1"># get test batch</span>
+                <span class="n">x_test</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">))</span>
+                <span class="n">x_test</span> <span class="o">=</span> <span class="n">x_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">test_outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+                        <span class="c1">### YOUR CODE HERE ####</span>
+                    <span class="p">)</span>
+                <span class="n">test_loss</span> <span class="o">+=</span> <span class="c1">### YOUR CODE HERE ####</span>
+                
+            <span class="n">test_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_loss</span> <span class="o">/</span> <span class="n">num_test_steps</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test loss: &quot;</span><span class="p">,</span> <span class="n">test_loss</span><span class="o">/</span><span class="n">num_test_steps</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
