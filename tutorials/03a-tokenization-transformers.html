@@ -463,6 +463,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transformers">Transformers</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pytorch">PyTorch</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pretrained-transformers">Pretrained transformers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -488,8 +489,6 @@ document.write(`
 </ul>
 <p>The contents of the sheet are inspired by <a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter2/2">this</a> tutorial.</p>
 <p><strong>To do</strong>: say a word about sentence representation.</p>
-<p>tokenization &amp; dealing with context window size, understanding transformers and their architecture and configs (with native Torch code), positional encodings, different model heads, some plots and results of training dynamics and how to interpret them (if time suffices)</p>
-<p>additional materials could be outlook to different architrectures: seq2seq, bidirectional transformers</p>
 <section id="tokenization">
 <h2>Tokenization<a class="headerlink" href="#tokenization" title="Permalink to this heading">#</a></h2>
 <p>Under the hood, neural networks are complicated functions; therefore, they cannot deal with raw text represented as strings, but uses numerical representations of the text. This conversion is done by a <em>tokenizer</em>, and the process is called <em>tokenization</em>. Tokenization commonly consists of the following steps:</p>
@@ -688,7 +687,8 @@ Token:  917 String:  und
 <li><p>Find out what kind of special Llama-2 chat tokens there are (look for <code class="docutils literal notranslate"><span class="pre">meta-llama/Llama-2-7b-chat-hf</span></code> on HF). How should they be used to represent the system prompt and the user input? (Hint: use the HF documentation)</p></li>
 </ol>
 </div></blockquote>
-<p>TODO: Each token is mapped onto an embedding; therefore, vocab size and model must match. TODO: inspect the embedding layer of gpt-2.</p>
+<p>After tokenization, each token is mapped onto an <em>embedding</em>. As discussed in the lecture, there are different types of embeddings: type-based and contextualized embeddings. In both cases, the token IDs are mapped to vector representations as the first processing step in an LM. For type-based representations, these vectors are already pretrained static embeddings. For contextualized cases, these vectores are passed through the net and only the processed vectors are considered embeddings.</p>
+<p>The initial mapping is done by creating <em>one-hot vector</em> as a representation of each index. These are then multipled with the embedding matrix, which results in embedding representations of each token. These are then further processed.</p>
 <section id="attention-masks">
 <h4>Attention masks<a class="headerlink" href="#attention-masks" title="Permalink to this heading">#</a></h4>
 <p>Note that, next to input IDs (i.e., token IDs), the tokenizer encoding returns an attention mask <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code>. The attention mask has the same shape as the input IDs. It is used for training, specifically, because we can nicely parallelise the training of transformers (in contrast to RNN training).</p>
@@ -697,11 +697,25 @@ Token:  917 String:  und
 The attention mask is used to enable <em>causal</em> language modeling, i.e., to hide tokens that come <em>after</em> a token at a given position that is currently used for training.</p>
 <p>EXAMPLE: TODO.</p>
 <p><strong>MLM mask</strong>:</p>
+<p>Example: TODO.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.3: Attention masking</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.3: Embeddings &amp; Attention</span></strong></p>
 <ol class="arabic simple">
 <li><p>Consider the sentence “The quick fox jumped.”. Write down the causal attention mask that we would use for i=2, i.e,. when training the model to predict the word that comes after “fox”. Assume word / punctuation-sign level tokenization.</p></li>
+<li><p>Consider a vocabulary that consists of five tokens. Consider the following embedding matrix with 3-dimensional embeddings:
+$$
+E =</p></li>
 </ol>
+<div class="amsmath math notranslate nohighlight" id="equation-1bdd7de7-e27c-4f33-8c74-660bf2fd8da8">
+<span class="eqno">()<a class="headerlink" href="#equation-1bdd7de7-e27c-4f33-8c74-660bf2fd8da8" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
+&gt;0.11 &amp; 0.02 &amp; 0.37\\
+&gt;0.56 &amp; 0.89 &amp; 0.41 \\
+&gt;0.60 &amp; 0.89 &amp; 0 \\
+&gt; 0.20 &amp; 1 &amp; 0.62 \\
+&gt; 0.12 &amp; 0.03 &amp; 0.29 \\ 
+&gt;\end{bmatrix}\]</div>
+<p>$$
+Extract the embedding for the token with the ID 2 (assume 0-indexing). Write down the respective calculation step.</p>
 </div></blockquote>
 </section>
 </section>
@@ -712,23 +726,84 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 <section id="pytorch">
 <h3>PyTorch<a class="headerlink" href="#pytorch" title="Permalink to this heading">#</a></h3>
 <p>PyTorch provides a pre-build <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html">transformer</a> architecture which allows to specify your desired model via different parameters.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.4: Simple transformers in PyTorch</span></strong></p>
+<ol class="arabic simple">
+<li><p>Write a docstring for the following model class definition. Make sure you can map the parameters of the model onto concepts that were discussed in the lecture.</p></li>
+</ol>
+</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">math</span>
 </pre></div>
 </div>
 </div>
 </div>
-<blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.4: Simple transformers in PyTorch</span></strong></p>
-<ol class="arabic simple">
-<li><p>TODO</p></li>
-</ol>
-</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inject some information about the relative or absolute position of the tokens in the sequence.</span>
+<span class="sd">    The positional encodings have the same dimension as the embeddings, so that the two can be summed.</span>
+<span class="sd">    Here, we use sine and cosine functions of different frequencies.</span>
+<span class="sd">    .. math:</span>
+<span class="sd">        PosEncoder(pos, 2i) = sin(pos/10000^(2i/d_model))</span>
+<span class="sd">        PosEncoder(pos, 2i+1) = cos(pos/10000^(2i/d_model))</span>
+<span class="sd">        where pos is the word position and i is the embed idx</span>
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">        d_model: the embed dim (required).</span>
+<span class="sd">        dropout: the dropout value (default=0.1).</span>
+<span class="sd">        max_len: the max. length of the incoming sequence (default=5000).</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; pos_encoder = PositionalEncoding(d_model)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PositionalEncoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
+
+        <span class="n">pe</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">div_term</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10000.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">d_model</span><span class="p">))</span>
+        <span class="n">pe</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">position</span> <span class="o">*</span> <span class="n">div_term</span><span class="p">)</span>
+        <span class="n">pe</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">position</span> <span class="o">*</span> <span class="n">div_term</span><span class="p">)</span>
+        <span class="n">pe</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;pe&#39;</span><span class="p">,</span> <span class="n">pe</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">TransformerModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Transformer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Container module with an encoder-decoder transformer model.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntoken</span><span class="p">,</span> <span class="n">ninp</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">nhid</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        #### YOUR DOCSTRING HERE #####</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TransformerModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">d_model</span><span class="o">=</span><span class="n">ninp</span><span class="p">,</span> 
+            <span class="n">nhead</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span> 
+            <span class="n">dim_feedforward</span><span class="o">=</span><span class="n">nhid</span><span class="p">,</span> 
+            <span class="n">num_encoder_layers</span><span class="o">=</span><span class="n">nlayers</span><span class="p">,</span>
+            <span class="n">num_decoder_layers</span><span class="o">=</span><span class="n">nlayers</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;Transformer&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_encoder</span> <span class="o">=</span> <span class="n">PositionalEncoding</span><span class="p">(</span><span class="n">ninp</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_emb</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">ntoken</span><span class="p">,</span> <span class="n">ninp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ninp</span> <span class="o">=</span> <span class="n">ninp</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="pretrained-transformers">
 <h3>Pretrained transformers<a class="headerlink" href="#pretrained-transformers" title="Permalink to this heading">#</a></h3>
-<p>Below, we consider in more detail what is under the hood when we load a pretrained transformer from HF. We will look at GPT-2.</p>
+<p>Below, we consider in more detail what is under the hood when we load a pretrained transformer from HF. We will look at GPT-2. GPT-2 is a <em>decoder-only</em> model. That is, it only uses self-attention.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
@@ -738,9 +813,75 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpt2_lm</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, we load the pretrained model and inspect it</span>
+<span class="n">gpt2_lm</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">gpt2_lm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2LMHeadModel(
+  (transformer): GPT2Model(
+    (wte): Embedding(50257, 768)
+    (wpe): Embedding(1024, 768)
+    (drop): Dropout(p=0.1, inplace=False)
+    (h): ModuleList(
+      (0-11): 12 x GPT2Block(
+        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (attn): GPT2Attention(
+          (c_attn): Conv1D()
+          (c_proj): Conv1D()
+          (attn_dropout): Dropout(p=0.1, inplace=False)
+          (resid_dropout): Dropout(p=0.1, inplace=False)
+        )
+        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (mlp): GPT2MLP(
+          (c_fc): Conv1D()
+          (c_proj): Conv1D()
+          (act): NewGELUActivation()
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (ln_f): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  )
+  (lm_head): Linear(in_features=768, out_features=50257, bias=False)
+)
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.5: GPT-2 architecture</span></strong></p>
+<ol class="arabic simple">
+<li><p>What are the dimensions of the embedding layer? What does each dimension represent? How do they relate to the vocabulary size and why is that so?</p></li>
+<li><p>In order to understand the architecture, for yourself, answer the following questions: (a) how many transformer blocks does GPT-2 consist of? (b) Which layer is used to compute attention weights? (c) What is the dimension of the resulting contextualized embedding?</p></li>
+</ol>
+</div></blockquote>
+<p>We can actually access the single components of the model. Let’s inspect the components of the first attention block in more detail. Feel free to play around with the printing to get an intuition how to acccess different parts of the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;shape of the attention weights &quot;</span><span class="p">,</span> <span class="n">gpt2_lm</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attention matrix&quot;</span><span class="p">)</span>
+<span class="n">gpt2_lm</span><span class="o">.</span><span class="n">transformer</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attn</span><span class="o">.</span><span class="n">c_attn</span><span class="o">.</span><span class="n">weight</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>shape of the attention weights  torch.Size([768, 2304])
+Attention matrix
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parameter containing:
+tensor([[-0.4738, -0.2614, -0.0978,  ...,  0.0513, -0.0584,  0.0250],
+        [ 0.0874,  0.1473,  0.2387,  ..., -0.0525, -0.0113, -0.0156],
+        [ 0.0039,  0.0695,  0.3668,  ...,  0.1143,  0.0363, -0.0318],
+        ...,
+        [-0.2592, -0.0164,  0.1991,  ...,  0.0095, -0.0516,  0.0319],
+        [ 0.1517,  0.2170,  0.1043,  ...,  0.0293, -0.0429, -0.0475],
+        [-0.4100, -0.1924, -0.2400,  ..., -0.0046,  0.0070,  0.0198]],
+       requires_grad=True)
 </pre></div>
 </div>
 </div>
@@ -749,11 +890,15 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 So far, we have implicitly assumed the <em>language modeling</em> head; i.e., a layer which maps the transformer representations onto a distribution over the vocabulary, from which we can sample the next word. However, for different tasks, we might want a different output.</p>
 <p>The full list of different classes with different heads can be found <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2Config">here</a>.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.5: GPT-2 task heads</span></strong></p>
-<ol class="arabic simple">
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.5: GPT-2 architecture</span></strong></p>
+<ol class="arabic simple" start="2">
 <li><p>Which layer is used to implement a sequence classification head with GPT-2? (Hint: use the docs above)</p></li>
 </ol>
 </div></blockquote>
+</section>
+<section id="outlook">
+<h3>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h3>
+<p>Seq2seq model architecture details, image captioning architectures.</p>
 </section>
 </section>
 </section>
@@ -818,6 +963,7 @@ So far, we have implicitly assumed the <em>language modeling</em> head; i.e., a 
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transformers">Transformers</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pytorch">PyTorch</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pretrained-transformers">Pretrained transformers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
