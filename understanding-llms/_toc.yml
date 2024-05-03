@@ -17,6 +17,7 @@ parts:
   - file: tutorials/02d-char-level-RNN
   - file: tutorials/02e-intro-to-hf
   - file: lectures/03-LSTMs-Transformers
+  - file: tutorials/03a-tokenization-transformers
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
