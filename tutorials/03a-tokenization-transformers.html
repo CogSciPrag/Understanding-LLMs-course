@@ -625,7 +625,7 @@ document.write(`
 <ol class="arabic simple">
 <li><p>Inspect the three tokenization related files that are loaded together with the pretrained GPT-2 <a class="reference external" href="https://huggingface.co/openai-community/gpt2/tree/main">here</a>. What do the single files contain?</p></li>
 <li><p>What kind of special tokens does the GPT-2 tokenizer have? (Hint: use the HF documentation of the respective tokenizer)</p></li>
-<li><p>Find out what kind of special Llama-2 chat tokens there are (look for <code class="docutils literal notranslate"><span class="pre">meta-llama/Llama-2-7b-chat-hf</span></code> on HF). How should they be used to represent the system prompt and the user input? (Hint: use the HF documentation)</p></li>
+<li><p>Find out what kind of special Llama-2 chat tokens there are (look for <code class="docutils literal notranslate"><span class="pre">meta-llama/Llama-2-7b-chat-hf</span></code> on HF). How should they be used to represent the system prompt and the user input? (Hint: use the HF documentation. You can also find out more about LLama-chat prompting <a class="reference external" href="https://huggingface.co/blog/llama2#how-to-prompt-llama-2">here</a>)</p></li>
 </ol>
 </div></blockquote>
 <p>After tokenization, each token is mapped onto an <em>embedding</em>. As discussed in the lecture, there are different types of embeddings: type-based and contextualized embeddings. In both cases, the token IDs are mapped to vector representations as the first processing step in an LM. For type-based representations, these vectors are already pretrained static embeddings. For contextualized cases, these vectores are passed through the net and only the processed vectors are considered embeddings.</p>
@@ -647,8 +647,8 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 $$
 E =</p></li>
 </ol>
-<div class="amsmath math notranslate nohighlight" id="equation-52bb7e9d-7dd0-4e66-b76a-d2916a32a666">
-<span class="eqno">(1)<a class="headerlink" href="#equation-52bb7e9d-7dd0-4e66-b76a-d2916a32a666" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
+<div class="amsmath math notranslate nohighlight" id="equation-a71e6b04-eff0-4f12-a126-79e92bf4c271">
+<span class="eqno">(1)<a class="headerlink" href="#equation-a71e6b04-eff0-4f12-a126-79e92bf4c271" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
 &gt;0.11 &amp; 0.02 &amp; 0.37\\
 &gt;0.56 &amp; 0.89 &amp; 0.41 \\
 &gt;0.60 &amp; 0.89 &amp; 0 \\
