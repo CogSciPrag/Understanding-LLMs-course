@@ -801,6 +801,72 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </div>
 </div>
 </div>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># 1. load dataset, only training split</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span>
+    <span class="s2">&quot;zeroshot/twitter-financial-news-sentiment&quot;</span><span class="p">,</span>
+    <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 2. understand dataset</span>
+<span class="c1"># print first 5 examples</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># print the columns of the dataset</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+
+<span class="c1"># get the number of examples in the dataset</span>
+<span class="n">dataset_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset size: </span><span class="si">{</span><span class="n">dataset_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># compute the tweet lengths (in words, i.e., split by whitespace)</span>
+<span class="c1"># plot them and compute the average tweet length</span>
+<span class="n">tweets</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+<span class="n">tweet_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">tweet</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">tweet</span> <span class="ow">in</span> <span class="n">tweets</span><span class="p">]</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">average_tweet_length</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tweet_lengths</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">tweet_lengths</span><span class="p">)</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average tweet length: </span><span class="si">{</span><span class="n">average_tweet_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># plot the tweet lengths</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">tweet_lengths</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Tweet length&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;text&#39;: [&#39;$BYND - JPMorgan reels in expectations on Beyond Meat https://t.co/bd0xbFGjkT&#39;, &#39;$CCL $RCL - Nomura points to bookings weakness at Carnival and Royal Caribbean https://t.co/yGjpT2ReD3&#39;, &#39;$CX - Cemex cut at Credit Suisse, J.P. Morgan on weak building outlook https://t.co/KN1g4AWFIb&#39;, &#39;$ESS: BTIG Research cuts to Neutral https://t.co/MCyfTsXc2N&#39;, &#39;$FNKO - Funko slides after Piper Jaffray PT cut https://t.co/z37IJmCQzB&#39;], &#39;label&#39;: [0, 0, 0, 0, 0]}
+[&#39;text&#39;, &#39;label&#39;]
+Dataset size: 9543
+Average tweet length: 12.17835062349366
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Tweet length&#39;)
+</pre></div>
+</div>
+<img alt="../_images/54bebe0bc64b73c0e351b077dc07b2284faab5835d922c79b8cfbb0f975b06d0.png" src="../_images/54bebe0bc64b73c0e351b077dc07b2284faab5835d922c79b8cfbb0f975b06d0.png" />
+</div>
+</details>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Answers Exercise 1.1.: Massaging a Twitter dataset</span></strong></p>
+<ol class="arabic simple" start="2">
+<li><p>The Tweet lenght peaks at 10 tokens, followed by between 10 and 15 tokens. The tweet lenght is almost never larger then 25 tokens. The Average tweet length is 12.17835062349366. This is quite small for tweets.
+So if you would train your Twitter bot with this dataset you would receive a bot that answers in very short sentences. If that is what you are looking for, the dataset would be appropiate.</p></li>
+</ol>
+</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. clean tweets: remove non-alphabetic or non-space characters</span>
@@ -839,6 +905,51 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </div>
 </div>
 </div>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. clean tweets: remove non-alphabetic characters</span>
+<span class="c1"># Hint: you can easily google how to remove non-alphabetic characters in Python</span>
+
+
+<span class="k">def</span> <span class="nf">clean_tweet</span><span class="p">(</span><span class="n">tweet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove non-alphabetic or non-space characters from a tweet.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    tweet: str</span>
+<span class="sd">        Tweet to clean.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cleaned_tweet: str</span>
+<span class="sd">        Cleaned tweet without non-alphabetic symbols.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tweet</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">char</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">tweet</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()]</span>
+    <span class="p">)</span>  <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="k">return</span> <span class="n">tweet</span>
+
+<span class="c1"># apply the preprocessing function to all tweets</span>
+<span class="n">cleaned_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">clean_tweet</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># look at a few examples of clean tweets</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cleaned_dataset</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5. split dataset into training and testing set</span>
@@ -862,6 +973,37 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </pre></div>
 </div>
 </div>
+</div>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5. split dataset into training and testing set</span>
+
+<span class="c1"># select the proportion of the dataset that should be used for training</span>
+<span class="c1"># and the proportion that should be used for testing</span>
+<span class="c1"># commonly train : test is around 80:20</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">dataset_size</span><span class="p">)</span>  <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">test_size</span> <span class="o">=</span> <span class="n">dataset_size</span> <span class="o">-</span> <span class="n">train_size</span>  <span class="c1">### YOUR CODE HERE ###</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, Test size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># split the dataset into training and testing set</span>
+<span class="c1"># this will create two new sub-datasets with the keys &quot;train&quot; and &quot;test&quot;</span>
+<span class="n">cleaned_dataset_split</span> <span class="o">=</span> <span class="n">cleaned_dataset</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span>  
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -906,6 +1048,52 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </div>
 </div>
 </div>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 7-8. Tokenize and batch the dataset with wrappers provided by the datasets package</span>
+<span class="c1"># for tokeinization, we use the GPT-2 tokenizer (more details for what is going on</span>
+<span class="c1"># under the hood of these wrappers is to come in the next sessions)</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">tokenization</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper around the tokenizer to tokenize the text of an example.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    ----</span>
+<span class="sd">    example: dict</span>
+<span class="sd">        Example tweet from the dataset.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Tokenized tweet with token IDs and an attention mask.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+<span class="c1"># apply the tokenization function to the train dataset</span>
+<span class="n">preprocessed_train_dataset</span> <span class="o">=</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenization</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># </span>
+<span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> 
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">format</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># finally, to see what the preprocessed dataset looks like </span>
@@ -929,6 +1117,16 @@ The following exercises are meant to foster understanding and critical thinking 
 <li><p>What is the difference between The Pile and Common Crawl? Why was The Pile introduced?</p></li>
 <li><p>What does the “epochs” column in Table 1 refer to? What is the idea behind it?</p></li>
 <li><p>What kind of data is missing from the mix reported in Table 1? What do you think the effect of adding such data would be on an LM trained with the data?</p></li>
+</ol>
+</div></blockquote>
+<p>Click below to see the solution.</p>
+<p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Answers Exercise 1.2.: Understanding The Pile</span></strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The majority of the data is english. Additionally is consists in 14 languages. Nonetheless, the main criteria for multilanguage data was the existence of english data. Therefore Hungarian text completion is probably not possible.</p></li>
+<li><p>Common crawl consists in a large amount of raw data, which can result in a poor quality. Because it is favourable to uses a mixtures of many diverse datasets of high quality and from different fields, the Pile was introduced. Furthermore common crawl is part if The Pile changed into PIle-CC while using jusText on Web Archive files for extraction to receive a higher quality.</p></li>
+<li><p>Epochs are the number of passes over each constituent dataset during a full epoch over the Pile. Therefore smaller datasets can pass the dataset more often the large datasets resulting in a better diversion.</p></li>
+<li><p>The standard diviation of the document could give inforation whether the dataset has strong outliers. It can give an impression whether the dataset is biased in some way or not.</p></li>
 </ol>
 </div></blockquote>
 </section>

@@ -633,7 +633,7 @@ document.write(`
 <section id="attention-masks">
 <h4>Attention masks<a class="headerlink" href="#attention-masks" title="Permalink to this heading">#</a></h4>
 <p>Note that, next to input IDs (i.e., token IDs), the tokenizer encoding returns an attention mask <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code>. The attention mask has the same shape as the input IDs. It is used for training in order to allow the transformer to base its predictions only on certain parts of the input text. Specifically, for causal LMs, attention masks are needed because we can nicely parallelise the training of transformers and process an entire sequence at once (in contrast to RNN training); but we still want to base the predictions only on the preceding part of a sentence.</p>
-<p>In the widespread HF implementation, the attention mask has a 1 to indicate that the transformer should <em>attend</em> to tokens at the particular positions, while a 0 indicates that the transformer should not attend to the given token. The attention mask provided by the tokenizer (or created manually nu the user) is further transformed and added to the attention computations. This operation results in “zero-ing out” contributions of tokens we don’t want to attend to when computing a given token representation, essentially as if they weren’t there.</p>
+<p>In the widespread HF implementation, the attention mask has a 1 to indicate that the transformer should <em>attend</em> to tokens at the particular positions, while a 0 indicates that the transformer should not attend to the given token. The attention mask provided by the tokenizer (or created manually by the user) is further transformed and added to the attention computations. This operation results in “zero-ing out” contributions of tokens we don’t want to attend to when computing a given token representation, essentially as if they weren’t there.</p>
 <p><strong>Causal mask</strong>:
 The attention mask is used to enable <em>causal</em> language modeling, i.e., to hide tokens that come <em>after</em> a token at a given position that is currently used for training. For training in a transformer in parallel over the entire sentence, the mask is created as a matrix, where each row <span class="math notranslate nohighlight">\(i\)</span> represents the correct mask for the <span class="math notranslate nohighlight">\(i\)</span>-th token. The matrix on the right in the picture shows an example causal attention mask.</p>
 <p><img alt="img" src="../_images/03a-masking.png" /></p>
@@ -647,8 +647,8 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 $$
 E =</p></li>
 </ol>
-<div class="amsmath math notranslate nohighlight" id="equation-a71e6b04-eff0-4f12-a126-79e92bf4c271">
-<span class="eqno">(1)<a class="headerlink" href="#equation-a71e6b04-eff0-4f12-a126-79e92bf4c271" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
+<div class="amsmath math notranslate nohighlight" id="equation-2c7c803b-6af7-4fc5-b3a8-c04636d24f19">
+<span class="eqno">(1)<a class="headerlink" href="#equation-2c7c803b-6af7-4fc5-b3a8-c04636d24f19" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
 &gt;0.11 &amp; 0.02 &amp; 0.37\\
 &gt;0.56 &amp; 0.89 &amp; 0.41 \\
 &gt;0.60 &amp; 0.89 &amp; 0 \\
@@ -1041,7 +1041,7 @@ Value matrix shape  torch.Size([32, 32])
 </section>
 <section id="outlook-optional">
 <h2>Outlook (optional)<a class="headerlink" href="#outlook-optional" title="Permalink to this heading">#</a></h2>
-<p>For thos who want to know more about topics that go beyond the contents of the sheet and the lecture, here are some pointers:</p>
+<p>For those who want to know more about topics that go beyond the contents of the sheet and the lecture, here are some pointers:</p>
 <ul class="simple">
 <li><p>A different task that relies on text generation is image captioning. We have briefly seen it in the context of attention visualization. <a class="reference external" href="https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Vinyals_Show_and_Tell_2015_CVPR_paper.pdf">This</a> paper introduces one of the first successful architectures in this domain.</p>
 <ul>
