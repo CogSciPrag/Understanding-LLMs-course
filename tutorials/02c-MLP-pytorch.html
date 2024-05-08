@@ -568,7 +568,7 @@ For each sampled <span class="math notranslate nohighlight">\(x\)</span>, we com
 </section>
 <section id="defining-the-mlp-using-pytorchs-built-in-modules">
 <h2>Defining the MLP using PyTorch’s built-in modules<a class="headerlink" href="#defining-the-mlp-using-pytorchs-built-in-modules" title="Permalink to this heading">#</a></h2>
-<p>Our model maps a single scalar <span class="math notranslate nohighlight">\(x\)</span> onto another scalar <span class="math notranslate nohighlight">\(y\)</span>.
+<p>As before (sheet 2.2), our model maps a single scalar <span class="math notranslate nohighlight">\(x\)</span> onto another scalar <span class="math notranslate nohighlight">\(y\)</span>.
 We use a 3-layer MLP, each hidden layer with dimension 10:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -635,6 +635,7 @@ They should implement the exact same model and work the same way eventually.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">mlp_explicit</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---------------------------------------------------------------------------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -706,10 +707,30 @@ They should implement the exact same model and work the same way eventually.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.1: Inspect the model’s parameters and their initial values</span></strong></p>
 <ol class="arabic simple" start="0">
-<li><p>Make sure that you understand what these parameters are. (Hint: We have a 3 layer network, each hidden layer has 10 nodes. We should expect to see slopes (aka weights) and intercepts (biases) somewhere. The order of the presentation in this print-out is the order in which the numbers matter in the computation of the forward pass.)</p></li>
+<li><p>[Just for yourself.] Make sure that you understand what these parameters are by mapping these onto the parameters of the custom-made model from sheet 2.2. (Hint: the order of the presentation in this print-out is the order in which the components occur in the computation of the forward pass.)</p></li>
 <li><p>Guess how the weights of the slope matrices are initialized (roughly). Same for the intercept vectors.</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<ul class="simple">
+<li><p>first layer connects input with 10 hidden nodes: 10x1</p></li>
+<li><p>each hidden node has a bias: 1x10</p></li>
+<li><p>second layer connects 10 hidden nodes with another layer of 10 hidden nodes: 10x10</p></li>
+<li><p>again each node has a bias: 1x10</p></li>
+<li><p>Again the third layer connects 10 hidden nodes with 10 hidden nodes and each node has a bias: 10x10, 1x10</p></li>
+<li><p>the last layer connects 10 hidden nodes with one output node: 1x10</p></li>
+<li><p>the last output node has a bias: 1x1</p></li>
+</ul>
+<p>This is the code for initializing the params:</p>
+<p><code class="docutils literal notranslate"><span class="pre">stdv</span> <span class="pre">=</span> <span class="pre">1.</span> <span class="pre">/</span> <span class="pre">math.sqrt(self.weight.size(1))</span></code>
+<code class="docutils literal notranslate"><span class="pre">self.weight.data.uniform_(-stdv,</span> <span class="pre">stdv)</span></code>
+<code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">self.bias</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">None:</span></code>
+<code class="docutils literal notranslate"><span class="pre">self.bias.data.uniform_(-stdv,</span> <span class="pre">stdv)</span></code></p>
+<p>It means if the source layer is of size 1, the weights are normally distributed between -1 and 1.
+If the source layer is 10, the weights are normally distributed between -0.32 and 0.32
+Same for biases.</p>
+</div>
 </section>
 <section id="more-concise-definition-of-nn-module">
 <h3>More concise definition of NN module<a class="headerlink" href="#more-concise-definition-of-nn-module" title="Permalink to this heading">#</a></h3>
@@ -776,7 +797,7 @@ The class <strong>DataLoader</strong> takes a <code class="docutils literal notr
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">##################################################</span>
-<span class="c1">## representing training data as a Dataset object</span>
+<span class="c1">## representing train data as a Dataset object</span>
 <span class="c1">##################################################</span>
 
 
@@ -959,6 +980,83 @@ Training process has finished.
 <li><p>Above we used the DataLoader to train in 4 mini-batches. Change it so that there is only one batch containing all the data. Change the <code class="docutils literal notranslate"><span class="pre">shuffle</span></code> parameter so that data is not shuffled. Run the model and check if you observe any notable differences. Explain what your observations are. (If you do not see anything, explain why you don’t. You might pay attention to the results of training.)</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">NonLinearRegressionData</span><span class="p">(</span><span class="n">x_obs</span><span class="p">,</span> <span class="n">y_obs</span><span class="p">)</span>
+<span class="c1"># set shuffle to false and batch size to 100</span>
+<span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># initialize model</span>
+<span class="n">mlp_condensed</span> <span class="o">=</span> <span class="n">MLPcondensed</span><span class="p">(</span><span class="n">n_input</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">mlp_condensed</span>
+
+<span class="c1">##################################################</span>
+<span class="c1">## training the model</span>
+<span class="c1">##################################################</span>
+
+<span class="c1"># Define the loss function and optimizer</span>
+<span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">n_train_steps</span> <span class="o">=</span> <span class="mi">50000</span>
+
+<span class="c1"># Run the training loop</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_train_steps</span><span class="p">):</span>
+
+    <span class="c1"># Set current loss value</span>
+    <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Iterate over the DataLoader for training data</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># Get inputs</span>
+        <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># Zero the gradients</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="c1"># Perform forward pass (make sure to supply the input in the right way)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="c1"># Compute loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="c1"># Perform backward pass</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="c1"># Perform optimization</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="c1"># Print statistics</span>
+        <span class="n">current_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss after epoch </span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current_loss</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">current_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># Process is complete.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training process has finished.&quot;</span><span class="p">)</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">o</span><span class="p">]))</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">x_obs</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="c1"># plot the data</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;x_obs&quot;</span><span class="p">:</span> <span class="n">x_obs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="s2">&quot;y_obs&quot;</span><span class="p">:</span> <span class="n">y_obs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="s2">&quot;y_pred&quot;</span><span class="p">:</span> <span class="n">y_pred</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">d_wide</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">id_vars</span><span class="o">=</span><span class="s2">&quot;x_obs&quot;</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y_obs&quot;</span><span class="p">,</span> <span class="s2">&quot;y_pred&quot;</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d_wide</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x_obs&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">goal_fun</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="toggle docutils container">
+<p>Shuffling the data seems to have no effect. While processing the data at once instead of batches seems to decrease the further and speed up training, processing in batches seems to produce predictions which fit closer to the line. This is probably because the more subtle “wiggles” in the data do get washed out with a more holistic training signal.</p>
+</div>
 </section>
 <section id="outlook-pytorch-layers-and-utils-optional">
 <h2>Outlook: PyTorch layers and utils [optional]<a class="headerlink" href="#outlook-pytorch-layers-and-utils-optional" title="Permalink to this heading">#</a></h2>
@@ -983,6 +1081,27 @@ Training process has finished.
 <li><p><code class="docutils literal notranslate"><span class="pre">rnn.pad_packed_sequence</span></code>:</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.3.3: Define functionality of PyTorch utilities</span></strong></p>
+<p>Please look at the documentation references above and, for youself, write down short (intuitive) definitions of what the following building blocks are (layer or activation function or something else), how / why / what for / where you think they could be used in the context of language modeling.</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GELU</span></code>: Activation function to model non-linear data. Used in BERT or GPT instead of ReLU.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.LogSoftmax</span></code>: Used to get a probability distribution over the entire vocabulary. (activation function?)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GRU</span></code>: Layer function. Used in RNNs to deal with vanishing gradients and improve predictions by “forgetting” and “remembering” certain information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.GRUCell</span></code>: Similar to GRU but for single timestamps over which you can iterate manually.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code>: Module for creating transformer models.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.Embedding</span></code>: Module to store embeddings</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.CosineSimilarity</span></code>: Function to return the cosine similarity between two word embeddings. Used to determine the similarity between words or texts.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn.CrossEntropyLoss</span></code>: Loss function used for calculating the Loss between prediction and gold label. Typically used for classification tasks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clip_grad_value_</span></code>: clips the gradients at some specified value. Gradients that are bigger or smaller will be capped.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weight_norm</span></code>: splits the parameter into two parameters, one representing the vector’s direction and one its magnitude</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rnn.pad_sequence</span></code>: stacks list of tensors of different lengths by padding shorter ones.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rnn.pad_packed_sequence</span></code>: unpacks a packed tensor and pads the single tensors. Inverse of pack_padded_sequence.</p></li>
+</ol>
+</div></blockquote>
+</div>
 <section id="advanced-outlook-pytorch-autograd-and-computational-graph-optional">
 <h3>Advanced outlook: PyTorch Autograd and computational graph [optional]<a class="headerlink" href="#advanced-outlook-pytorch-autograd-and-computational-graph-optional" title="Permalink to this heading">#</a></h3>
 <p>The main work horse behind training neural networks is the chain rule of differentiation. This is the basic rule of calculus that allows exact computation of the gradient of the complicated function that is a neural net with respect to the current input. This gradient, in turn, allows to compute the value by which each weight of the net should be updated in order to improve on the target task (e.g., predicting the next word).</p>
@@ -999,6 +1118,54 @@ Training process has finished.
 <li><p>Try to draw the computational graph (like in Figure 4 of the autograd blogpost) for the function <span class="math notranslate nohighlight">\(f(x) = x^3 - x^2\)</span>.</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Digraph</span>
+
+<span class="n">forward</span> <span class="o">=</span> <span class="n">Digraph</span><span class="p">()</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;x^3&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;x^2&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;v-w&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<span class="n">forward</span><span class="o">.</span><span class="n">edges</span><span class="p">([</span><span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="s2">&quot;BD&quot;</span><span class="p">,</span> <span class="s2">&quot;CE&quot;</span><span class="p">,</span> <span class="s2">&quot;DE&quot;</span><span class="p">,</span> <span class="s2">&quot;EF&quot;</span><span class="p">,</span> <span class="s2">&quot;FG&quot;</span><span class="p">])</span>
+<span class="n">forward</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backward</span> <span class="o">=</span> <span class="n">Digraph</span><span class="p">()</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;dz/dy&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;Subtraction Derivative&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;dz/dv&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;dz/dw&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;dz/dx&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;dz/dx&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;Power Derivative&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;Power Derivative&quot;</span><span class="p">)</span>
+<span class="n">backward</span><span class="o">.</span><span class="n">edges</span><span class="p">([</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="s2">&quot;BC&quot;</span><span class="p">,</span> <span class="s2">&quot;BD&quot;</span><span class="p">,</span> <span class="s2">&quot;CG&quot;</span><span class="p">,</span> <span class="s2">&quot;DH&quot;</span><span class="p">,</span> <span class="s2">&quot;GE&quot;</span><span class="p">,</span> <span class="s2">&quot;HF&quot;</span><span class="p">])</span>
+<span class="n">backward</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
 </section>
 </section>
 </section>

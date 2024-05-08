@@ -481,9 +481,9 @@ By using stochastic gradient descent to minimize the loss, we seek the parameter
 This is, therefore, a <strong>maximum likelihood estimation</strong>.</p>
 <section id="packages">
 <h2>Packages<a class="headerlink" href="#packages" title="Permalink to this heading">#</a></h2>
-<p>We will need to import the `torch` package for the main functionality.
-We also will use `seaborn` for plotting, and `matplotlib` for showing the plots.
-Finally, we use the `warnings` package to suppress all warning messages in the notebook.</p>
+<p>We will need to import the <code class="docutils literal notranslate"><span class="pre">torch</span></code> package for the main functionality.
+We also will use <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> for plotting, and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> for showing the plots.
+Finally, we use the <code class="docutils literal notranslate"><span class="pre">warnings</span></code> package to suppress all warning messages in the notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -499,10 +499,10 @@ Finally, we use the `warnings` package to suppress all warning messages in the n
 </section>
 <section id="true-distribution-training-data">
 <h2>True distribution &amp; training data<a class="headerlink" href="#true-distribution-training-data" title="Permalink to this heading">#</a></h2>
-<p>The “true distribution” that generates the data is a normal distribution with a mean (location) stored in the variable `true_location`.
+<p>The “true distribution” that generates the data is a normal distribution with a mean (location) stored in the variable <code class="docutils literal notranslate"><span class="pre">true_location</span></code>.
 (We keep the scale parameter (standard deviation) fixed at a known value of 1.)
-The `torch.distributions` package contains ready-made probability distributions for sampling.
-So, here we define the true distribution, and take `n_obs` samples from it, the set of which we call “training data”.</p>
+The <code class="docutils literal notranslate"><span class="pre">torch.distributions</span></code> package contains ready-made probability distributions for sampling.
+So, here we define the true distribution, and take <code class="docutils literal notranslate"><span class="pre">n_obs</span></code> samples from it, the set of which we call “training data”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_obs</span> <span class="o">=</span> <span class="mi">10000</span>
@@ -638,14 +638,14 @@ Here we consider the likelihood: how likely is the training data under the curre
 </div>
 </div>
 </div>
-<p>Notice that the `loss` variable is a single-numbered tensor (containing the information how bad (we want to minimize it) the current parameter value is).
-Notice that PyTorch has also added information on how to compute gradients, i.e., it keeps track of way in which values for the variable `location` influence the values for the variable `loss`.</p>
+<p>Notice that the <code class="docutils literal notranslate"><span class="pre">loss</span></code> variable is a single-numbered tensor (containing the information how bad (we want to minimize it) the current parameter value is).
+Notice that PyTorch has also added information on how to compute gradients, i.e., it keeps track of way in which values for the variable <code class="docutils literal notranslate"><span class="pre">location</span></code> influence the values for the variable <code class="docutils literal notranslate"><span class="pre">loss</span></code>.</p>
 </section>
 <section id="part-3-backpropagate-the-error-signal">
 <h3>Part 3: Backpropagate the error signal<a class="headerlink" href="#part-3-backpropagate-the-error-signal" title="Permalink to this heading">#</a></h3>
-<p>In the next step, we will use the information stored about the functional relation between `location` and `loss` to infer how the `location` parameter would need to be changed to make `loss` higher or lower.
+<p>In the next step, we will use the information stored about the functional relation between <code class="docutils literal notranslate"><span class="pre">location</span></code> and <code class="docutils literal notranslate"><span class="pre">loss</span></code> to infer how the <code class="docutils literal notranslate"><span class="pre">location</span></code> parameter would need to be changed to make <code class="docutils literal notranslate"><span class="pre">loss</span></code> higher or lower.
 This is the so-called backpropagation step.</p>
-<p>Concretely, at the outset, the gradient information for `location` is “NONE”.</p>
+<p>Concretely, at the outset, the gradient information for <code class="docutils literal notranslate"><span class="pre">location</span></code> is “NONE”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value (initial)                = </span><span class="si">{</span><span class="n">location</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -722,7 +722,7 @@ Gradient information (after zero-ing) = None
 </section>
 <section id="training-loop">
 <h2>Training loop<a class="headerlink" href="#training-loop" title="Permalink to this heading">#</a></h2>
-<p>After having gone through our cycle of parameter updating step-by-step, let’s iterate this in a training loop consisting of `n_training_steps`.</p>
+<p>After having gone through our cycle of parameter updating step-by-step, let’s iterate this in a training loop consisting of <code class="docutils literal notranslate"><span class="pre">n_training_steps</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_training_steps</span> <span class="o">=</span> <span class="mi">10000</span>
@@ -774,13 +774,25 @@ Gradient information (after zero-ing) = None
 </div>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.2.1: Explore the optimization process</span></strong></p>
-<p>This exercise is intended to make you play around with the parameters of the training procedure, namely `learning_rate` and `n_training_steps`, and to develop a feeling for what they do. There is not necessarily a single “true” solution. Report the values that you found to work best for each of the following cases:</p>
+<p>This exercise is intended to make you play around with the parameters of the training procedure, namely <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> and <code class="docutils literal notranslate"><span class="pre">n_training_steps</span></code>, and to develop a feeling for what they do. There is not necessarily a single “true” solution. Report the values that you found to work best for each of the following cases:</p>
 <ol class="arabic simple">
-<li><p>Change the initial value of the parameter `location` to -5000.</p></li>
-<li><p>Revert to initial conditions. Change the true mean (parameter `true_location`) to 5000.</p></li>
-<li><p>Revert to initial conditions. Use only 100 samples for the training set (using variable `n_obs`).</p></li>
+<li><p>Change the initial value of the parameter <code class="docutils literal notranslate"><span class="pre">location</span></code> to -5000.</p></li>
+<li><p>Revert to initial conditions. Change the true mean (parameter <code class="docutils literal notranslate"><span class="pre">true_location</span></code>) to 5000.</p></li>
+<li><p>Revert to initial conditions. Use only 100 samples for the training set (using variable <code class="docutils literal notranslate"><span class="pre">n_obs</span></code>).</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.2.1: Explore the optimization process</span></strong></p>
+<p>This exercise is intended to make you play around with the parameters of the training procedure, namely <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> and <code class="docutils literal notranslate"><span class="pre">n_training_steps</span></code>, and to develop a feeling for what they do. There is not necessarily a single “true” solution. Report the values that you found to work best for each of the following cases:</p>
+<ol class="arabic simple">
+<li><p>Change the initial value of the parameter <code class="docutils literal notranslate"><span class="pre">location</span></code> to -5000. <strong>Answer</strong> This means that the initial value and the true mean are further apart, so training takes longer (i.e. you need more training steps) or you have to increase the learning rate.</p></li>
+<li><p>Revert to initial conditions. Change the true mean (parameter <code class="docutils literal notranslate"><span class="pre">true_location</span></code>) to 5000. <strong>Answer</strong> Similar to 1. In both cases, the parameter has to change more during training.</p></li>
+<li><p>Revert to initial conditions. Use only 100 samples for the training set (using variable <code class="docutils literal notranslate"><span class="pre">n_obs</span></code>). <strong>Answer</strong> The overall loss will be lower, so the estimate will change more slowly. You can solve this by increasing the learning rate (however, the final estimate might still be more different to the true mean compared to using more training samples).</p></li>
+</ol>
+</div></blockquote>
+</div>
 </section>
 </section>
 

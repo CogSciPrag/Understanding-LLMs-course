@@ -547,6 +547,37 @@ a dictionary, called “names_data”, contains a list of names for each categor
 <li><p>[Just for yourself.] Find out what’s in the data set. How any different countries do we have? How many names per country? Are all names unique in a given country? Do the names sound typical to your ears for the given countries?</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">[</span><span class="n">c</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Bruckner&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+
+<span class="n">names_data</span>
+
+<span class="c1"># number of countries</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of countries: </span><span class="si">{</span><span class="n">n_categories</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># number of names per country</span>
+<span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">country</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">country</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Unique names per country</span>
+<span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">country</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">country</span><span class="p">]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Most of the name lists contain duplicates.</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
 </section>
 <section id="train-test-split">
 <h2>Train-test split<a class="headerlink" href="#train-test-split" title="Permalink to this heading">#</a></h2>
@@ -604,6 +635,10 @@ Polish 139 125 14
 <li><p>How is the original data information split into training and test set? (E.g., what amount of data is allocated to each part?; is the split exclusive and exhaustive?; how is it determined which item goes where?)</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<p>The dataset is split in training- and testset, where 90% are used for training and 10% for testing. The datapoints are shuffled before assignment and therefore randomly assigned. The split is both exclusive and exhaustive.</p>
+</div>
 </section>
 <section id="defining-the-model">
 <h2>Defining the model<a class="headerlink" href="#defining-the-model" title="Permalink to this heading">#</a></h2>
@@ -637,16 +672,19 @@ The inclusion of dropout introduces a random element in the model during trainin
         <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">dropout</span><span class="p">):</span>
         <span class="n">input_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
         <span class="n">output_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span> <span class="n">output</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">output_combined</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">output_combined</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span><span class="p">(</span><span class="n">output_combined</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dropout</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
 
@@ -662,6 +700,11 @@ The inclusion of dropout introduces a random element in the model during trainin
 <li><p>[Just for yourself.] Make sure that you understand the model architecture and its implementation. E.g., do you agree that this code implements the model graph shown above? Can you think of slight alterations to the model which might also work?</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solutions.</p>
+<div class="toggle docutils container">
+<p>The model matches the graph in the picture. Not sure what the expected alternation here is. It could be a good idea to limit the dropout layer to training and deactivate for inference. We would have to add an additional parameter to the forward pass as shown above.</p>
+<p>Another idea would be to add a non-linear activation function between the combined output layer and the final output layer. This seems to improve training quiet a bit.</p>
+</div>
 </section>
 <section id="helper-functions-for-training">
 <h2>Helper functions for training<a class="headerlink" href="#helper-functions-for-training" title="Permalink to this heading">#</a></h2>
@@ -740,6 +783,35 @@ For sequences of characters we distinguish those used as input to the model (’
 <li><p>Write a doc-string for the function ’random_training_example’ that is short but completely explanatory regarding the format and meaning of its output.</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make category, input, and target tensors from a random category, line pair</span>
+<span class="k">def</span> <span class="nf">random_training_example</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    create a random training example from dataset.</span>
+<span class="sd">    :return:</span>
+<span class="sd">        category_tensor_: A tensor of shape (1X18) with a one at the index of the current country and zeros elsewhere</span>
+<span class="sd">        input_line_tensor: A tensor of shape (length current name x 1 x 60). There is one tensor for each character of</span>
+<span class="sd">                           the name with a one at the index of the current character and zeros elsewhere.</span>
+<span class="sd">        target_line_tensor: A tensor of length equal to the number of characters in the name indicating the indices</span>
+<span class="sd">                            of the characters in the vocabulary. (gold label)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">random_training_pair</span><span class="p">()</span>
+    <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
 <p>We use this timing function to keep track of training time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -776,7 +848,7 @@ For sequences of characters we distinguish those used as input to the model (’
     <span class="c1"># zero the gradients</span>
     <span class="c1"># sequentially probe predictions and collect loss</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">l</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">loss</span> <span class="o">+=</span> <span class="n">l</span>
     <span class="c1"># perform backward pass</span>
@@ -879,6 +951,10 @@ For sequences of characters we distinguish those used as input to the model (’
 <li><p>What exactly is the loss function here? What are we training the model on: perplexity, average surprisal, or yet something else?</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<p>We have the loss function defined as the negative log likelihood loss, which is basically average surprisal. Especially since nn.NLLLoss has a parameter “reduction” which is set to “mean” by default.</p>
+</div>
 </section>
 <section id="evaluation-inference">
 <h2>Evaluation &amp; inference<a class="headerlink" href="#evaluation-inference" title="Permalink to this heading">#</a></h2>
@@ -901,7 +977,7 @@ We can use them to compare the model’s performance on the training and test da
     <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">surprisal</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">surprisal</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
@@ -958,6 +1034,10 @@ mean surprisal (train): 16.530164374188345
 <li><p>What do these two last numbers represent? What’s better: a higher or lower value? What do the two numbers tell us when we compare them?</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<p>These two values answer the question, how surprised the model is seeing the data. A higher value indicates more surprisal. We can see that the model is more surprised seeing the test set, which makes sense because it was trained on the train set while it has never seen the test set before.</p>
+</div>
 </section>
 <section id="inference">
 <h2>Inference<a class="headerlink" href="#inference" title="Permalink to this heading">#</a></h2>
@@ -987,7 +1067,7 @@ mean surprisal (train): 16.530164374188345
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># greedy decoding: choosing the most likely guess</span>
     <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1043,6 +1123,10 @@ Muka
 <li><p>Is the prediction function as implemented in this subsection stochastic or not?</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<p>The predict() function itself is not stochastic but rather deterministic, because it uses greedy decoding. This means it will always choose the next most likely character. The variance in the completions comes from the dropout layer in the models architecture leaving space for some randomness. Removing that layer during inference (as described above) will always lead to the same completion given the same input.</p>
+</div>
 </section>
 <section id="inverting-the-generation-model">
 <h2>Inverting the generation model<a class="headerlink" href="#inverting-the-generation-model" title="Permalink to this heading">#</a></h2>
@@ -1070,6 +1154,85 @@ For instance, we can do this:</p>
 <li><p>Use the model as a speaker likelihood function to compute, via Bayes rule, the probability <span class="math notranslate nohighlight">\(P(category\mid name)\)</span> for the names “Dovesky”, “Jackson” and “Satoshi”. Compare the results against those obtained by the RNN-based classifier reported in <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html">this tutorial</a> (all the way at the end).</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># names_data</span>
+<span class="n">n_names</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">train_data</span><span class="p">:</span>
+    <span class="n">n_names</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+<span class="n">n_categories</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># function to retrieve conditional probability for (name|country)</span>
+<span class="k">def</span> <span class="nf">get_prob</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">country</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">init_hidden</span><span class="p">()</span>
+    <span class="n">log_prob</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor_</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="n">log_prob</span> <span class="o">+=</span> <span class="n">output</span><span class="p">[</span><span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_prob</span><span class="o">/</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+
+<span class="c1"># get probability of categories</span>
+<span class="n">p_categories</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+    <span class="n">p_categories</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">/</span><span class="n">n_names</span>
+
+<span class="c1"># get the conditional probabilities P(name|cat) from model</span>
+<span class="n">cond_prob_names</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Doveski&quot;</span><span class="p">:[],</span> <span class="s2">&quot;Jackson&quot;</span><span class="p">:[],</span> <span class="s2">&quot;Satoshi&quot;</span><span class="p">:[]}</span>    
+<span class="n">country2idx</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names_data</span><span class="p">):</span>
+    <span class="c1"># create mapping from index to country</span>
+    <span class="n">country2idx</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cond_prob_names</span><span class="p">:</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">get_prob</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">cond_prob_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    
+<span class="c1"># calculate probability of name as P(name) = sum(P(name|category) * P(category)) for all categories</span>
+<span class="n">p_names</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Doveski&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Jackson&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Satoshi&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">p_names</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+        <span class="n">p_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">cond_prob_names</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">country2idx</span><span class="p">[</span><span class="n">country</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">1</span><span class="o">/</span><span class="mi">18</span>
+
+<span class="c1"># apply bayes law</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cond_prob_names</span><span class="p">:</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
+        <span class="c1"># print(f&quot;P({country} | {name}) = {(cond_prob_names[name][country2idx[country]] * p_categories[country]) / p_names[name]}&quot;)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logspace: P(</span><span class="si">{</span><span class="n">country</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">cond_prob_names</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">country2idx</span><span class="p">[</span><span class="n">country</span><span class="p">]]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">p_names</span><span class="p">[</span><span class="n">name</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="p">(</span><span class="n">cond_prob_names</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">country2idx</span><span class="p">[</span><span class="n">country</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">1</span><span class="o">/</span><span class="mi">18</span><span class="p">)</span> <span class="o">/</span> <span class="n">p_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------------------------------------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="toggle docutils container">
+<p>While the numbers don’t exactly match with the tutorial, the general tendency is the same except for “satoshi”, where our model predicts more correctly japanese as the most likely class as opposed to italian in the tutorial.</p>
+</div>
 </section>
 </section>
 
