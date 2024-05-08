@@ -572,7 +572,50 @@ a dictionary, called “names_data”, contains a list of names for each categor
 <span class="k">for</span> <span class="n">country</span> <span class="ow">in</span> <span class="n">names_data</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">country</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">names_data</span><span class="p">[</span><span class="n">country</span><span class="p">]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Most of the name lists contain duplicates.</span>
+<span class="c1"># ---&gt; Most of the name lists contain duplicates.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>yes
+Number of countries: 18
+
+Czech: 519
+German: 724
+Arabic: 2000
+Japanese: 991
+Chinese: 268
+Vietnamese: 73
+Russian: 9408
+French: 277
+Irish: 232
+English: 3668
+Spanish: 298
+Greek: 203
+Italian: 709
+Portuguese: 74
+Scottish: 100
+Dutch: 297
+Korean: 94
+Polish: 139
+False
+False
+False
+False
+False
+False
+False
+False
+False
+True
+False
+False
+False
+True
+True
+False
+True
+False
 </pre></div>
 </div>
 </div>
@@ -904,26 +947,26 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0m 9s (5000 5%) 19.6658
-0m 18s (10000 10%) 18.8256
-0m 26s (15000 15%) 18.4274
-0m 35s (20000 20%) 18.1675
-0m 43s (25000 25%) 18.0140
-0m 52s (30000 30%) 17.8482
-1m 0s (35000 35%) 17.7381
-1m 9s (40000 40%) 17.6431
-1m 18s (45000 45%) 17.5494
-1m 26s (50000 50%) 17.4842
-1m 35s (55000 55%) 17.4396
-1m 44s (60000 60%) 17.3909
-1m 52s (65000 65%) 17.3364
-2m 1s (70000 70%) 17.2860
-2m 10s (75000 75%) 17.2455
-2m 18s (80000 80%) 17.2208
-2m 27s (85000 85%) 17.1925
-2m 35s (90000 90%) 17.1608
-2m 44s (95000 95%) 17.1264
-2m 52s (100000 100%) 17.1055
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0m 18s (5000 5%) 19.8029
+0m 36s (10000 10%) 18.7308
+0m 54s (15000 15%) 18.1777
+1m 13s (20000 20%) 17.7180
+1m 32s (25000 25%) 17.3607
+1m 49s (30000 30%) 17.0758
+2m 7s (35000 35%) 16.8325
+2m 25s (40000 40%) 16.6393
+2m 43s (45000 45%) 16.4591
+3m 0s (50000 50%) 16.2746
+3m 16s (55000 55%) 16.1081
+3m 33s (60000 60%) 15.9675
+3m 50s (65000 65%) 15.8344
+4m 7s (70000 70%) 15.7046
+4m 24s (75000 75%) 15.5894
+4m 41s (80000 80%) 15.4826
+4m 58s (85000 85%) 15.3850
+5m 15s (90000 90%) 15.2958
+5m 32s (95000 95%) 15.2122
+5m 49s (100000 100%) 15.1304
 </pre></div>
 </div>
 </div>
@@ -942,7 +985,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/e2e58b558a034f9142eaef306fe5af7129bcdd944db09617ffc8914529f7c27d.png" src="../_images/e2e58b558a034f9142eaef306fe5af7129bcdd944db09617ffc8914529f7c27d.png" />
+<img alt="../_images/999b70799e4d0c751f9ebf942539665a9194c86e75cf9079d144cd1a16d2820b.png" src="../_images/999b70799e4d0c751f9ebf942539665a9194c86e75cf9079d144cd1a16d2820b.png" />
 </div>
 </div>
 <blockquote>
@@ -1021,9 +1064,9 @@ We can use them to compare the model’s performance on the training and test da
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean surprisal (test): 18.06200265467764
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean surprisal (test): 15.743693795963553
 
-mean surprisal (train): 16.530164374188345
+mean surprisal (train): 11.90373899401307
 </pre></div>
 </div>
 </div>
@@ -1089,10 +1132,10 @@ mean surprisal (train): 16.530164374188345
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Müllen
-Müllen
-Müllenger
-Müllen
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Müller
+Müller
+Müller
+Müller
 </pre></div>
 </div>
 </div>
@@ -1108,10 +1151,10 @@ Müllen
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Maka
-Kana
-Maka
-Muka
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shima
+Shima
+Shima
+Shima
 </pre></div>
 </div>
 </div>
@@ -1142,8 +1185,8 @@ For instance, we can do this:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13.716519355773926
-19.072649002075195
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12.857054710388184
+19.908905029296875
 </pre></div>
 </div>
 </div>
@@ -1225,6 +1268,75 @@ For instance, we can do this:</p>
         <span class="n">total</span> <span class="o">+=</span> <span class="p">(</span><span class="n">cond_prob_names</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">country2idx</span><span class="p">[</span><span class="n">country</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">1</span><span class="o">/</span><span class="mi">18</span><span class="p">)</span> <span class="o">/</span> <span class="n">p_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">------------------------------------------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Logspace: P(Czech | Doveski) = -2.329154273345582
+Logspace: P(German | Doveski) = -3.049187345280759
+Logspace: P(Arabic | Doveski) = -3.044040465112291
+Logspace: P(Japanese | Doveski) = -2.5707610099012776
+Logspace: P(Chinese | Doveski) = -3.9830674364599212
+Logspace: P(Vietnamese | Doveski) = -4.176395016805715
+Logspace: P(Russian | Doveski) = -2.557712239995114
+Logspace: P(French | Doveski) = -3.26594367422115
+Logspace: P(Irish | Doveski) = -3.1344274634863063
+Logspace: P(English | Doveski) = -3.089089898243062
+Logspace: P(Spanish | Doveski) = -2.989767319373302
+Logspace: P(Greek | Doveski) = -2.4374993423367664
+Logspace: P(Italian | Doveski) = -2.746094297468178
+Logspace: P(Portuguese | Doveski) = -3.2719710113848373
+Logspace: P(Scottish | Doveski) = -3.503078942968957
+Logspace: P(Dutch | Doveski) = -2.7748951742793246
+Logspace: P(Korean | Doveski) = -4.33744430690024
+Logspace: P(Polish | Doveski) = -1.9166837202752751
+1.0
+
+------------------------------------------------------------------------
+
+Logspace: P(Czech | Jackson) = -2.6531856900705275
+Logspace: P(German | Jackson) = -2.6175335252350447
+Logspace: P(Arabic | Jackson) = -3.8089478089254367
+Logspace: P(Japanese | Jackson) = -3.3889435308678326
+Logspace: P(Chinese | Jackson) = -3.6692703950843093
+Logspace: P(Vietnamese | Jackson) = -4.384112744200534
+Logspace: P(Russian | Jackson) = -2.6612294775126752
+Logspace: P(French | Jackson) = -3.262053290805339
+Logspace: P(Irish | Jackson) = -2.21096220730527
+Logspace: P(English | Jackson) = -2.1701001434279856
+Logspace: P(Spanish | Jackson) = -4.137311827640074
+Logspace: P(Greek | Jackson) = -3.9253905269010243
+Logspace: P(Italian | Jackson) = -3.8398610504968342
+Logspace: P(Portuguese | Jackson) = -4.879318062464732
+Logspace: P(Scottish | Jackson) = -1.4070479577071051
+Logspace: P(Dutch | Jackson) = -2.943814170795518
+Logspace: P(Korean | Jackson) = -3.79754031778924
+Logspace: P(Polish | Jackson) = -3.0787130945986387
+0.9999999999999994
+
+------------------------------------------------------------------------
+
+Logspace: P(Czech | Satoshi) = -2.582685867418279
+Logspace: P(German | Satoshi) = -3.205616125930776
+Logspace: P(Arabic | Satoshi) = -3.151007538987999
+Logspace: P(Japanese | Satoshi) = -1.819255000074138
+Logspace: P(Chinese | Satoshi) = -3.5181813091977734
+Logspace: P(Vietnamese | Satoshi) = -3.454367770907213
+Logspace: P(Russian | Satoshi) = -2.9190526549711127
+Logspace: P(French | Satoshi) = -2.945132093597879
+Logspace: P(Irish | Satoshi) = -2.83683439539813
+Logspace: P(English | Satoshi) = -3.1927830372943777
+Logspace: P(Spanish | Satoshi) = -2.975641382951965
+Logspace: P(Greek | Satoshi) = -2.726918229927053
+Logspace: P(Italian | Satoshi) = -2.1676781420602698
+Logspace: P(Portuguese | Satoshi) = -3.0917557944550413
+Logspace: P(Scottish | Satoshi) = -3.076368400920858
+Logspace: P(Dutch | Satoshi) = -3.444657022227277
+Logspace: P(Korean | Satoshi) = -4.716580436309544
+Logspace: P(Polish | Satoshi) = -3.033587316144933
+1.0
+
+------------------------------------------------------------------------
 </pre></div>
 </div>
 </div>

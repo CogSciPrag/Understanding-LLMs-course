@@ -555,6 +555,20 @@ array, which includes <span class="math notranslate nohighlight">\(k\)</span> ma
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(1)
+tensor([1, 2, 3])
+tensor([[1, 2],
+        [3, 4]])
+tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+tensor([[[1, 2],
+         [3, 4],
+         [5, 6]]])
+</pre></div>
+</div>
+</div>
 </details>
 </div>
 </section>
@@ -731,6 +745,29 @@ The function <code class="docutils literal notranslate"><span class="pre">torch.
 <span class="c1">########## Exercise 2.1.2 Task 3 #################</span>
 <span class="n">exercise3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="mi">6</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">exercise3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+tensor([[[ 1,  2],
+         [ 3,  4],
+         [ 5,  6]],
+
+        [[10, 20],
+         [30, 40],
+         [50, 60]]])
+tensor([[[3, 3, 3, 3],
+         [3, 3, 3, 3]],
+
+        [[3, 3, 3, 3],
+         [3, 3, 3, 3]],
+
+        [[3, 3, 3, 3],
+         [3, 3, 3, 3]]])
+tensor([1.9025e-01, 4.4543e-01, 7.3338e-04, 8.5581e-01, 3.8884e-01, 2.4922e-02])
 </pre></div>
 </div>
 </div>
@@ -955,6 +992,34 @@ The syntax for doing this is slightly different on different machines.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">mix8</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mix8</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mix8</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([1, 1])
+torch.int64
+torch.Size([2])
+tensor([1.0000, 1.2000])
+torch.float32
+tensor([1.0000, 1.2000])
+torch.float32
+tensor([1.2000, 1.0000])
+torch.float32
+tensor([1, 1])
+torch.int64
+tensor([1.2000, 1.0000])
+torch.float32
+tensor([[1.2000, 1.0000],
+        [2.0000, 1.2000],
+        [0.0000, 2.0000]])
+torch.float32
+torch.Size([3, 2])
+tensor([[1.2000],
+        [2.0000],
+        [0.0000]])
+torch.float32
+torch.Size([3, 1])
+torch.Size([3, 1])
 </pre></div>
 </div>
 </div>
@@ -1390,6 +1455,24 @@ tensor(101)
 <span class="n">matrix2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">]])</span>
 <span class="n">matrixProd</span> <span class="o">=</span> <span class="n">matrix1</span> <span class="nd">@matrix2</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">matrixProd</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1, 2],
+         [3, 4],
+         [5, 6]]])
+tensor([[1],
+        [2],
+        [3],
+        [4],
+        [5],
+        [6]])
+tensor([[1, 2, 3, 4, 5, 6]])
+tensor(531)
+[[  1  10 100]
+ [  2  20 200]
+ [  3  30 300]]
 </pre></div>
 </div>
 </div>

@@ -950,6 +950,11 @@ So if you would train your Twitter bot with this dataset you would receive a bot
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;text&#39;: [&#39;BYND  JPMorgan reels in expectations on Beyond Meat httpstcobdxbFGjkT&#39;], &#39;label&#39;: [0]}
+</pre></div>
+</div>
+</div>
 </details>
 </div>
 <div class="cell docutils container">
@@ -1002,6 +1007,13 @@ So if you would train your Twitter bot with this dataset you would receive a bot
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test split examples: &quot;</span><span class="p">,</span> <span class="n">cleaned_dataset_split</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Train size: 7634, Test size: 1909
+Train split examples:  {&#39;text&#39;: [&#39;Aimia gains  after settling with dissident shareholders&#39;, &#39;Walmart hit with wrongfuldeath lawsuit by estate of worker who died of coronavirus httpstcoZzapLmfA&#39;, &#39;LHarris started at buy with  stock price target at Benchmark&#39;], &#39;label&#39;: [1, 0, 1]}
+Test split examples:  {&#39;text&#39;: [&#39;Rise of the intangibles is pushing down on central bank rates  BoEs Haskel httpstcogYMZyzI httpstcoyFeHVc&#39;, &#39;Wells still bullish on TMobile after unsurprising CEO change&#39;, &#39;Wall Street slips from record highs at open after jobs report&#39;], &#39;label&#39;: [2, 1, 0]}
 </pre></div>
 </div>
 </div>
@@ -1091,6 +1103,14 @@ So if you would train your Twitter bot with this dataset you would receive a bot
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="n">preprocessed_train_dataset</span><span class="o">.</span><span class="n">format</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Map: 100%|██████████| 7634/7634 [00:00&lt;00:00, 32869.18 examples/s]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;torch&#39;
 </pre></div>
 </div>
 </div>
