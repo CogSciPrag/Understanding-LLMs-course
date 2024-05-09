@@ -1,0 +1,752 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 4.1: Transformer configurations &amp; Training utilities &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/04a-transformers-heads-training';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs, RNNs &amp; Transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/04a-transformers-heads-training.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 4.1: Transformer configurations & Training utilities</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-heads">Model heads</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-utilities">Training utilities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpreting-training-dynamics">Interpreting training dynamics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mlm-masking">MLM masking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-and-optional-exercises">Outlook and optional exercises</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-4-1-transformer-configurations-training-utilities">
+<h1>Sheet 4.1: Transformer configurations &amp; Training utilities<a class="headerlink" href="#sheet-4-1-transformer-configurations-training-utilities" title="Permalink to this heading">#</a></h1>
+<p><strong>Author:</strong> Polina Tsvilodub</p>
+<p>This sheet introduces a few more architectural details that occur in the context of language models, and briefly mentions some engineering details that are often used when training LMs. Specifically, the learning goals for this sheet are:</p>
+<ul class="simple">
+<li><p>understand the concept of different <em>model heads</em></p></li>
+<li><p>learn to choose the head appropriate for you needs</p></li>
+<li><p>gain a conceptual overview of a few popular engineering “tricks” needed for stable training of LMs</p></li>
+<li><p>see a practical example of ‘masking’ used for training masked language models like BERT.</p></li>
+</ul>
+<section id="model-heads">
+<h2>Model heads<a class="headerlink" href="#model-heads" title="Permalink to this heading">#</a></h2>
+<p>So far, when using a language model, we have been using models intended for <em>next-token prediction</em>. In other words, we have been using models whose last layer outputs a distribution over the vocabulary, from which we choose the next token. This last model layer is sometimes called the model <em>head</em>; therefore, so far we’ve been using models with a <em>language modeling head</em>.</p>
+<p>For instance, we used GPT-2 either by loading it with the AutoClass:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span>
+
+<span class="n">gpt2</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>or via  a specific class, namely, <code class="docutils literal notranslate"><span class="pre">GPT2LMHeadModel</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
+
+<span class="n">gpt2</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the former case, the AutoClass lets HF figure out the architecture automatically based on a config file that is downloaded when the model is downloaded from HF based on the name “gpt2”.
+The special class is provided specifically for GPT-2. Note that both classes provide a hint as to which task we want to initializee the model for. The AutoClass name includes <code class="docutils literal notranslate"><span class="pre">CausalLM</span></code>, meaning that the class will initialize a model with a next-token prediction head, and the GPT-2 class name includes <code class="docutils literal notranslate"><span class="pre">LMHead</span></code> directly, also meaning that a next-token prediction head will be initialized.</p>
+<p>However, it is common in NLP to use the same architectures with <em>different model heads</em> for different tasks. For instance, based on the core of GPT-2, instead of next-token prediction, we might want to do classification or, e.g., token classification. For these tasks, we need different output layers (rather than one outputting a distribution over the vocabulary), i.e., different <em>model heads</em>. The base architecture (e.g., GPT-2) is often called the model <em>backbone</em> (also in computer vision).</p>
+<p>Luckily, HF provides different classes for different model heads. For instance, for GPT-2 there are classes like <code class="docutils literal notranslate"><span class="pre">GPT2ForSequenceClassification</span></code> or <code class="docutils literal notranslate"><span class="pre">GPT2ForTokenClassification</span></code>.
+The full list of different GPT-2 classes with different heads can be found <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2Config">here</a>.</p>
+<p>Note that different model head choices entail different training objectives, i.e., potentially one has to use different loss functions or different labels.</p>
+<p>For instance, <code class="docutils literal notranslate"><span class="pre">GPT2ForTokenClassification</span></code> could be used for POS tagging or a named-entity-recognition (NER) task. For the latter, for instance, we could consider the task of extracting city names and person’s names, so for each token, we’d want to assign one of the three labels: [CITY] (0), [PER] (1), [NONE] (2). Therefore, during training, the inputs would be tokens, and the labels would be numbers corresponding to the correct labels. The output layer needs to assign a distribution over the possible labels for each token; this is done by a <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layer outputting scores (3 scores in this example).<br />
+Since this is a classification task where each token has only one correct category, the CrossEntropy (classification) loss is used for training.
+Information about the layer and the loss can be found, e.g., when inspecting the <a class="reference external" href="https://github.com/huggingface/transformers/blob/v4.40.2/src/transformers/models/gpt2/modeling_gpt2.py#L1733">source</a> of the class.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.1: Model heads</span></strong></p>
+<ol class="arabic simple">
+<li><p>Inspect the documentation for <code class="docutils literal notranslate"><span class="pre">GPT2ForSequenceClassification</span></code> <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2ForSequenceClassification">here</a>. (1) What kind of layer is under the hood of “ForSequenceClassification”? (2) What kind of loss should be used to train a model for sequence classification?</p></li>
+<li><p>One popular task in NLP is <em>extractive question answering</em>. Conceptually, it refers to the task of predicting the location of a passage of text preceding a question which contains the answer to that question. <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2ForQuestionAnswering">Here</a> is the class implementing such a system with GPT-2.
+Inspect it, perhaps search for other resources, so as to get a conceptual understanding what this task looks like. Then, for yourself, identify what a model trained for extractive QA should output when given the following input:
+“The quick brown fox jumped over the lazy brown dog. Who did the fox jump over?” (assume word-wise tokenization)</p></li>
+<li><p>For yourself, for each of the following tasks, select one or several possible model heads from the list of GPT-2 heads that you think work best for the task:</p></li>
+</ol>
+<ul class="simple">
+<li><p>POS tagging</p></li>
+<li><p>sentiment classification</p></li>
+<li><p>summarization</p></li>
+<li><p>multiple-choice question answering</p></li>
+<li><p>translation</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="training-utilities">
+<h2>Training utilities<a class="headerlink" href="#training-utilities" title="Permalink to this heading">#</a></h2>
+<p>Training deep neural networks with millions of parameters is a tricky task. The last decades of NLP research have identified (mostly bytesting what works well in practice) several engineering tricks that usually help to stabilize the optimization process. The following (non-exhaustive!) list provides an overview of commonly used tricks, so as to equip you with a high-level conceptual idea of what these are when you encounter them in NLP papers:</p>
+<ul class="simple">
+<li><p><strong>Learning rate scheduling</strong>: refers to using a schedule for decreasing the learning rate that is used for updating the weights. Helps to avoid too large updates close to potential optima.</p></li>
+<li><p><strong>Weight / gradient clipping</strong>: refers to setting min or max values that a single weight or a gradient can take on. Helps to avoid very large values in the updates of the weights or in loss computations.</p></li>
+<li><p><strong>Weight initialization</strong>: when training a NN from scratch, the weights are first initialized with some values. There are various ways of doing so, for instance:</p>
+<ul>
+<li><p>Zero initialization: all weights to zero</p></li>
+<li><p>Random initialization: weights with random values (often sampled from a standard normal distribution)</p></li>
+<li><p>He initialization: multiplying the random initialization with <span class="math notranslate nohighlight">\(\sqrt{\frac{2}{n}}\)</span>, where n is the size of the previous layer.</p></li>
+</ul>
+</li>
+<li><p><strong>Hyperparameter tuning</strong>: refers to generally selecting configurations of the model and / or the training process. For instance, it can be the process of searching for optimal learning rates, optimal dimension of hidden representations, number of layers, etc. To avoid having to test too many combinations of hyperparameters (as in an exhaustive algorithm such as grid search), specialized algorithms have been developed that balance exploration and convergence. A few common approaches include:</p>
+<ul>
+<li><p>Grid search: defines a list of values for each parameter and tries all possible combinations, while evaluating the models performance for each combination.</p></li>
+<li><p>Random search: Samples values randomly from a specifies distribution and again, evaluates the performance for each combination.</p></li>
+<li><p>Bayesian Optimization: Defines an objective function <span class="math notranslate nohighlight">\(P(score | hyperparameters)\)</span> and tries to maximize this probability. It is essentially another machine learning model trained to find the optimal hyperparameters. The advantage to the other two approaches is that it makes an informed guess based on previous observations.</p></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.2: Training tricks</span></strong></p>
+<ol class="arabic simple">
+<li><p>Find out what cosine learning rate scheduling is (as a high-level concept), how to use it in PyTorch, and write a few lines of code that could be added to the model in sheet 2.4 to use it in training.</p></li>
+</ol>
+</div></blockquote>
+<section id="interpreting-training-dynamics">
+<h3>Interpreting training dynamics<a class="headerlink" href="#interpreting-training-dynamics" title="Permalink to this heading">#</a></h3>
+<p>Lastly, an important part of training a model is being able to understand whether it is actually successfully learning. There are different ways of doing so. For instance, we could stop the training every now and then and test the model on our desired task, and check if it performs the task correctly on a held out test set. Since we want to <em>quantify</em> the quality of the performance, we might compute a test accuracy (if applicable for the task). Alternatively, we could look at the test loss.
+Another possibility of checking training progress is to rely on the <em>training loss</em> which should decrease with successful training.</p>
+<p>In practice, both of these things are done in combination in model training loops (e.g., see HW1 ex. 3). Commonly, both training and test (or, validation) losses are plotted and inspected over the training epochs. This is done to avoid <em>overfitting</em> – the issue arising when the model starts to “memorize” the training set (i.e., does very well on it), at the cost of generalizing to other data set. This can be identified when the training loss further decreases while the validation loss starts to increase.</p>
+<p><img alt="img" src="../_images/overfitting.png" /></p>
+<p>Source <a class="reference external" href="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*_7OPgojau8hkiPUiHoGK_w.png">here</a></p>
+<p>The image illustrates the models predictions as the dotted line and the actual training data as points. The subplots show different stages of model fit. The first plot shows underfitting, i.e., the model failed to learn the data pattern at all. The middle plot shows ideal generalization. The last plot shows that the model is fitted too tightly to the training set and fails to capture the general pattern in the training data. The model’s performance on a test set which exhibits the same general pattern but will have slightly differently distributed datapoints will be worse.</p>
+<p>In order to get the model at its “ideal” fitting and generalization stage (or as closely as possible to it), often, the training and validation losses are plotted against each other and so-called <em>early-stopping</em> is applied. This refers to stopping the model training as soon as the validation loss start increasing and diverging from the training loss (or, model weights saved at the respective epoch are used). The image below illustrates this.</p>
+<p><img alt="img" src="../_images/early-stopping.png" /></p>
+<p>Source <a class="reference external" href="https://www.kaggle.com/code/ryanholbrook/overfitting-and-underfitting">here</a></p>
+</section>
+<section id="mlm-masking">
+<h3>MLM masking<a class="headerlink" href="#mlm-masking" title="Permalink to this heading">#</a></h3>
+<p>A different type of masking than what we have seen for causal language modeling are masks used with <em>masked</em> language models like BERT. Here, the objective is to predict a single masked token (or, even spans of multiple tokens in other models) based on the entire rest of the sequence. During training, usually tokens are masked at random at a certain rate (e.g., 0.15 in BERT). For the sentence “The quick fox jumped.”, for instance, the actual training input could be “The quick [MASK] jumped.”, and the training labels would be “The quick fox jumped.”.
+The helper class <code class="docutils literal notranslate"><span class="pre">DataCollatorForLanguageModeling(tokenizer,</span> <span class="pre">mlm=True,</span> <span class="pre">mlm_probability=0.15)</span></code> that we’ve used in the previous sheet allows to flexibly switch between the different types of masking via the <code class="docutils literal notranslate"><span class="pre">mlm</span></code> parameter:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">DataCollatorForLanguageModeling</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;stanfordnlp/imdb&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+<span class="n">bert_tok</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;bert-base-cased&quot;</span><span class="p">)</span>
+<span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span><span class="n">bert_tok</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mlm_probability</span><span class="o">=</span><span class="mf">0.45</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span>
+        <span class="n">input_text</span><span class="p">,</span> 
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="o">=</span><span class="n">bert_tok</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to tokenize text into a series of input ids.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    input_text : the text to tokenize.</span>
+<span class="sd">    max_length : the maximal number of resulting tokens.</span>
+<span class="sd">    tokenizer  : instantiated tokenizer of a masked LM.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    input_ids corresponding to the tokenized text and an attention_mask,</span>
+<span class="sd">    where padding tokens are masked.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tokenized_input</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+        <span class="n">input_text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
+        <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># mask padding tokens so that the model doesn&#39;t attend to them</span>
+    <span class="c1"># more on masking next week</span>
+    <span class="n">tokenized_input</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tokenized_input</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tokenized_input</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">],</span>
+            <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tokenized_input</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]}</span>
+
+<span class="n">tokenized_datasets</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_columns</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span>
+<span class="p">)</span>
+<span class="n">subsampled_dataset</span> <span class="o">=</span> <span class="n">tokenized_datasets</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="c1"># inspect what masked inputs for MLM look like</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">data_collator</span><span class="p">([</span><span class="n">subsampled_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="outlook-and-optional-exercises">
+<h2>Outlook and optional exercises<a class="headerlink" href="#outlook-and-optional-exercises" title="Permalink to this heading">#</a></h2>
+<p>The following part contains optional resources and exercises that you could work on if you’d like to practice programming more.</p>
+<p>Here are a few additional resources that cover useful topics for training LLMs:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter7/6">this</a> tutorial exemplifies what to do when training texts exceed the maximal context size of the LM.</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/transformers/tasks/summarization">this</a> tutorial provides another example of a sequence-to-sequence model, this time, tuned to do summarization (while the lecture examples covered sequence-to-sequence machine translation). The tutorial uses a popular seq2seq architecture, T5.</p></li>
+</ul>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.6: Optional exercises</span></strong></p>
+<ol class="arabic simple">
+<li><p>Implement the character-level name generation model from sheet 2.4, but now use an LSTM cell instead of an RNN cell.</p></li>
+<li><p>Re-implement the model from ex. 3 of HW1 as an extractive question answering model (rather than a generative question answering system). Hint: Note see <span class="xref myst">here</span> for inspiration.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-heads">Model heads</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-utilities">Training utilities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpreting-training-dynamics">Interpreting training dynamics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mlm-masking">MLM masking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-and-optional-exercises">Outlook and optional exercises</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
