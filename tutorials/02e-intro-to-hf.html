@@ -173,7 +173,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs, RNNs &amp; Transformers</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
@@ -181,6 +181,9 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="04a-transformers-heads-training.html">Sheet 4.1: Transformer configurations &amp; Training utilities</a></li>
@@ -479,8 +482,8 @@ document.write(`
 <li><p>train model on data</p></li>
 <li><p>evaluate model (sheet 2.4; more on evaluation of language models to come in future sessions)</p></li>
 </ol>
-<p>The contents of the single steps differ by application (e.g., we use different kinds of data nad models to train an image classifier vs. to train a language model), but the general structure of the process is the same.</p>
-<p>With this background, in principle, you should be able to put together any well-known neural network yourself! (e.g., implement Llama-3 or GPT-3)! (assuming sufficient time and access to information like PyTorch docs, details of the architecture, maybe some concepts from the next lecture, of course)</p>
+<p>The contents of the single steps differ by application (e.g., we use different kinds of data and models to train an image classifier vs. to train a language model), but the general structure of the process is the same.</p>
+<p>With this background, in principle, you should be able to put together any well-known neural network yourself (e.g., implement Llama-3 or GPT-3, assuming sufficient time and access to information like PyTorch docs, details of the architecture, maybe some concepts from the next lecture, of course).</p>
 <p>However, putting together the network (i.e., specifying all the layers, their sizes, implementing the forward pass through the net etc.) does <em>not</em> mean that you will be able to use the model for generating predictions in practice. Generating predictions (= running inference) on new inputs (e.g., predicting continuations of new input texts or classifying new images) is the purpose of creating a machine learning model – we build them because we want to automate these tasks. Ideally, we want the model to <em>generalize well</em> – to be able to handle inputs for that the model was not trained on and still perform the task correctly (e.g., produce a sensible text completion for an entirely new text input).</p>
 <p>For generating predictions, we need the <strong>trained</strong> model, i.e., we need not just the definition of the model, but also the <em>model weights</em> set to optimized values that result from (successful) training. That is, we need the values of all the weight matrices (we have seen those in sheet 2.3). In practice, successful training of state-of-the-art models is quite costly and data-hungry (at least for creating actually useful models).</p>
 <p><strong>NB</strong>: The practical sheets will try to be consistent and use the term “architecture” to refer to the more abstract definition, carcass, of a model (i.e,. the specific layer types and parameterizations underlying the model), and the term “model” for the particular instatiation with particular weights of that model configuration. When referring to a specific model instance, there are different important concepts / terms:</p>
@@ -493,7 +496,7 @@ document.write(`
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.5.1: ML models workflow </span></strong></p>
 <ol class="arabic simple">
 <li><p>Given examples from the previous sheets, in your own words, describe the difference between <em>training</em> a model and running <em>inference</em> with a model. (Understanding this is absolutely critical; please ask questions if have any doubts!)</p></li>
-<li><p>Suppose you want to train the model GPT-2 to generate IMDB movie reviews. In your own words (few intuitive sentences), describe the highlevel steps that you would do to accomplish this task.</p></li>
+<li><p>Suppose you want to train the model GPT-2 to generate IMDB movie reviews. In your own words (few intuitive sentences), describe the high-level steps that you would do to accomplish this task.</p></li>
 </ol>
 </div></blockquote>
 <p>Click below to see the solution.</p>
@@ -509,11 +512,11 @@ document.write(`
 </section>
 <section id="huggingface">
 <h2>HuggingFace 🤗<a class="headerlink" href="#huggingface" title="Permalink to this heading">#</a></h2>
-<p>Luckily, there are many popular <em>open-source</em> models, i.e., those for which the architecture and the weights have been made freely accessible by the developers: e.g., GPT-2, the LLama models, BERT etc. In contrast, e.g., GPT-4 is <em>closed-source</em> – we don’t know exactly which layers with which configurations are inside the model and we cannot access the weights ourselves; they are only hosted by OpenAI and we can send our input data to their servers and get back predictions (by using the OpenAI API).</p>
+<p>Luckily, there are many popular <em>open-source</em> models, i.e., those for which the architecture and the weights have been made freely accessible by the developers: e.g., GPT-2, the LLama models, BERT and others. In contrast, e.g., GPT-4 is <em>closed-source</em> – we don’t know exactly which layers with which configurations are inside the model, and we cannot access the weights ourselves; they are only hosted by OpenAI, and we can send our input data to their servers and get back predictions (by using the OpenAI API).</p>
 <p>Open-source models are frequently used by the community and have been made available via platforms and packages which provide an easy interface for loading pretrained models, generating predictions from these pretrained models, or training models from scratch. The by-far most used platform for open-source resources which we will heavily use in this course is <a class="reference external" href="https://huggingface.co/"><strong>HuggingFace</strong></a>. HuggingFace provides infrastructure for working with many different types of machine learning models (for working with audio, vision, language tasks), but, as you might guess, we will be focusing on functionality relevant to language modeling. HuggingFace will often be abbreviated as HF throughout the sheets.</p>
 <p>Here is a high-level overview of all the nice things that HuggingFace provides:</p>
 <ul class="simple">
-<li><p>(most relevant for us) the packages <a class="reference external" href="https://huggingface.co/docs/transformers/en/index"><code class="docutils literal notranslate"><span class="pre">transformers</span></code></a> and <a class="reference external" href="https://huggingface.co/docs/datasets/index"><code class="docutils literal notranslate"><span class="pre">datasets</span></code></a> which we already installed alst week. These allow easy access and workflow with models and with datasets.</p>
+<li><p>(most relevant for us) the packages <a class="reference external" href="https://huggingface.co/docs/transformers/en/index"><code class="docutils literal notranslate"><span class="pre">transformers</span></code></a> and <a class="reference external" href="https://huggingface.co/docs/datasets/index"><code class="docutils literal notranslate"><span class="pre">datasets</span></code></a> which we already installed last week. These allow easy access and workflow with models and with datasets.</p>
 <ul>
 <li><p>Overviews, guides, tutorials for different tasks that can be done with <code class="docutils literal notranslate"><span class="pre">transformers</span></code>, docs for different models as well as the documentation of the API can be found <a class="reference external" href="https://huggingface.co/docs/transformers/index">here</a>.</p></li>
 <li><p>The same resources for <code class="docutils literal notranslate"><span class="pre">datasets</span></code> can be found <a class="reference external" href="https://huggingface.co/docs/datasets/index">here</a>.</p></li>
@@ -521,15 +524,15 @@ document.write(`
 </li>
 <li><p>The (online) HF platform called HuggingFace Hub actually stores trained model weights (also sometimes called checkpoints) and datasets. They are downloaded to the local machine when accessed through the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> or <code class="docutils literal notranslate"><span class="pre">datasets</span></code> package. Available models can be browsed <a class="reference external" href="https://huggingface.co/models">here</a>; available datasets can be browsed <a class="reference external" href="https://huggingface.co/datasets">here</a>.</p>
 <ul>
-<li><p>In order to <em>upload</em> yourown resources to HF Hub and in order to access some models (inclding LLama-2), you need a free account. It can easily be created on HF. So far, an account is not required for following the class.</p></li>
+<li><p>In order to <em>upload</em> your own resources to HF Hub and in order to access some models (inclding LLama-2), you need a free account. It can easily be created on HF. So far, an account is not required for following the class.</p></li>
 </ul>
 </li>
-<li><p>The platform provides much more (feel free to explore! but also try not to feel overwhlemed if you are seeing HF for the first time). Here are some highlights most relevant to the course:</p>
+<li><p>The platform provides much more (feel free to explore, but also try not to feel overwhelmed if you are seeing HF for the first time). Here are some highlights most relevant to the course:</p>
 <ul>
 <li><p><a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter1/1">NLP course</a> which includes practical tutorials for common NLP tasks with transformers.</p></li>
-<li><p><a class="reference external" href="https://huggingface.co/docs/evaluate/index"><code class="docutils literal notranslate"><span class="pre">evaluate</span></code></a> package for computing common evaluation metrics (more on this in the next sessions)</p></li>
-<li><p>(more advanced) packages for <a class="reference external" href="https://huggingface.co/docs/accelerate/index">accelerated</a> and parallelized training on GPUs, via parameter-efficient fine-tuning (<a class="reference external" href="https://huggingface.co/docs/peft/index">PEFT</a>) and more.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tokenizers</span></code> <a class="reference external" href="https://huggingface.co/docs/tokenizers/index">package</a>. However, we will only use functionality of pretrained tokenizers which are shipped together with models via transformers.</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/evaluate/index"><code class="docutils literal notranslate"><span class="pre">evaluate</span></code></a> package for computing common evaluation metrics (more on this in the next sessions).</p></li>
+<li><p>Further (more advanced) packages for <a class="reference external" href="https://huggingface.co/docs/accelerate/index">accelerated</a> and parallelized training on GPUs, via parameter-efficient fine-tuning (<a class="reference external" href="https://huggingface.co/docs/peft/index">PEFT</a>) and more.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">tokenizers</span></code> <a class="reference external" href="https://huggingface.co/docs/tokenizers/index">package</a>, which we will not make (heavy) use of, because we will only use functionality of pretrained tokenizers which are shipped together with models via transformers.</p></li>
 </ul>
 </li>
 </ul>
@@ -541,13 +544,13 @@ document.write(`
 </div></blockquote>
 <section id="working-with-lms-via-transformers">
 <h3>Working with LMs via 🤗 Transformers<a class="headerlink" href="#working-with-lms-via-transformers" title="Permalink to this heading">#</a></h3>
-<p>We will dive right into using the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> package ourselves. The learning goals for the remaining part of the sheett are:</p>
+<p>We will dive right into using the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> package ourselves. The learning goals for the remaining part of the sheet are:</p>
 <ul class="simple">
 <li><p>learn how to load a pretrained language model</p></li>
 <li><p>learn how to generate a prediction with the model</p></li>
-<li><p>learn about the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> class which allows to train from scratch or fine-tune the model (the following code is inspired by <a class="reference external" href="https://huggingface.co/docs/transformers/training">this</a> tutorial)</p></li>
+<li><p>learn about the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> class which allows to train from scratch or fine-tune the model. (The following code is inspired by <a class="reference external" href="https://huggingface.co/docs/transformers/training">this</a> tutorial.)</p></li>
 </ul>
-<p><strong>NB:</strong> this sheet uses the pretrained <a class="reference external" href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">GPT-2</a>, a causal (decoder-only) transformer model. We have not covered transformers in detail yet, so the set up of the model and some of the required set-up for using it are treated as a blackbox in this sheet. More in-depth explanations will follow the next lecture covering transformers.</p>
+<p><strong>NB:</strong> this sheet uses the pretrained <a class="reference external" href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">GPT-2</a>, a causal (decoder-only) transformer model. We have not covered transformers in detail yet, so the setup of the model and some of the required setup for using it are treated as a blackbox in this sheet. More in-depth explanations will follow the next lecture covering transformers.</p>
 <p>There are two ways of generating predictions with a trained model available on HF. First, we will do so explicitly. The steps are:</p>
 <ul class="simple">
 <li><p>load the pretrained model with its dedicated class</p></li>
@@ -583,7 +586,7 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># additioanlly, we need to install accelerate</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># additioanly, we need to install accelerate</span>
 <span class="c1"># uncomment and run the following line on Colab or in your environment</span>
 <span class="c1"># !pip install accelerate</span>
 <span class="c1"># NOTE: in a notebook, reloading of the kernel might be required after installation if you get dependency errors with the transformers package</span>
