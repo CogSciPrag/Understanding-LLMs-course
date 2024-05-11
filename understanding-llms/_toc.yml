@@ -20,7 +20,7 @@ parts:
   chapters:
   - file: lectures/03-LSTMs-Transformers
   - file: tutorials/03a-tokenization-transformers
-  - file: tutorials/04a-transformers-heads-training
+  - file: tutorials/03b-transformers-heads-training
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
