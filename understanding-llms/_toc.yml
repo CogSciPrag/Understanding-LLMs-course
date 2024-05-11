@@ -17,6 +17,7 @@ parts:
   - file: tutorials/02d-char-level-RNN
   - file: tutorials/02e-intro-to-hf
 - caption: 03 LSTMs & transformers
+  chapters:
   - file: lectures/03-LSTMs-Transformers
   - file: tutorials/03a-tokenization-transformers
   - file: tutorials/04a-transformers-heads-training
