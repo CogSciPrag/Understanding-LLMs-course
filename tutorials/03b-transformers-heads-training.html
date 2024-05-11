@@ -64,7 +64,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/04a-transformers-heads-training';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/03b-transformers-heads-training';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Homework 1: Language models (50 points)" href="../homework/01-language-modeling.html" />
@@ -247,7 +247,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/03b-transformers-heads-training.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onBinder"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -265,7 +265,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/03b-transformers-heads-training.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -331,7 +331,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/04a-transformers-heads-training.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/03b-transformers-heads-training.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -361,7 +361,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/tutorials/04a-transformers-heads-training.ipynb" target="_blank"
+      <li><a href="../_sources/tutorials/03b-transformers-heads-training.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -516,7 +516,7 @@ The full list of different GPT-2 classes with different heads can be found <a cl
 Since this is a classification task where each token has only one correct category, the CrossEntropy (classification) loss is used for training.
 Information about the layer and the loss can be found, e.g., when inspecting the <a class="reference external" href="https://github.com/huggingface/transformers/blob/v4.40.2/src/transformers/models/gpt2/modeling_gpt2.py#L1733">source</a> of the class.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.1: Model heads</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.2.1: Model heads</span></strong></p>
 <ol class="arabic simple">
 <li><p>Inspect the documentation for <code class="docutils literal notranslate"><span class="pre">GPT2ForSequenceClassification</span></code> <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2ForSequenceClassification">here</a>. (1) What kind of layer is under the hood of “ForSequenceClassification”? (2) What kind of loss should be used to train a model for sequence classification?</p></li>
 <li><p>One popular task in NLP is <em>extractive question answering</em>. Conceptually, it refers to the task of predicting the location of a passage of text preceding a question which contains the answer to that question. <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2ForQuestionAnswering">Here</a> is the class implementing such a system with GPT-2.
@@ -640,7 +640,7 @@ The helper class <code class="docutils literal notranslate"><span class="pre">Da
 <li><p><a class="reference external" href="https://huggingface.co/docs/transformers/tasks/summarization">this</a> tutorial provides another example of a sequence-to-sequence model, this time, tuned to do summarization (while the lecture examples covered sequence-to-sequence machine translation). The tutorial uses a popular seq2seq architecture, T5.</p></li>
 </ul>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.6: Optional exercises</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.2.2: Optional exercises</span></strong></p>
 <ol class="arabic simple">
 <li><p>Implement the character-level name generation model from sheet 2.4, but now use an LSTM cell instead of an RNN cell.</p></li>
 <li><p>Re-implement the model from ex. 3 of HW1 as an extractive question answering model (rather than a generative question answering system). Hint: Note see <span class="xref myst">here</span> for inspiration.</p></li>
