@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Background &#8212; Understanding LLMs</title>
+    <title>Prompting &amp; Current LMs &#8212; Understanding LLMs</title>
   
   
   
@@ -62,11 +62,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/01-introduction';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/04-LLMs-Prompting';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Sheet 1.1: Practical set-up &amp; Training data" href="../tutorials/01-introduction.html" />
-    <link rel="prev" title="Course overview: Understanding LLMs" href="../intro.html" />
+    <link rel="next" title="Homework 1: Language models (50 points)" href="../homework/01-language-modeling.html" />
+    <link rel="prev" title="Sheet 3.2: Transformer configurations &amp; Training utilities" href="../tutorials/03b-transformers-heads-training.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -169,8 +169,8 @@ const thebe_selector_output = ".output, .cell_output"
             </li>
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Background</a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
@@ -183,11 +183,11 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Prompting &amp; Current LMs</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
 <ul class="nav bd-sidenav">
@@ -263,7 +263,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/01-introduction.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/04-LLMs-Prompting.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -293,7 +293,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/lectures/01-introduction.md" target="_blank"
+      <li><a href="../_sources/lectures/04-LLMs-Prompting.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -377,7 +377,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Background</h1>
+    <h1>Prompting & Current LMs</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -399,18 +399,26 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="background">
-<h1>Background<a class="headerlink" href="#background" title="Permalink to this heading">#</a></h1>
-<p>Slides from the first lecture can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/01-introduction.pdf">here</a>.</p>
-<p>A cheat sheet on mathematical notation and a few basics for the class can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/cheat-sheet-notation-algebra.pdf">here</a>.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="prompting-current-lms">
+<h1>Prompting &amp; Current LMs<a class="headerlink" href="#prompting-current-lms" title="Permalink to this heading">#</a></h1>
+<p>Slides from the fourth lecture introducing prompting strategies in the context of base (or, foundational) language models, as well as some of the current large language models can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/04-LLMs-prompting.pdf">here</a>.</p>
 <section id="additional-materials">
 <h2>Additional materials<a class="headerlink" href="#additional-materials" title="Permalink to this heading">#</a></h2>
-<p>If you want to dig a bit deeper, here are a few (optional!) readings on the development trends of LLMs, a general textbook on NLP as well as a paper mentioned in the slides:</p>
+<p>If you want to dig a bit deeper, here are (optional!) supplementary readings introducing the prompting strategies and the mentioned LMs that were covered in class:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://web.stanford.edu/~jurafsky/slp3/">Jurafsky &amp; Martin (2024) Speech and Language Processing (textbook)</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/2303.18223.pdf">Zhao et al. (2023) A survey of LLMs</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/2001.08361.pdf">Kaplan et al. (2020) Scaling Laws for Neural Language Models</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/1301.3781.pdf">Mikolov et al. (2013) Word2Vec paper</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2201.11903">Wei et al. (2023) Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2205.11916">Kojima et al. (2023) Large Language Models are Zero-Shot Reasoners</a></p></li>
+<li><p><a class="reference external" href="https://aclanthology.org/2022.naacl-main.167.pdf">Webson &amp; Pavlick (2022) Do Prompt-Based Models Really Understand the Meaning of Their Prompts?</a></p></li>
+<li><p><a class="reference external" href="https://openreview.net/pdf?id=HBlx2idbkbq">Nye et al. (2022) Show Your Work: Scratchpads for Intermediate Computation with Language Models</a></p></li>
+<li><p><a class="reference external" href="https://dl.acm.org/doi/10.1145/3411763.3451760">Reynolds &amp; McDonnell (2021) Prompt Programming for Large Language Models: Beyond the Few-Shot Paradigm</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2203.11171">Wang et al. (2023) Self-Consistency Improves Chain of Thought Reasoning in Language Models</a></p></li>
+<li><p><a class="reference external" href="https://aclanthology.org/2022.acl-long.225.pdf">Liu et al. (2022) Generated Knowledge Prompting for Commonsense Reasoning</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2305.10601">Yao et al. (2023) Tree of Thoughts: Deliberate Problem Solving with Large Language Models</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2111.02080">Xie et al. (2022) An Explanation of In-context Learning as Implicit Bayesian Inference</a></p></li>
+<li><p><a class="reference external" href="https://aclanthology.org/2022.emnlp-main.759.pdf">Min et al. (2022) Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?</a></p></li>
+<li><p><a class="reference external" href="https://aclanthology.org/2022.findings-emnlp.38/">Lampinen et al. (2022) Can language models learn from explanations in context?</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2302.13971">Touvron et al. (2023) LLaMA: Open and Efficient Foundation Language Models</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2307.09288">Touvron et al. (2023) Llama 2: Open Foundation and Fine-Tuned Chat Models</a></p></li>
 </ul>
 </section>
 </section>
@@ -446,20 +454,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../intro.html"
+       href="../tutorials/03b-transformers-heads-training.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Course overview: Understanding LLMs</p>
+        <p class="prev-next-title">Sheet 3.2: Transformer configurations &amp; Training utilities</p>
       </div>
     </a>
     <a class="right-next"
-       href="../tutorials/01-introduction.html"
+       href="../homework/01-language-modeling.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Sheet 1.1: Practical set-up &amp; Training data</p>
+        <p class="prev-next-title">Homework 1: Language models (50 points)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
