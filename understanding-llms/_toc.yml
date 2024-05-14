@@ -21,6 +21,7 @@ parts:
   - file: lectures/03-LSTMs-Transformers
   - file: tutorials/03a-tokenization-transformers
   - file: tutorials/03b-transformers-heads-training
+  - file: lectures/04-LLMs-Prompting
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
