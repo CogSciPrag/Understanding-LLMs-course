@@ -774,7 +774,7 @@ This prompting technique is used to answer this multiple-choice question from th
         <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
     <span class="p">)</span>
     <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
-    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Average log P &quot;</span><span class="p">,</span> <span class="n">log_p</span><span class="p">)</span>
 </pre></div>
