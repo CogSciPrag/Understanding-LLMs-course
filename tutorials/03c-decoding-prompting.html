@@ -1,0 +1,911 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 3.3: Prompting &amp; Decoding &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/03c-decoding-prompting';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/03c-decoding-prompting.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/03c-decoding-prompting.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/03c-decoding-prompting.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/03c-decoding-prompting.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 3.3: Prompting & Decoding</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decoding-schemes">Decoding schemes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-3-3-prompting-decoding">
+<h1>Sheet 3.3: Prompting &amp; Decoding<a class="headerlink" href="#sheet-3-3-prompting-decoding" title="Permalink to this heading">#</a></h1>
+<p><strong>Author</strong>: Polina Tsvilodub &amp; Michael Franke</p>
+<p>This sheet provides more details on concepts that have been mentioned in passing in the previous sheets, and provides some practical examples and exercises for prompting techniques that have been covered in lecture four. Therefore, the learning goals for this sheet are:</p>
+<ul class="simple">
+<li><p>take a closer look and understand various decoding schemes,</p></li>
+<li><p>understand the temperature parameter,</p></li>
+<li><p>see a few practical examples of prompting techniques from the lecture.</p></li>
+</ul>
+<section id="decoding-schemes">
+<h2>Decoding schemes<a class="headerlink" href="#decoding-schemes" title="Permalink to this heading">#</a></h2>
+<p>This part of this sheet is a close replication of <a class="reference external" href="https://michael-franke.github.io/npNLG/06-LSTMs/06d-decoding-GPT2.html">this</a> sheet.</p>
+<p>This topic addresses the following question: Given a language model that outputs a next-word probability, how do we use this to actually generate naturally sounding text? For that, we need to choose a single next token from the distribution, which we will then feed back to the model, together with the preceding tokens, so that it can generate the next one. This inference procedure is repeated, until the EOS token is chosen, or a maximal sequence length is achieved. The procedure of how exactly to get that single token from the distribution is call <em>decoding scheme</em>. Note that “decoding schemes” and “decoding strategies” refer to the same concept and are used interchangeably.</p>
+<p>We have already discussed decoding schemes in lecture 02 (slide 25). The following introduces these schemes in more detail again and provides example code for configuring some of them.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.3.1: Decoding schemes</span></strong></p>
+<p>Please read through the following introduction and look at the provided code.</p>
+<ol class="arabic simple">
+<li><p>With the help of the example and the documentation, please complete the code (where it says “### YOUR CODE HERE ####”) for all the decoding schemes.</p></li>
+</ol>
+</div></blockquote>
+<p>Common decoding strategies are:</p>
+<ul class="simple">
+<li><p><strong>pure sampling</strong>: In a pure sampling approach, we just sample each next word with exactly the probability assigned to it by the LM. Notice that this process, therefore, is non-determinisitic. We can force replicable results, though, by setting a <em>seed</em>.</p></li>
+<li><p><strong>Softmax sampling</strong>: In soft-max sampling, the probablity of sampling word <span class="math notranslate nohighlight">\(w_i\)</span> is <span class="math notranslate nohighlight">\(P_{LM} (w_i \mid w_{1:i-1}) \propto \exp(\frac{1}{\tau} P_{LM}(w_i \mid w_{1:i-1}))\)</span>, where <span class="math notranslate nohighlight">\(\tau\)</span> is a <em>temperature parameter</em>.</p>
+<ul>
+<li><p>The <em>temperature parameter</em> is also often available for closed-source models like the GPT family. It is often said to change the “creativity” of the output.</p></li>
+</ul>
+</li>
+<li><p><strong>greedy sampling</strong>: In greedy sampling, we don’t actually sample but just take the most likely next-word at every step. Greedy sampling is equivalent to setting <span class="math notranslate nohighlight">\(\tau = 0\)</span> for soft-max sampling. It is also sometimes referred to as <em>argmax</em> decoding.</p></li>
+<li><p><strong>beam search</strong>: In simplified terms, beam search is a parallel search procedure that keeps a number <span class="math notranslate nohighlight">\(k\)</span> of path probabilities open at each choice point, dropping the least likely as we go along. (There is actually no unanimity in what exactly beam search means for NLG.)</p></li>
+<li><p><strong>top-<span class="math notranslate nohighlight">\(k\)</span> sampling</strong>: his sampling scheme looks at the <span class="math notranslate nohighlight">\(k\)</span> most likely next-words and samples from so that: $<span class="math notranslate nohighlight">\(P_{\text{sample}}(w_i  \mid w_{1:i-1}) \propto \begin{cases} P_{M}(w_i \mid w_{1:i-1}) &amp; \text{if} \; w_i \text{ in top-}k \\ 0 &amp; \text{otherwise} \end{cases}\)</span>$</p></li>
+<li><p><strong>top-<span class="math notranslate nohighlight">\(p\)</span> sampling</strong>: Top-<span class="math notranslate nohighlight">\(p\)</span> sampling is similar to top-<span class="math notranslate nohighlight">\(k\)</span> sampling, but restricts sampling not to the top-<span class="math notranslate nohighlight">\(k\)</span> most likely words (so always the same number of words), but the set of most likely words the summed probability of which does not exceed threshold <span class="math notranslate nohighlight">\(p\)</span>.</p></li>
+</ul>
+<p>The within the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> package, for all causal LMs, the <code class="docutils literal notranslate"><span class="pre">.generate()</span></code> function is available which allows to sample text from the model (remember the brief introduction in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/02e-intro-to-hf.html">sheet 2.5</a>). Configuring this function via different values and combinations of various parameters allows to sample text with the different decoding schemes described above. The respective documentation can be found <a class="reference external" href="https://huggingface.co/docs/transformers/v4.40.2/en/generation_strategies#decoding-strategies">here</a>. The same configurations can be passed to the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> endpoint which we have seen in the same sheet.</p>
+<p>Check out <a class="reference external" href="https://medium.com/&#64;harshit158/softmax-temperature-5492e4007f71">this</a> blog post for very noce visualizations and more detials on the <em>temperature</em> parameter.</p>
+<p>Please complete the code below. GPT-2 is used as an example model, but this works exactly the same with any other causal LM from HF.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import relevant packages</span>
+<span class="kn">import</span> <span class="nn">torch</span> 
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span>
+
+<span class="c1"># load the tokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2Tokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+
+<span class="c1"># add the EOS token as PAD token to avoid warnings</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">,</span> <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">)</span>
+
+<span class="c1"># convenience function for nicer output</span>
+<span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="c1"># encode context the generation is conditioned on</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;I enjoy walking with my cute dog&#39;</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set a seed for reproducibility (if you want)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">199</span><span class="p">)</span>
+
+<span class="c1"># below, greedy decoding is implemented</span>
+<span class="c1"># NOTE: while it is the default for .generate(), it is NOT for pipeline()</span>
+
+<span class="n">greedy_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pretty_print</span><span class="p">(</span><span class="n">greedy_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># here, beam search is shown</span>
+<span class="c1"># option `early_stopping` implies stopping when all beams reach the end-of-sentence token</span>
+<span class="n">beam_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span> 
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+    <span class="n">num_beams</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
+    <span class="n">early_stopping</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span> 
+
+<span class="n">pretty_print</span><span class="p">(</span><span class="n">beam_output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="c1">#  pure sampling</span>
+<span class="n">sample_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span>        <span class="c1"># context to continue</span>
+    <span class="c1">#### YOUR CODE HERE ####</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># return maximally 10 new tokens (following the input)</span>
+<span class="p">)</span>
+
+<span class="n">pretty_print</span><span class="p">(</span><span class="n">sample_output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># same as pure sampling before but with `temperature`` parameter</span>
+<span class="n">SM_sample_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span>        <span class="c1"># context to continue</span>
+    <span class="c1">#### YOUR CODE HERE ####</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">pretty_print</span><span class="p">(</span><span class="n">SM_sample_output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># top-k sampling </span>
+<span class="n">top_k_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span> 
+    <span class="c1">### YOUR CODE HERE #### </span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">pretty_print</span><span class="p">(</span><span class="n">top_k_output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># top-p sampling</span>
+<span class="n">top_p_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span> 
+    <span class="c1">### YOUR CODE HERE #### </span>
+    <span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> 
+<span class="p">)</span>
+
+<span class="n">pretty_print</span><span class="p">(</span><span class="n">top_p_output</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.3.2: Understanding decoding schemes</span></strong></p>
+<p>Think about the following questions about the different decoding schemes.</p>
+<ol class="arabic simple">
+<li><p>Why is the temperature parameter in softmax sampling sometimes referred to as a creativity parameter? Hint: Think about the shape distribution and from which the next word is sampled, and how it compares to the “pure” distribution when the temperature parameter is varied.</p></li>
+<li><p>Just for yourself, draw a diagram of how beam decoding that starts with the BOS token and results in the sentence “BOS Attention is all you need” might work, assuming k=3 and random other tokens of your choice.</p></li>
+<li><p>Which decoding scheme seems to work best for GPT-2?</p></li>
+<li><p>Which of the decoding schemes included in this work sheet is a special case of which other decoding scheme(s)? E.g., X is a special case of Y if the behavior of Y is obtained when we set certain paramters of X to specific values.</p></li>
+<li><p>Can you see pros and cons to using some of these schemes over others?</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Outlook</strong></p>
+<p>There are also other more recent schemes, e.g., <a class="reference external" href="https://arxiv.org/abs/2202.00666">locally typical sampling</a> introduced by Meister et al. (2022).</p>
+</section>
+<section id="prompting-strategies">
+<h2>Prompting strategies<a class="headerlink" href="#prompting-strategies" title="Permalink to this heading">#</a></h2>
+<p>The lecture introduced different prompting techniques. (Note: “prompting technique” and “prompting strategy” refer to the same concept and are used interchangeably)
+Prompting techniques refer to the way (one could almost say – the art) of constructing the inputs to the LM, so as to get optimal outputs for your task at hand. Note that prompting is complementary to choosing the right decoding scheme – one still has to choose the decoding scheme for predicting the completion, given the prompt constructed via a particulat prompting strategy.</p>
+<p>Below, a practical example of a simple prompting strategy, namely <em>few-shot prompting</em> (which is said to elicit <em>in-context learning</em>), and a more advanced example, namely <em>generated knowledge prompting</em> are provided. These should serve as inspiration for your own implementations and explorations of other prompting schemes out there. Also, feel free to play around with the examples below to build your intuitions! Of course, you can also try different models, sentences, …</p>
+<p><strong>Note</strong></p>
+<p>You might have already experienced rate limits of accessing the GPU on Colab. To try to avoid difficulties with completing the tasks on GPU, if you want to use Colab, here are a few potential aspects (approximated by experience, definitely non-exhaustive and inofficial) that might lead to rate limits: requesting GPU runtimes and then not utilizing the GPU, requesting a lot of GPU runtimes (e.g., multiple per day), running very long jobs (multiple hours).
+To try to work around this, one possibility is to debug and test code that doesn’t require GPUs in non-GPU runtimes, and only request those when actually needed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define computational device</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">,</span>
+    <span class="c1"># trust_remote_code=True,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># few shot prompting </span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Input: This class is awesome. Sentiment: positive</span>
+<span class="s2">Input: This class is terrible. Sentiment: neutral</span>
+<span class="s2">Input: The class is informative. Sentiment: neutral</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">input_text</span> <span class="o">=</span> <span class="s2">&quot;The class is my favourite!&quot;</span>
+
+<span class="n">full_prompt</span> <span class="o">=</span> <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;Input: &quot;</span> <span class="o">+</span> <span class="n">input_text</span> <span class="o">+</span> <span class="s2">&quot; Sentiment: &quot;</span>
+
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">full_prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">few_shot_prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">input_ids</span><span class="p">,</span> 
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">few_shot_prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Example of generated knowledge prompting (somewhat approximated, based on code from <a class="reference external" href="https://cogsciprag.github.io/LLM-implications/materials/session5">this class</a>), as introduced by <a class="reference external" href="https://aclanthology.org/2022.acl-long.225.pdf">Liu et al. (2022)</a>.
+This prompting technique is used to answer this multiple-choice question from the CommonsenseQA benchmark: “Where would you expect to find a pizzeria while shopping?”. The answer options are: A = [“chicago”, “street”, “little italy”, “food court”, “capital cities”]</p>
+<p>As a reminder, the overall idea of generated knowledge prompting is the following:</p>
+<ul class="simple">
+<li><p>knowledge generation: given question <span class="math notranslate nohighlight">\(Q\)</span> and a few-shot example, generate a set <span class="math notranslate nohighlight">\(K_Q\)</span> of <span class="math notranslate nohighlight">\(k\)</span> knowledge statements</p>
+<ul>
+<li><p>we will load the few-shot examples from a csv file <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/files/knowledge_examples.csv">here</a>.</p></li>
+</ul>
+</li>
+<li><p>knowledge integration: given <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(K_Q\)</span>, retrieve the log probabilities of each answer option <span class="math notranslate nohighlight">\(a_i \in A\)</span> and select the option with the highest probability.</p>
+<ul>
+<li><p>in the paper, this is done separately for each knowledge statement in <span class="math notranslate nohighlight">\(K_Q\)</span>. As a simplification, we will concatenate all <span class="math notranslate nohighlight">\(K_Q\)</span> and compare the answer options given this combined prompt.</p></li>
+</ul>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. construct few-shot example</span>
+
+<span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Where would you expect to find a pizzeria while shopping?&quot;</span>
+<span class="n">answers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chicago&quot;</span><span class="p">,</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span> <span class="s2">&quot;little italy&quot;</span><span class="p">,</span> <span class="s2">&quot;food court&quot;</span><span class="p">,</span> <span class="s2">&quot;capital cities&quot;</span><span class="p">]</span>
+
+<span class="n">examples_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;files/knowledge_examples.csv&quot;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+
+<span class="n">few_shot_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{q}</span><span class="s2"> We know that </span><span class="si">{k}</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="n">few_shot_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;knowledge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">examples_df</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructed few shot prompt</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. generate knowledge statements</span>
+<span class="c1"># tokenize few shot prompt together with our actual question</span>
+<span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">knowledge_statements</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt_input_ids</span><span class="p">,</span> 
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> 
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+<span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span> 
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
+<span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
+
+<span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="c1"># NOTE: This can take a moment</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+    <span class="c1"># construct the full prompt</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># construct the prompt without the answer to create a mask which will </span>
+    <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+    <span class="n">context_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># tokenize the prompt</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                          <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># tokenize the context prompt</span>
+    <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                  <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+    <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+    <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+    <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mask &quot;</span><span class="p">,</span> <span class="n">masked_labels</span><span class="p">)</span>
+    <span class="c1"># generate the answer</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span> 
+        <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+    <span class="p">)</span>
+    <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Average log P &quot;</span><span class="p">,</span> <span class="n">log_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. retrieve the answer option with the highest score</span>
+<span class="c1"># find max probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">],</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.3.3: Prompting techniques</span></strong></p>
+<p>For the following exercises, use the same model as used above.</p>
+<ol class="arabic simple">
+<li><p>Using the code for the generated knowledge approach, score the different answers to the question <em>without</em> any additional knowledge. Compare your results to the result of generated knowledge prompting. Did it improve the performance of the model?</p></li>
+<li><p>Implement an example of a few-shot chain-of-thought prompt.</p></li>
+<li><p>Try to vary the few-shot and the chain-of-thought prompt by introducing mistakes and inconsistencies. Do these mistakes affect the result of your prediction? Feel free to use any example queries of your choice or reuse the examples above.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Outlook</strong></p>
+<p>As always, here are a few optional resources on this topic to llok at (although there is definitely much more online):</p>
+<ul class="simple">
+<li><p>a <a class="reference external" href="https://www.promptingguide.ai/">prompting webbook</a> providing an overview of various approaches</p></li>
+<li><p>a framework / package, LangChain, which provides very useful utilities for more complex schemes like <a class="reference external" href="https://github.com/langchain-ai/langchain/blob/master/cookbook/tree_of_thought.ipynb">tree of thought prompting</a> (spoiler: we will look closer at this package in future sessions, but you can already take a look if you are curious!)</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decoding-schemes">Decoding schemes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
