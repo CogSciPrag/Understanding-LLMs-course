@@ -554,7 +554,7 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <h3>1. Second Possibility<a class="headerlink" href="#second-possibility" title="Permalink to this heading">#</a></h3>
 <blockquote>
 <div><ol class="arabic">
-<li><p>a. vocabulary <span class="math notranslate nohighlight">\(V\)</span>= {’<BOS>’,’the’, ‘cat’, ‘sleeps’, ‘mouse’, ‘sings’,’a’, ‘dog’’<EOS>’}</p>
+<li><p>a. vocabulary <span class="math notranslate nohighlight">\(V\)</span>= {‘&lt;BOS&gt;’,’the’, ‘cat’, ‘sleeps’, ‘mouse’, ‘sings’,’a’, ‘dog’,’&lt;EOS&gt;’}</p>
 <p>b. The cat sleeps:</p>
 </li>
 </ol>
@@ -562,7 +562,7 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 \[\begin{align*} 
 P_{LM} = &amp;\prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})\\
 \end{align*}\]</div>
-<p><span class="math notranslate nohighlight">\(P_{LM}(&lt;BOS&gt;, the,cat,sleeps, &lt;EOS&gt;)= p(the|&lt;BOS&gt;)*p(cat|&lt;BOS&gt;, the)*p(sleeps∣&lt;BOS&gt;,the,cat)\)</span>*p(<EOS>∣<BOS>,the,cat, sleeps)$</p>
+<p><span class="math notranslate nohighlight">\(P_{LM}(&lt;BOS&gt;, the,cat,sleeps, &lt;EOS&gt;)= p(the|&lt;BOS&gt;)*p(cat|&lt;BOS&gt;, the)*p(sleeps∣&lt;BOS&gt;,the,cat)*p(&lt;EOS&gt;∣&lt;BOS&gt;,the,cat, sleeps)\)</span></p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
 P_{LM}(&lt;BOS&gt;, the,cat,sleeps, &lt;EOS&gt;)=&amp;\frac{3}{4}*\frac{2}{3}*\frac{2}{2}*\frac{2}{2}= \frac{6}{12} = \frac{1}{2}= 0.5\\
@@ -613,13 +613,13 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <p>hidden_neurons = 13</p>
 <p>output_neurons = 3</p>
 <p><span class="math notranslate nohighlight">\(M_1 ϵ R^{2x13}\)</span> input to hidden1</p>
-<p><span class="math notranslate nohighlight">\(b_1 ϵR^{1x13}\)</span> weights1</p>
+<p><span class="math notranslate nohighlight">\(b_1 ϵR^{1x13}\)</span> bias of weights1</p>
 <p><span class="math notranslate nohighlight">\(M_2 ϵ R^{13x13}\)</span> hidden1 to hidden2</p>
-<p><span class="math notranslate nohighlight">\(b_2 ϵ R^{1x13}\)</span> weights2</p>
+<p><span class="math notranslate nohighlight">\(b_2 ϵ R^{1x13}\)</span> bias of weights2</p>
 <p><span class="math notranslate nohighlight">\(M_3 ϵ R^{13x13}\)</span> hidden2 to hidden3</p>
-<p><span class="math notranslate nohighlight">\(b_3 ϵ R^{1x13}\)</span> weights3</p>
+<p><span class="math notranslate nohighlight">\(b_3 ϵ R^{1x13}\)</span> bias of weights3</p>
 <p><span class="math notranslate nohighlight">\(M_4 ϵ R^{13x3}\)</span> hidden3 to output</p>
-<p><span class="math notranslate nohighlight">\(b_4 ϵ R^{1x13}\)</span> weights4</p>
+<p><span class="math notranslate nohighlight">\(b_4 ϵ R^{1x13}\)</span> bias of weights4</p>
 </li>
 </ol>
 </div></blockquote>
@@ -971,7 +971,10 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <span class="sd">        &quot;&quot;&quot;</span>        <span class="c1"># retrieve a training sample at the specified index idx</span>
         <span class="c1"># HINT: note that this might depend on self.dataset_split</span>
         <span class="c1">### YOUR CODE HERE ####</span>
-        <span class="n">input_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_split</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+            <span class="n">input_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_split</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_split</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="n">tokenized_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
             <span class="n">input_text</span><span class="p">,</span>
             <span class="c1">### YOUR CODE HERE ####</span>
@@ -1140,7 +1143,9 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the fine-tuning loss</span>
 <span class="c1">### YOUR CODE HERE ###</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;train loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="n">test_losses</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;test loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Training steps&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1239,7 +1244,7 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 </ol>
 </div></blockquote>
 <blockquote>
-<div><p><span class="math notranslate nohighlight">\(Accuracy = \frac{#correct\:predictions}{#total\:predictions}\)</span></p>
+<div><p>Accuracy = <span class="math notranslate nohighlight">\(\frac{\#correct\:predictions}{\#total\:predictions}\)</span></p>
 </div></blockquote>
 </section>
 </section>
