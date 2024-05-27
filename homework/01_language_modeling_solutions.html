@@ -607,9 +607,27 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <li><p>caculation correct for one alternative but formula of the other alterative = -1 point</p></li>
 </ul>
 <hr class="docutils" />
+<ol class="arabic simple" start="2">
+<li></li>
+</ol>
+<p>Usually we multiply the weight matrix by the input matrix, i.e. <span class="math notranslate nohighlight">\(W\cdot X\)</span>. Note that - unlike scalar multiplication - matrix multiplication is not commutative. <span class="math notranslate nohighlight">\(W\cdot X\)</span> is different to <span class="math notranslate nohighlight">\(X\cdot W\)</span>. If we compute <span class="math notranslate nohighlight">\(W\cdot X\)</span> (and this is how it is implemented in Pytorch as well), The weight matrices would be:</p>
 <blockquote>
-<div><ol class="arabic" start="2">
-<li><p>input_neurons = 2</p>
+<div><p>input_neurons = 2</p>
+<p>hidden_neurons = 13</p>
+<p>output_neurons = 3</p>
+<p><span class="math notranslate nohighlight">\(M_1 ϵ R^{13x2}\)</span> input to hidden1</p>
+<p><span class="math notranslate nohighlight">\(b_1 ϵR^{13x1}\)</span> bias of weights1</p>
+<p><span class="math notranslate nohighlight">\(M_2 ϵ R^{13x13}\)</span> hidden1 to hidden2</p>
+<p><span class="math notranslate nohighlight">\(b_2 ϵ R^{13x1}\)</span> bias of weights2</p>
+<p><span class="math notranslate nohighlight">\(M_3 ϵ R^{13x13}\)</span> hidden2 to hidden3</p>
+<p><span class="math notranslate nohighlight">\(b_3 ϵ R^{13x1}\)</span> bias of weights3</p>
+<p><span class="math notranslate nohighlight">\(M_4 ϵ R^{3x13}\)</span> hidden3 to output</p>
+<p><span class="math notranslate nohighlight">\(b_4 ϵ R^{3x1}\)</span> bias of weights4</p>
+</div></blockquote>
+<p>In this case the input would also be transposed: 2x1. The first calculation, mupltiplying the first weight matrix by the input would be <span class="math notranslate nohighlight">\(W^{13\times 2}\cdot X^{2\times 1}\)</span>. It is important that the inner dimensions match (2 here). The result will have as many rows as W and as many columns as X (13x1 here).</p>
+<p>However, it is also possible to compute <span class="math notranslate nohighlight">\(X\cdot W\)</span>. In this case we would have to transpose all matrices and the result would also be the transpose of the result from the previous solution. This is possible because of the matrix property <span class="math notranslate nohighlight">\((A\cdot B)^T = B^T\cdot A^T\)</span> (reverse the order and transpose both factors to get the transpose of the orinial result). The first calculation step would be <span class="math notranslate nohighlight">\(X^{1\times 2}\cdot W^{2\times 13}\)</span>. Again, the inner dimensions match and the result would be of shape 1x13.</p>
+<blockquote>
+<div><p>input_neurons = 2</p>
 <p>hidden_neurons = 13</p>
 <p>output_neurons = 3</p>
 <p><span class="math notranslate nohighlight">\(M_1 ϵ R^{2x13}\)</span> input to hidden1</p>
@@ -620,8 +638,6 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <p><span class="math notranslate nohighlight">\(b_3 ϵ R^{1x13}\)</span> bias of weights3</p>
 <p><span class="math notranslate nohighlight">\(M_4 ϵ R^{13x3}\)</span> hidden3 to output</p>
 <p><span class="math notranslate nohighlight">\(b_4 ϵ R^{1x13}\)</span> bias of weights4</p>
-</li>
-</ol>
 </div></blockquote>
 </section>
 <section id="id1">
@@ -949,7 +965,7 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <span class="sd">        Method returning the length of the training dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">### YOUR CODE HERE ####</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_split</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_split</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_split</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1027,14 +1043,14 @@ P_{LM} = \prod^n_{n=1}P_{LM}(w_i|w_{1:i-1})
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">CommonsenseQADataset</span><span class="p">(</span>
     <span class="c1">### YOUR CODE HERE ####</span>
     <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
-    <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+    <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">],</span>
     <span class="n">tokenizer</span>
 <span class="p">)</span>
 <span class="c1"># instantiate test dataset with the downloaded commonsense_qa data</span>
 <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">CommonsenseQADataset</span><span class="p">(</span>
     <span class="c1">### YOUR CODE HERE ####,</span>
     <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
-    <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+    <span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">],</span>
     <span class="n">tokenizer</span><span class="p">,</span>
     <span class="n">dataset_split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span>
 <span class="p">)</span>
