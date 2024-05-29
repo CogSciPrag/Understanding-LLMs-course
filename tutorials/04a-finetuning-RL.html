@@ -62,6 +62,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/04a-finetuning-RL';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -187,6 +189,9 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
 <ul class="nav bd-sidenav">
@@ -454,9 +459,15 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-peft-in-practice">Outlook: PEFT in practice</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rl-fine-tuning">RL fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning">Supervised fine-tuning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-modeling">Reward modeling</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-why-is-rl-so-useful">Outlook: Why is RL so useful?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -494,39 +505,45 @@ document.write(`
 </ul>
 <section id="flavours-of-fine-tuning">
 <h2>Flavours of fine-tuning<a class="headerlink" href="#flavours-of-fine-tuning" title="Permalink to this heading">#</a></h2>
-<p>In <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/02e-intro-to-hf.html">sheet 2.5</a>, we already brushed over the distinction between pretrained and fine-tuned models (please recap if needed!). In particular, fine-tuning was introduced as the training LMs on <em>task-specific</em> datasets, e.g., for movie review generation or classification. For classification, LMs are usually fine-tuned with a classification head (see <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/03b-transformers-heads-training.html">sheet 3.2</a> for a recap). However, from here on, we will focus on fine-tuning of model for <em>generative</em> tasks, i.e., simply fine-tuning LMs for next-word prediction on a specific task.</p>
-<p>We have seen fine-tuning of a generative LM for question answering in homework 1. Here, the specific task the model is supposed to learn is constituted by the specific dataset and the formatting of the questions and the answers. The model was trained on examples of questions with correct answers; i.e., this is <em>supervised fine-tuning</em> where the model is “shown” what the desired behavior is (i.e., which next tokens it is supposed to predict).</p>
+<p>In <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/02e-intro-to-hf.html">sheet 2.5</a>, we already brushed over the distinction between pretrained and fine-tuned models. In particular, fine-tuning was introduced as the training LMs on <em>task-specific</em> datasets, e.g., for movie review generation or classification. For classification, LMs are usually fine-tuned with a classification head (see <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/03b-transformers-heads-training.html">sheet 3.2</a> for a recap). However, from here on, we will focus on fine-tuning of model for <em>generative</em> tasks, i.e., simply fine-tuning LMs for next-word prediction on a specific task.</p>
+<p>We have seen fine-tuning of a generative LM for question answering in homework 1. Here, the specific task the model is supposed to learn is constituted by the specific dataset and the formatting of the questions and the answers. The model was trained on examples of questions with correct answers; i.e., this is <em>supervised fine-tuning</em> where the model was shown what the desired behavior is (i.e., which next tokens it is supposed to predict).</p>
 <p>For state-of-the-art LLMs, it has been identified that there is a particular kind of task that <em>general-purpose LLMs</em>, and in particular <em>assistants</em>, should be able to complete: namely, <strong>instruction-following</strong>. That is, rather than creating LMs that can only do QA on a specific dataset with a particular formatting, the community started to build <em>instruction-tuned</em> LLMs, which generate sensible outputs given user instructions ranging from “Provide ten recipes with tofu in a bullet list format” to “Summarize the following scientific paper”.
 This has also been achieved with supervised fine-tuning, where the example input and output pairs in the dataset consist of example isntructions, and their respective completions.</p>
-<p><strong>TODO</strong>: distinction to self-supervised training.</p>
+<p><strong>TODO</strong>: distinction to self-supervised training. mention catastrophic forgetting. behavioral cloning.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.1: Supervised-finetuning</span></strong></p>
 <ol class="arabic simple">
 <li><p>Take a look at <a class="reference external" href="https://huggingface.co/datasets/HuggingFaceH4/instruction-dataset?row=23">this</a> dataset. For which kind of fine-tuning is it intended? What kinds of examples are there?</p></li>
-<li><p>Consider the following use cases: assistant tutor model for students for different subjects, model for answering highly specific questions about a knowledge base, a model intended for writing abstracts of scientific papers. What kind of fine-tuning set up would you consider?</p></li>
-<li><p>Please come up with a prompt testing whether an LM can follow instructions. Use the following code to test the instruction-following performance of an instruction-tuned model and a simple small LM. Feel free to play around with the decoding parameters! (<strong>WARNING</strong>: the instruction-tuned model is a large model, so it can take a moment to load on Colab. Please also be aware of it if you execute the notebook locally!)</p></li>
+<li><p>Consider the following use cases for which you want to build an LM: (a) an assistant tutor model for students for different subjects, (b) a model for answering highly specific questions about a medical knowledge base, (c) a model intended for writing abstracts of scientific papers. What kind of fine-tuning set up would you consider (i.e., what kind of fine-tuning dataset would you ideally choose)?</p></li>
+<li><p>Please come up with a prompt for testing whether an LM can follow instructions. Use the following code to test the instruction-following performance of an instruction-tuned model (Phi-3) and a simple small LM (GPT-2). Feel free to play around with the decoding parameters! (<strong>WARNING</strong>: the instruction-tuned model is a large model, so it can take a moment to load on Colab. Please also be aware of it if you execute the notebook locally!)</p></li>
 </ol>
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
 
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer_instruct</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;microsoft/Phi-3-mini-4k-instruct&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer_instruct</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;microsoft/Phi-3-mini-4k-instruct&quot;</span><span class="p">)</span>
 <span class="n">model_instruct</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;microsoft/Phi-3-mini-4k-instruct&quot;</span><span class="p">)</span>
 
 <span class="n">tokenizer_lm</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2-small&quot;</span><span class="p">)</span>
@@ -537,7 +554,7 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">instruction_text</span> <span class="o">=</span> <span class="c1">#### YOUR TEXT HERE ####</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">instruction_text</span> <span class="o">=</span> <span class="c1">#### YOUR TEXT HERE ####</span>
 <span class="n">input_ids_instruct</span> <span class="o">=</span> <span class="n">tokenizer_instruct</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">instruction_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="n">input_ids_lm</span> <span class="o">=</span> <span class="n">tokenizer_lm</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">instruction_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
@@ -554,14 +571,298 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 </div>
 </div>
+<p>The distinctions above focused on distinctions in the <em>content</em> of the fine-tuning, i.e., the content of the input-output demonstrations in the datasets used for the supervised fine-tuning.</p>
+<p>Additionally, the lecture introduced different <em>methods</em> of efficient supervised fine-tuning, which is especially important for large LMs that take a lot of resources to train.
+The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, during the fine-tuning, all parameters were updated. However, as explained in the lecture, the more common state-of-the-art approach to fine-tuning is <em>parameter-efficient</em>, i.e., only a <em>selected</em> subset of the pretrained model parameters, or a <em>small set of new parameters</em> is updated.</p>
+<p>The following code provides an simple example of vanilla selective fine-tuning where only the last transformer block and the last layer (i.e., LM head) of GPT-2 would be finetuned, and all other layers are frozen (❄️). Concretely, this means that we don’t want to compute gradients of parameters that are frozen, and we do not want to change their values. Usually parameters are (un)frozen by-layer / component.</p>
+<p>Of course, the same approach can be used for (un)freezing any other subset of layers, in any other <code class="docutils literal notranslate"><span class="pre">transformers</span></code> model. For this, it is useful to know how to inspect and access different components of a pretrained model, as was briefly shown in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/03a-tokenization-transformers.html#transformers">sheet 3.1</a>.</p>
+<blockquote>
+<div><p>Optionally, you can reuse the code from the homework to fine-tune this partially frozen model on the QA task from the homework. Do your results change?</p>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpt2_model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+
+<span class="c1"># first we inspect the model&#39;s configuration</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gpt2_model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/huggingface_hub/file_download.py:1132: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2LMHeadModel(
+  (transformer): GPT2Model(
+    (wte): Embedding(50257, 768)
+    (wpe): Embedding(1024, 768)
+    (drop): Dropout(p=0.1, inplace=False)
+    (h): ModuleList(
+      (0-11): 12 x GPT2Block(
+        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (attn): GPT2Attention(
+          (c_attn): Conv1D()
+          (c_proj): Conv1D()
+          (attn_dropout): Dropout(p=0.1, inplace=False)
+          (resid_dropout): Dropout(p=0.1, inplace=False)
+        )
+        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (mlp): GPT2MLP(
+          (c_fc): Conv1D()
+          (c_proj): Conv1D()
+          (act): NewGELUActivation()
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (ln_f): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  )
+  (lm_head): Linear(in_features=768, out_features=50257, bias=False)
+)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/huggingface_hub/file_download.py:1132: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, we can inspect the model&#39;s configuration and named parameters</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>transformer.wte.weight
+transformer.wpe.weight
+transformer.h.0.ln_1.weight
+transformer.h.0.ln_1.bias
+transformer.h.0.attn.c_attn.weight
+transformer.h.0.attn.c_attn.bias
+transformer.h.0.attn.c_proj.weight
+transformer.h.0.attn.c_proj.bias
+transformer.h.0.ln_2.weight
+transformer.h.0.ln_2.bias
+transformer.h.0.mlp.c_fc.weight
+transformer.h.0.mlp.c_fc.bias
+transformer.h.0.mlp.c_proj.weight
+transformer.h.0.mlp.c_proj.bias
+transformer.h.1.ln_1.weight
+transformer.h.1.ln_1.bias
+transformer.h.1.attn.c_attn.weight
+transformer.h.1.attn.c_attn.bias
+transformer.h.1.attn.c_proj.weight
+transformer.h.1.attn.c_proj.bias
+transformer.h.1.ln_2.weight
+transformer.h.1.ln_2.bias
+transformer.h.1.mlp.c_fc.weight
+transformer.h.1.mlp.c_fc.bias
+transformer.h.1.mlp.c_proj.weight
+transformer.h.1.mlp.c_proj.bias
+transformer.h.2.ln_1.weight
+transformer.h.2.ln_1.bias
+transformer.h.2.attn.c_attn.weight
+transformer.h.2.attn.c_attn.bias
+transformer.h.2.attn.c_proj.weight
+transformer.h.2.attn.c_proj.bias
+transformer.h.2.ln_2.weight
+transformer.h.2.ln_2.bias
+transformer.h.2.mlp.c_fc.weight
+transformer.h.2.mlp.c_fc.bias
+transformer.h.2.mlp.c_proj.weight
+transformer.h.2.mlp.c_proj.bias
+transformer.h.3.ln_1.weight
+transformer.h.3.ln_1.bias
+transformer.h.3.attn.c_attn.weight
+transformer.h.3.attn.c_attn.bias
+transformer.h.3.attn.c_proj.weight
+transformer.h.3.attn.c_proj.bias
+transformer.h.3.ln_2.weight
+transformer.h.3.ln_2.bias
+transformer.h.3.mlp.c_fc.weight
+transformer.h.3.mlp.c_fc.bias
+transformer.h.3.mlp.c_proj.weight
+transformer.h.3.mlp.c_proj.bias
+transformer.h.4.ln_1.weight
+transformer.h.4.ln_1.bias
+transformer.h.4.attn.c_attn.weight
+transformer.h.4.attn.c_attn.bias
+transformer.h.4.attn.c_proj.weight
+transformer.h.4.attn.c_proj.bias
+transformer.h.4.ln_2.weight
+transformer.h.4.ln_2.bias
+transformer.h.4.mlp.c_fc.weight
+transformer.h.4.mlp.c_fc.bias
+transformer.h.4.mlp.c_proj.weight
+transformer.h.4.mlp.c_proj.bias
+transformer.h.5.ln_1.weight
+transformer.h.5.ln_1.bias
+transformer.h.5.attn.c_attn.weight
+transformer.h.5.attn.c_attn.bias
+transformer.h.5.attn.c_proj.weight
+transformer.h.5.attn.c_proj.bias
+transformer.h.5.ln_2.weight
+transformer.h.5.ln_2.bias
+transformer.h.5.mlp.c_fc.weight
+transformer.h.5.mlp.c_fc.bias
+transformer.h.5.mlp.c_proj.weight
+transformer.h.5.mlp.c_proj.bias
+transformer.h.6.ln_1.weight
+transformer.h.6.ln_1.bias
+transformer.h.6.attn.c_attn.weight
+transformer.h.6.attn.c_attn.bias
+transformer.h.6.attn.c_proj.weight
+transformer.h.6.attn.c_proj.bias
+transformer.h.6.ln_2.weight
+transformer.h.6.ln_2.bias
+transformer.h.6.mlp.c_fc.weight
+transformer.h.6.mlp.c_fc.bias
+transformer.h.6.mlp.c_proj.weight
+transformer.h.6.mlp.c_proj.bias
+transformer.h.7.ln_1.weight
+transformer.h.7.ln_1.bias
+transformer.h.7.attn.c_attn.weight
+transformer.h.7.attn.c_attn.bias
+transformer.h.7.attn.c_proj.weight
+transformer.h.7.attn.c_proj.bias
+transformer.h.7.ln_2.weight
+transformer.h.7.ln_2.bias
+transformer.h.7.mlp.c_fc.weight
+transformer.h.7.mlp.c_fc.bias
+transformer.h.7.mlp.c_proj.weight
+transformer.h.7.mlp.c_proj.bias
+transformer.h.8.ln_1.weight
+transformer.h.8.ln_1.bias
+transformer.h.8.attn.c_attn.weight
+transformer.h.8.attn.c_attn.bias
+transformer.h.8.attn.c_proj.weight
+transformer.h.8.attn.c_proj.bias
+transformer.h.8.ln_2.weight
+transformer.h.8.ln_2.bias
+transformer.h.8.mlp.c_fc.weight
+transformer.h.8.mlp.c_fc.bias
+transformer.h.8.mlp.c_proj.weight
+transformer.h.8.mlp.c_proj.bias
+transformer.h.9.ln_1.weight
+transformer.h.9.ln_1.bias
+transformer.h.9.attn.c_attn.weight
+transformer.h.9.attn.c_attn.bias
+transformer.h.9.attn.c_proj.weight
+transformer.h.9.attn.c_proj.bias
+transformer.h.9.ln_2.weight
+transformer.h.9.ln_2.bias
+transformer.h.9.mlp.c_fc.weight
+transformer.h.9.mlp.c_fc.bias
+transformer.h.9.mlp.c_proj.weight
+transformer.h.9.mlp.c_proj.bias
+transformer.h.10.ln_1.weight
+transformer.h.10.ln_1.bias
+transformer.h.10.attn.c_attn.weight
+transformer.h.10.attn.c_attn.bias
+transformer.h.10.attn.c_proj.weight
+transformer.h.10.attn.c_proj.bias
+transformer.h.10.ln_2.weight
+transformer.h.10.ln_2.bias
+transformer.h.10.mlp.c_fc.weight
+transformer.h.10.mlp.c_fc.bias
+transformer.h.10.mlp.c_proj.weight
+transformer.h.10.mlp.c_proj.bias
+transformer.h.11.ln_1.weight
+transformer.h.11.ln_1.bias
+transformer.h.11.attn.c_attn.weight
+transformer.h.11.attn.c_attn.bias
+transformer.h.11.attn.c_proj.weight
+transformer.h.11.attn.c_proj.bias
+transformer.h.11.ln_2.weight
+transformer.h.11.ln_2.bias
+transformer.h.11.mlp.c_fc.weight
+transformer.h.11.mlp.c_fc.bias
+transformer.h.11.mlp.c_proj.weight
+transformer.h.11.mlp.c_proj.bias
+transformer.ln_f.weight
+transformer.ln_f.bias
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># next, we define which layers NOT to freeze </span>
+<span class="c1"># (of course, we can do this vice versa and define which layers to freeze)</span>
+
+<span class="n">layers_to_unfreeze</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;transformer.h.11&quot;</span><span class="p">,</span> <span class="s2">&quot;transformer.ln_f.weight&quot;</span><span class="p">,</span> <span class="s2">&quot;transformer.ln_f.bias&quot;</span><span class="p">]</span>
+
+<span class="c1"># iterate over model&#39;s parameters</span>
+<span class="c1"># note that, by default, in train mode, all parameters are set to require grad = True (i.e., unfrozen)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+     <span class="c1"># check that these parameters are not in the layers_to_unfreeze list</span>
+     <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">layers_to_unfreeze</span><span class="p">]):</span> 
+        <span class="c1"># if not, freeze these parameters</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now we check how many parameters are trainable</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The model has </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1"> trainable parameters&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The model has 7,089,408 trainable parameters
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.2: PEFT</span></strong></p>
+<ol class="arabic simple">
+<li><p>Compare the number above with the number of trainable parameters in the original model. What changed? How do you expect this to affect fine-tuning results?</p></li>
+<li><p>Suppose that we wanted to use rank <span class="math notranslate nohighlight">\(r=4\)</span> LoRA for fine-tuning the decoder self-attention block of GPT-2. How many parameters would the lower rank matrices A and B have (see slides 27-29 for reference)?</p></li>
+</ol>
+</div></blockquote>
+<section id="outlook-peft-in-practice">
+<h3>Outlook: PEFT in practice<a class="headerlink" href="#outlook-peft-in-practice" title="Permalink to this heading">#</a></h3>
+<p>Below, more optional resources for the other types of fine-tuning introduced in the (LoRA, QLoRA) can be found.</p>
+<p><strong>TODO</strong></p>
+</section>
 </section>
 <section id="rl-fine-tuning">
 <h2>RL fine-tuning<a class="headerlink" href="#rl-fine-tuning" title="Permalink to this heading">#</a></h2>
-<p><strong>The following is just a draft</strong>:</p>
-<p>Reinforcement Learning from Human Feedback (RLHF) approach as it was used for training ChatGPT and InstructGPT. Core components of the approaches are discussed, especially focusing on the reward modeling aspect. The second part provides an overview of developments that were made in the domain of policy-gradient methods (e.g., advantage estimation, gradient variance reduction techniques etc). The session focuses on Proximal Policy Optimization (PPO), one of the most popular deep RL algorithms in the current literature.</p>
+<p>Reinforcement learning is often introduced a separate type of machine learning, in addition to supervised and unsupervised learning. Reinforcement learning broadly defines the field of study and the methods for training agents to learn to take actions that (optimally) achieve a goal, based on experience in the environment. It can be seen as the computational formalization of trial-and-error learning.</p>
+<p>The key difference to supervised learning is that the agent (the terms “model”, “LM” and “agent” will be used interchangeably in this section) learns which actions are useful for achieving the goal itself, rather than being shown the “ground truth” optimal actions as in supervised learning. The task of the developer is, therefore, to correctly specify the goal, and the agent will “discover” a way to achieve it.
+In the formal framework which underpins RL (namely, MDPs), the goal is represented via the <em>reward function</em>. This function assigns high rewards to desired outcomes, and low rewards to undesired ones, therefore implicitly representing a goal.
+It is important to note that, in general, the approach of RL allows to specify what the developer want the agent to learn to do (i.e., the goal), but <em>not necessarily how</em>, exactly. Correct specification of the goal is a far from trivial task and a lot of current research goes into understanding how to specify these goals in the field of <em>alignment</em> (more on this in future sessions).</p>
+<p>Using RL for fine-tuning LLMs is one of the main methodological innovations that seems to have led to the impressive performance of SOTA LLMs. In particular, RL allows to fine-tune LLMs towards human preferences and commericial usability, because its mechanics lend itself to training a model based on a more abstract signal whether an output is good or bad (i.e., let it discover how to generate output that recevies a “good” reward!), rather than based on particular demonstrations. This is especially useful because the objectives of fine-tuning of SOTA LLMs often include aspects that are very difficult to specify via specific demonstrations, like being <em>helpful, honest, harmless</em> (<a class="reference external" href="https://arxiv.org/pdf/2204.05862">Bai et al., 2022</a>).
+To this end, instead of using supervised learning, <em>human feedback</em> can be used as a reward signal to fine-tune the model.
+This is why the fine-tuning technique in question  is called Reinforcement Learning from Human Feedback (RLHF).</p>
+<p>Below, practical aspects of the core components of RLHF are discussed. These core components are: the policy (i.e., the backbone LLM), the supervised fine-tuning data (SFT), the reward modeling data and the resulting reward model, and, finally the training objective (commonly, the PPO algorithm).
+As with standard LM training, there are packages which implement some of the steps required for training for us. We will look at the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> based package <code class="docutils literal notranslate"><span class="pre">trl</span></code>.</p>
+<section id="supervised-fine-tuning">
+<h3>Supervised fine-tuning<a class="headerlink" href="#supervised-fine-tuning" title="Permalink to this heading">#</a></h3>
+<p><strong>TODO</strong></p>
+</section>
+<section id="reward-modeling">
+<h3>Reward modeling<a class="headerlink" href="#reward-modeling" title="Permalink to this heading">#</a></h3>
+<p>A core component of RL fine-tuning is the reward model. For training a reward model, human annotations (i.e., human feedback) are required. As discussed in the lecture, these can take different forms.
+Below, examples of a reward model and reward modeling dataset based on simple binary comparison are shown.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.3: Reward modeling</span></strong></p>
+<ol class="arabic simple">
+<li><p>Inspect this dataset. What do the single columns contain? Based on slide XXX, which values go where?</p></li>
+<li><p>Look at the code below and make sure to understand it. What was the RM trained for? Test it on a few of your own intuitive examples; do the score (ordinally) correspond to your intuition?</p></li>
+</ol>
+</div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span> 
     <span class="n">AutoModelForCausalLM</span><span class="p">,</span> 
@@ -582,7 +883,7 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load reward model </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load reward model </span>
 <span class="n">reward_tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;lvwerra/distilbert-imdb&quot;</span><span class="p">)</span>
 <span class="c1"># TODO try to find a helpfulness model</span>
 <span class="n">reward_model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;lvwerra/distilbert-imdb&quot;</span><span class="p">)</span>
@@ -592,7 +893,7 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run an example from the IMDB train split to see how the reward model works</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run an example from the IMDB train split to see how the reward model works</span>
 
 <span class="n">input_reward</span> <span class="o">=</span> <span class="n">reward_tokenizer</span><span class="p">(</span><span class="n">imdb_ds</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
 <span class="n">out_reward</span> <span class="o">=</span> <span class="n">reward_model</span><span class="p">(</span><span class="o">**</span><span class="n">input_reward</span><span class="p">)</span>
@@ -605,11 +906,14 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 </div>
 <p><strong>TODO:</strong> have people look at the RM objective and the creating of RM data.</p>
+</section>
 <section id="outlook-why-is-rl-so-useful">
 <h3>Outlook: Why is RL so useful?<a class="headerlink" href="#outlook-why-is-rl-so-useful" title="Permalink to this heading">#</a></h3>
 <p><strong>TODO:</strong> speak about the differential bottleneck.</p>
-<p>Outlook:</p>
-<p>more utilities for fine-tuning: PEFT, qlora, quantization, deepspeed.</p>
+</section>
+<section id="outlook">
+<h3>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h3>
+<p>Other sources of reward.</p>
 </section>
 </section>
 </section>
@@ -659,9 +963,15 @@ This has also been achieved with supervised fine-tuning, where the example input
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-peft-in-practice">Outlook: PEFT in practice</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rl-fine-tuning">RL fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning">Supervised fine-tuning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-modeling">Reward modeling</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-why-is-rl-so-useful">Outlook: Why is RL so useful?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
 </ul>
 </li>
 </ul>
