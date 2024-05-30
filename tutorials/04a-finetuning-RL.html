@@ -464,10 +464,11 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rl-fine-tuning">RL fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#policy">Policy</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning">Supervised fine-tuning</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-modeling">Reward modeling</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-why-is-rl-so-useful">Outlook: Why is RL so useful?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ppo-training">PPO training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-outlook">Optional outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -843,21 +844,166 @@ It is important to note that, in general, the approach of RL allows to specify w
 <p>Using RL for fine-tuning LLMs is one of the main methodological innovations that seems to have led to the impressive performance of SOTA LLMs. In particular, RL allows to fine-tune LLMs towards human preferences and commericial usability, because its mechanics lend itself to training a model based on a more abstract signal whether an output is good or bad (i.e., let it discover how to generate output that recevies a “good” reward!), rather than based on particular demonstrations. This is especially useful because the objectives of fine-tuning of SOTA LLMs often include aspects that are very difficult to specify via specific demonstrations, like being <em>helpful, honest, harmless</em> (<a class="reference external" href="https://arxiv.org/pdf/2204.05862">Bai et al., 2022</a>).
 To this end, instead of using supervised learning, <em>human feedback</em> can be used as a reward signal to fine-tune the model.
 This is why the fine-tuning technique in question  is called Reinforcement Learning from Human Feedback (RLHF).</p>
-<p>Below, practical aspects of the core components of RLHF are discussed. These core components are: the policy (i.e., the backbone LLM), the supervised fine-tuning data (SFT), the reward modeling data and the resulting reward model, and, finally the training objective (commonly, the PPO algorithm).
-As with standard LM training, there are packages which implement some of the steps required for training for us. We will look at the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> based package <code class="docutils literal notranslate"><span class="pre">trl</span></code>.</p>
+<p>Below, practical aspects of the core components of RLHF are discussed. These core components are (see <a class="reference external" href="https://cdn.openai.com/instruction-following/draft-20220126f/methods.svg">this</a> figure for an overview):</p>
+<ul class="simple">
+<li><p>the policy (i.e., the backbone LLM),</p></li>
+<li><p>the supervised fine-tuning data (SFT) and training,</p></li>
+<li><p>the reward modeling data and the resulting reward model,</p></li>
+<li><p>and, finally the RL training objective (commonly, the PPO algorithm) and the dataset for fine-tuning.</p></li>
+</ul>
+<p>As with standard LM training, there are packages which implement some of the steps required for training for us. We will look at the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> based package <a class="reference external" href="https://huggingface.co/docs/trl/en/index"><code class="docutils literal notranslate"><span class="pre">trl</span></code></a>.</p>
+<section id="policy">
+<h3>Policy<a class="headerlink" href="#policy" title="Permalink to this heading">#</a></h3>
+<p>As the policy, a pretrained, sufficintly large LM is usually chosen. For instance, Llama offers a suite of models where both the initial LM, i.e., the <em>base</em> model and the resulting fine-tuned model is provided. For Llama-2 (<a class="reference external" href="https://arxiv.org/pdf/2307.09288">Touvron et al. (2022)</a>), the paper provides some information about the details of the training and the architecture of the models.</p>
+<p>Under state-of-the-art models, usually LMs of at least &gt;=1B parameters are used as policies for further fine-tuning. The intuitive reason is that RLHF is mostly used for creating more general-purpose assistants rather than task-specific models, and therefore, the initial model should have rather large capacity and perform well on a wide range of tasks (which, as we know, tends to come with <a class="reference external" href="https://arxiv.org/pdf/2001.08361">scale</a>). In other words, the base model should be good – otherwise: “Garbage in, garbage out” (i.e., it might be very difficult if not impossible to fix a bad base model through fine-tuning).</p>
+<p>Of course, it is absolutely possible to use RLHF for task-specific fine-tuning, e.g., early work fine-tuned a model for <a class="reference external" href="https://arxiv.org/pdf/2009.01325">summarization</a>.</p>
+</section>
 <section id="supervised-fine-tuning">
 <h3>Supervised fine-tuning<a class="headerlink" href="#supervised-fine-tuning" title="Permalink to this heading">#</a></h3>
-<p><strong>TODO</strong></p>
+<p>This step is a “standard” supervised fine-tuning (SFT) step that is performed as we have discussed above. Some RL-tuned models are closed source, so it is unknown whether any of the PEFT techniques is used; others are open-source and might report their fine-tuning approach.</p>
+<p>While the specific methodological details might vary, the conceptual point behind SFT is two-fold: (1) models are often instruction-tuned for turning into actually useful assistants and (2) (more importantly) the model is “nudged” towards outputting human-demonstrated (and therefore, human-preferred) texts for the ultimate goal of the fine-tuning (e.g., being helpful, harmless, honest). This makes subsequent RL-tuning more efficient. Intuitively, this is because the space of actions (i.e., any possible completion, given a prompt!) which the agent has to explore is quite giagantic, and the agent might make quite a lot of errors before “stumbling” upon high-reward actions. Through SFT, the agent is already biased towards the higher-reward space of actions.
+Therefore, the SFT dataset usually consists of examples of target outputs written by human annotators.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.3: Supervised fine-tuning for RL</span></strong></p>
+<ol class="arabic simple">
+<li><p>What would an SFT dataset look like for fine-tuning a model for summarization?</p></li>
+<li><p>What apects do you think are important to keep in mind when performing SFT? (Think: what sorts of examples should human annotators see? What should they be instructed to do? Feel free to also use information from the OpenAI <a class="reference external" href="https://openai.com/index/chatgpt/">blogpost</a> for inspiration)</p></li>
+<li><p>Below is an example of using the <code class="docutils literal notranslate"><span class="pre">trl</span></code> library for the <a class="reference external" href="https://huggingface.co/docs/trl/en/sft_trainer#quickstart">SFT step</a>. Please go through the code and make sure you understand it. Look at the docs for the training arguments class which is used by default by the SFTTrainer <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">here</a>. By default, for how many epochs is the model trained?</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># uncomment and run on Colab / install the package in your enironment if you haven&#39;t yet</span>
+<span class="c1"># !pip install trl</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">trl</span> <span class="kn">import</span> <span class="n">SFTTrainer</span>
+
+<span class="c1"># load dataset</span>
+<span class="c1"># you can inspect it to get a sense of its contents and formatting</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;CarperAI/openai_summarize_tldr&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;valid&quot;</span><span class="p">)</span>
+<span class="c1"># load base model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;facebook/opt-350m&quot;</span><span class="p">)</span>
+
+<span class="c1"># define a function that formats the prompts</span>
+<span class="c1"># NOTE: the formatting of examples is extremely important for successful training and deployment for a given task</span>
+<span class="c1"># for instance, the use of special tokens and prompt formatting should be consistent with the task, the model (if it already uses special tokens)</span>
+<span class="c1"># and should be used in consistent ways in further training</span>
+
+<span class="k">def</span> <span class="nf">formatting_prompts_func</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+    <span class="n">output_texts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># iterate over batch</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;prompt&#39;</span><span class="p">])):</span>
+        <span class="c1"># retrieve both inputs and target labels</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;prompt&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">output_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output_texts</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">SFTTrainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+    <span class="n">formatting_func</span><span class="o">=</span><span class="n">formatting_prompts_func</span><span class="p">,</span>
+    <span class="n">max_seq_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">dataset_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+<span class="c1"># If one wants to pass custom training arguments, an example of doing so is here: https://github.com/huggingface/trl/blob/main/examples/scripts/sft.py</span>
+
+<span class="c1"># NOTE: if you experience errors running this, setting the version of accelerate to pip install accelerate==0.27.2 might help</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">24</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span>         <span class="n">output_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span>     <span class="k">return</span> <span class="n">output_texts</span>
+<span class="ne">---&gt; </span><span class="mi">24</span> <span class="n">trainer</span> <span class="o">=</span> <span class="n">SFTTrainer</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span>     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span>     <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span>     <span class="n">formatting_func</span><span class="o">=</span><span class="n">formatting_prompts_func</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span>     <span class="n">max_seq_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">29</span>     <span class="n">dataset_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">30</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">31</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">33</span> <span class="c1"># If one wants to pass custom training arguments, an example of doing so is here: https://github.com/huggingface/trl/blob/main/examples/scripts/sft.py</span>
+<span class="g g-Whitespace">     </span><span class="mi">34</span> 
+<span class="g g-Whitespace">     </span><span class="mi">35</span> <span class="c1"># NOTE: if you experience errors running this, setting the version of accelerate to pip install accelerate==0.27.2 might help</span>
+
+<span class="nn">File /opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/trl/trainer/sft_trainer.py:323,</span> in <span class="ni">SFTTrainer.__init__</span><span class="nt">(self, model, args, data_collator, train_dataset, eval_dataset, tokenizer, model_init, compute_metrics, callbacks, optimizers, preprocess_logits_for_metrics, peft_config, dataset_text_field, packing, formatting_func, max_seq_length, infinite, num_of_sequences, chars_per_token, dataset_num_proc, dataset_batch_size, neftune_noise_alpha, model_init_kwargs, dataset_kwargs, eval_packing)</span>
+<span class="g g-Whitespace">    </span><span class="mi">317</span> <span class="k">if</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="o">!=</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">318</span>     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">319</span>         <span class="s2">&quot;You passed a tokenizer with `padding_side` not equal to `right` to the SFTTrainer. This might lead to some unexpected behaviour due to &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">320</span>         <span class="s2">&quot;overflow issues when training a model in half-precision. You might consider adding `tokenizer.padding_side = &#39;right&#39;` to your code.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">323</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span>     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>     <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>     <span class="n">data_collator</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>     <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span>     <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span>     <span class="n">model_init</span><span class="o">=</span><span class="n">model_init</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">331</span>     <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">332</span>     <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">333</span>     <span class="n">optimizers</span><span class="o">=</span><span class="n">optimizers</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">334</span>     <span class="n">preprocess_logits_for_metrics</span><span class="o">=</span><span class="n">preprocess_logits_for_metrics</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">335</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">337</span> <span class="c1"># Add tags for models that have been loaded with the correct transformers version</span>
+<span class="g g-Whitespace">    </span><span class="mi">338</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;add_model_tags&quot;</span><span class="p">):</span>
+
+<span class="nn">File /opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/transformers/trainer.py:373,</span> in <span class="ni">Trainer.__init__</span><span class="nt">(self, model, args, data_collator, train_dataset, eval_dataset, tokenizer, model_init, compute_metrics, callbacks, optimizers, preprocess_logits_for_metrics)</span>
+<span class="g g-Whitespace">    </span><span class="mi">370</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="g g-Whitespace">    </span><span class="mi">371</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_in_train</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="ne">--&gt; </span><span class="mi">373</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_accelerator_and_postprocess</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">375</span> <span class="c1"># memory metrics - must set up as early as possible</span>
+<span class="g g-Whitespace">    </span><span class="mi">376</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_tracker</span> <span class="o">=</span> <span class="n">TrainerMemoryTracker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">skip_memory_metrics</span><span class="p">)</span>
+
+<span class="nn">File /opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/transformers/trainer.py:4252,</span> in <span class="ni">Trainer.create_accelerator_and_postprocess</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">4249</span> <span class="n">gradient_accumulation_plugin</span> <span class="o">=</span> <span class="n">GradientAccumulationPlugin</span><span class="p">(</span><span class="o">**</span><span class="n">grad_acc_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">4251</span> <span class="c1"># create accelerator object</span>
+<span class="ne">-&gt; </span><span class="mi">4252</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="n">Accelerator</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">4253</span>     <span class="n">deepspeed_plugin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed_plugin</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">4254</span>     <span class="n">gradient_accumulation_plugin</span><span class="o">=</span><span class="n">gradient_accumulation_plugin</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">4255</span>     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">accelerator_config</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+<span class="g g-Whitespace">   </span><span class="mi">4256</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">4257</span> <span class="c1"># some Trainer classes need to use `gather` instead of `gather_for_metrics`, thus we store a flag</span>
+<span class="g g-Whitespace">   </span><span class="mi">4258</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather_for_metrics</span>
+
+<span class="ne">TypeError</span>: Accelerator.__init__() got an unexpected keyword argument &#39;use_seedable_sampler&#39;
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="reward-modeling">
 <h3>Reward modeling<a class="headerlink" href="#reward-modeling" title="Permalink to this heading">#</a></h3>
-<p>A core component of RL fine-tuning is the reward model. For training a reward model, human annotations (i.e., human feedback) are required. As discussed in the lecture, these can take different forms.
-Below, examples of a reward model and reward modeling dataset based on simple binary comparison are shown.</p>
+<p>A core component of RL fine-tuning is the reward model. There are various ways of obtaining a reward model. The perhaps most intuitive one, as discussed in the lecture, is obtaining human feedback as the reward signal. Since having humans give online feedback to an LM for thousands of samples is costly and cumbersome, instead, a reward model is trained on human preferences. For training such a reward model, human annotations are collected. As discussed in the lecture, these annotations can take different forms.</p>
+<p>Below, we will look at an example based on simple binary comparisons, where human annotators were shown two outputs of the LM sampled for the same input <span class="math notranslate nohighlight">\(x\)</span> and had to indicate which of them they preferred (e.g., output <span class="math notranslate nohighlight">\(y_1\)</span> over <span class="math notranslate nohighlight">\(y_2\)</span>).
+Specifically, the reward model is usually initialized from a pretrained LLM (maybe even the same one as the base LM of the policy), and fine-tuned with a specific <em>head</em> to output numerical scores. It is usually trained to maximize the difference in predicted scores scores <span class="math notranslate nohighlight">\(r\)</span> between the preferred and the rejected answer in a pair. Formally, the model is trained with the following loss:</p>
+<div class="math notranslate nohighlight">
+\[L(\theta) = -\frac{1}{N}\mathbb{E}_{(x, y_1, y_2) \sim D} [log \; (\sigma (r_{\theta} (x, y_1) - r_{\theta}(x, y_2)))] \]</div>
+<p>This form of human annotations has proven especially useful for eliciting human intuitions for such difficult-to-capture concepts like “helpfulness”. It is much easier for humans to decide which of two options they prefer than, e.g., to consistently assign scalar 1-10 scores to outputs.</p>
 <blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.3: Reward modeling</span></strong></p>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.4: Reward modeling</span></strong></p>
 <ol class="arabic simple">
-<li><p>Inspect this dataset. What do the single columns contain? Based on slide XXX, which values go where?</p></li>
-<li><p>Look at the code below and make sure to understand it. What was the RM trained for? Test it on a few of your own intuitive examples; do the score (ordinally) correspond to your intuition?</p></li>
+<li><p>Consider <span class="xref myst">this</span> well-known dataset from Anthropic for training helpful and harmless assistants. Pick a specific sample. For this sample, which text corresponds to <span class="math notranslate nohighlight">\(x, y_1, y_2\)</span>?</p></li>
+<li><p>An example of a model trained with the approach above can be found <a class="reference external" href="https://huggingface.co/reciprocate/openllama-13b_rm_oasst-hh">here</a>. Feel free to explore the repository, if you want. We will not test this model since it is quite large.</p></li>
+</ol>
+</div></blockquote>
+<p>However, there are also alternative ways of providing rewards. For instance, some work has used other models to provide feedback, an approach that is called <a class="reference external" href="https://arxiv.org/pdf/2212.08073">RLAIF</a> (RL from AI feedback).
+Alternatively, more task-specific reward models can be constructed. For instance, if one wants to use RL-tuning for training a summarization model, the score for evaluating summaries (ROUGE) can be used as the numerical reward. If one wants to train a model for generating positive-sentiment texts only, one can train a reward model on labelled sentiment classification data like, e.g., the IMDB dataset.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.5: Task-specific reward modeling</span></strong></p>
+<ol class="arabic simple">
+<li><p>The code below provides an example loading a trained reward model. This model was trained on movie reviews, in particular to assign high scores to positive reviews and low scores to negative reviews, as described above. Please look at the code and make sure to understand it. Test it on a few of your own intuitive examples; do the scores (ordinally) correspond to your intuition?</p></li>
 </ol>
 </div></blockquote>
 <div class="cell docutils container">
@@ -865,27 +1011,17 @@ Below, examples of a reward model and reward modeling dataset based on simple bi
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span> 
-    <span class="n">AutoModelForCausalLM</span><span class="p">,</span> 
     <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
-    <span class="n">LogitsProcessorList</span><span class="p">,</span>
-    <span class="n">MinLengthLogitsProcessor</span><span class="p">,</span>
-    <span class="n">TemperatureLogitsWarper</span><span class="p">,</span>
-    <span class="n">StoppingCriteriaList</span><span class="p">,</span>
-    <span class="n">MaxLengthCriteria</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load reward model </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load reward model and its tokenizer</span>
 <span class="n">reward_tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;lvwerra/distilbert-imdb&quot;</span><span class="p">)</span>
-<span class="c1"># TODO try to find a helpfulness model</span>
 <span class="n">reward_model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;lvwerra/distilbert-imdb&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -894,26 +1030,41 @@ Below, examples of a reward model and reward modeling dataset based on simple bi
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run an example from the IMDB train split to see how the reward model works</span>
+<span class="n">positive_sentence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1">#### YOUR EXAMPLE HERE ####</span>
+<span class="n">negative_sentence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="c1">#### YOUR EXAMPLE HERE ####</span>
 
-<span class="n">input_reward</span> <span class="o">=</span> <span class="n">reward_tokenizer</span><span class="p">(</span><span class="n">imdb_ds</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
-<span class="n">out_reward</span> <span class="o">=</span> <span class="n">reward_model</span><span class="p">(</span><span class="o">**</span><span class="n">input_reward</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Raw output format of the reward model: &quot;</span><span class="p">,</span> <span class="n">out_reward</span><span class="p">)</span>
-<span class="c1"># transform logits to probabilities</span>
-<span class="n">reward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out_reward</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">reward</span><span class="p">)</span> <span class="c1"># reward at index 1 is the probability of being positive; i.e., this can be used as the training reward</span>
+<span class="n">input_pos</span> <span class="o">=</span> <span class="n">reward_tokenizer</span><span class="p">(</span><span class="n">positive_sentence</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
+<span class="n">input_neg</span> <span class="o">=</span> <span class="n">reward_tokenizer</span><span class="p">(</span><span class="n">negative_sentence</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
+
+<span class="n">reward_pos</span> <span class="o">=</span> <span class="n">reward_model</span><span class="p">(</span><span class="o">**</span><span class="n">input_pos</span><span class="p">)</span>
+<span class="n">reward_neg</span> <span class="o">=</span> <span class="n">reward_model</span><span class="p">(</span><span class="o">**</span><span class="n">input_neg</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reward for positive sentence: &quot;</span><span class="p">,</span> <span class="n">reward_pos</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reward for negative sentence: &quot;</span><span class="p">,</span> <span class="n">reward_neg</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p><strong>TODO:</strong> have people look at the RM objective and the creating of RM data.</p>
 </section>
-<section id="outlook-why-is-rl-so-useful">
-<h3>Outlook: Why is RL so useful?<a class="headerlink" href="#outlook-why-is-rl-so-useful" title="Permalink to this heading">#</a></h3>
-<p><strong>TODO:</strong> speak about the differential bottleneck.</p>
+<section id="ppo-training">
+<h3>PPO training<a class="headerlink" href="#ppo-training" title="Permalink to this heading">#</a></h3>
+<p>Once the SFT model and the reward model are available, the final step is to fine-tune the SFT model with RL. For this, a dataset to fine-tune on is needed again. Depedning on the model, sometimes the same dataset as for SFT used, sometimes a similar dataset with other inputs is used. Note that now the dataset doesn’t need any labels, but only the inputs (i.e., initial “states”) based on which the model will generate predictions (i.e., actions) which, in turn, will be assigned rewards (by the reward model which represents the environment).</p>
+<p>There are different algorithms for training the policy. One currently common choice is the Proximal Policy Optimization (<a class="reference external" href="https://arxiv.org/pdf/1707.06347">PPO</a>). Its components were developed in order to stabilize policy updates and speed up convergence. However, there is a core shared idea between PPO and other algorithms in the category of <em>policy-gradient</em> methods.
+Specifically, the theorem behind this class of methods shows that the policy can be trained with a loss based on “trials and errors” (i.e., based on sampling; this objective has been shown to update the policy in such a way that, by following it, the agent is expected to receive higher rewards). Specifically, for a training step, we can sample actions, retrieve their log probability under the current policy, get rewards for these actions, and calculate weight updates based on the product of log probability and the reward.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.6: RL training</span></strong></p>
+<ol class="arabic simple">
+<li><p>Suppose you train an LM for summarization and have a suitable reward model and dataset of input texts. Consider the last sentence of the explanation above. Please provide a specific details of such a training step with this summarization example (in words).</p></li>
+<li><p>An example of using the <code class="docutils literal notranslate"><span class="pre">trl</span></code> library for training a model to generate positive model reviews (using the reward model above!) with PPO can be found <a class="reference external" href="https://github.com/huggingface/trl/blob/main/examples/notebooks/gpt2-sentiment.ipynb">here</a>. Please look at the code and try to understand all of it! Please ask questions or research if anything is unclear, this approach might be relevant for your own future exercise ;)</p></li>
+</ol>
+</div></blockquote>
 </section>
-<section id="outlook">
-<h3>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h3>
-<p>Other sources of reward.</p>
+<section id="optional-outlook">
+<h3>Optional outlook<a class="headerlink" href="#optional-outlook" title="Permalink to this heading">#</a></h3>
+<p>RL fine-tuning is an active area of research, so there are many developments and new methods. Below are some optional resources if you want to know more.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2305.18290">Rafailov et al. (2023) Direct Preference Optimization: Your Language Model is Secretly a Reward Model</a></p></li>
+</ul>
 </section>
 </section>
 </section>
@@ -968,10 +1119,11 @@ Below, examples of a reward model and reward modeling dataset based on simple bi
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rl-fine-tuning">RL fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#policy">Policy</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning">Supervised fine-tuning</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-modeling">Reward modeling</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-why-is-rl-so-useful">Outlook: Why is RL so useful?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ppo-training">PPO training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-outlook">Optional outlook</a></li>
 </ul>
 </li>
 </ul>
