@@ -23,7 +23,7 @@ parts:
   - file: tutorials/03b-transformers-heads-training
   - file: lectures/04-LLMs-Prompting
   - file: tutorials/03c-decoding-prompting
-- capion: 04 Fine-tuning & RLHF
+- caption: 04 Fine-tuning & RLHF
   chapters:
   - file: lectures/05-finetuning-RLHF
   - file: tutorials/04a-finetuning-RL
