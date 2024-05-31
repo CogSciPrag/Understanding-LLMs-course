@@ -26,6 +26,7 @@ parts:
 - capion: 04 Fine-tuning & RLHF
   chapters:
   - file: lectures/05-finetuning-RLHF
+  - file: tutorials/04a-finetuning-RL
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
