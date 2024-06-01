@@ -1,0 +1,1089 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Homework 3: LLM agents &amp; RL fine-tuning &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/03-agents-RL';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Fine-tuning &amp; RLHF</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/03-agents-RL.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/03-agents-RL.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/03-agents-RL.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/homework/03-agents-RL.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Homework 3: LLM agents & RL fine-tuning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">Exercise 1: Building a retrieval-augmented generation system (XXX points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization">Exercise 2: RLHF for summarization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-xxx-points">Exercise 3: Aspects of fine-tuning (XXX points)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="homework-3-llm-agents-rl-fine-tuning">
+<h1>Homework 3: LLM agents &amp; RL fine-tuning<a class="headerlink" href="#homework-3-llm-agents-rl-fine-tuning" title="Permalink to this heading">#</a></h1>
+<p>The third homework zooms in on the following skills: implementing an advanced generation system, diving into task-specific RL fine-tuning hands-on and critically thinking about fine-tuning of LMs.</p>
+<section id="logistics">
+<h2>Logistics<a class="headerlink" href="#logistics" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>submission deadline: June 25th th 23:59 German time via Moodle</p>
+<ul>
+<li><p>please upload a <strong>SINGLE .IPYNB FILE named Surname_FirstName_HW3.ipynb</strong> containing your solutions of the homework.</p></li>
+</ul>
+</li>
+<li><p>please solve and submit the homework <strong>individually</strong>!</p></li>
+<li><p>if you use Colab, to speed up the execution of the code on Colab, you can use the available GPU (if Colab resources allow). For that, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save.</p></li>
+<li><p>please note that we will need a lot of GPU memory for both Ex. 1 and Ex. 2 – therefore, it might be best to do the tasks in <strong>separate runtimes on Colab</strong>, otherwise you might run into out of memory issues.</p></li>
+</ul>
+</section>
+<section id="exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">
+<h2>Exercise 1: Building a retrieval-augmented generation system (XXX points)<a class="headerlink" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points" title="Permalink to this heading">#</a></h2>
+<p>An increasingly popular approach to language generation is so called <em>retrieval-augmented generation</em> (RAG) wherein a language model is supplied with additional (textual) information retrieved from some storage, in addition to the actual task query. It has been found that this additional context improves model performance, and, e.g., allows to use LLMs with custom information (e.g., proprietary documents etc).</p>
+<p>The general set up of a RAG system is as follows:</p>
+<ol class="arabic simple">
+<li><p>Some form of a database (DB) with (searchable) relevant background information (e.g., a database, a set of documents, …) is created.</p>
+<ol class="arabic simple">
+<li><p>A common database format are <em>vector DBs</em>, or, vectore stores. You can optionally learn more about vector DBs, e.g., here: https://www.pinecone.io/learn/vector-database/. The important conceptual point is that some form of a searchable database with relevant (textual) information is created.</p></li>
+</ol>
+</li>
+<li><p>An LLM that will be generating the responses to the queries, given context, is chosen.</p></li>
+<li><p>An embedding model is chosen.</p></li>
+<li><p>Task queries (e.g., questions or instructions) are provided to the system.</p>
+<ol class="arabic simple">
+<li><p>The query is converted to an embedding (using the model chosen ins tep 3), and the embedding is used to search and retrieve relevant information from the database. The specific retrieval method depnds on the nature of the database.</p></li>
+<li><p>The relevant information is supplied to the LLM as context.</p></li>
+</ol>
+</li>
+<li><p>Given the extended context, the LLM provides output.</p></li>
+</ol>
+<p>This is visualized in the figure below.</p>
+<p><img alt="img" src="../_images/basic_rag.png" /></p>
+<p>The image is sourced from <a class="reference external" href="https://docs.llamaindex.ai/en/stable/getting_started/concepts/">here</a>.</p>
+<p>For more details on RAG, you can read the first part of <a class="reference external" href="https://docs.llamaindex.ai/en/stable/getting_started/concepts/">this</a> blog post (until “important concepts within each step”). <a class="reference external" href="https://arxiv.org/pdf/2005.11401">Here</a> is an optional paper about RAG, in case you want to learn more.</p>
+<p><strong>YOUR TASK</strong></p>
+<blockquote>
+<div><p>Your task in this exercise is to explore RAG by implementing a RAG system for recipe generation. The implemented RAG system should be compared to the performance of the same model in a “vanilla” set-up where the model solves the task directly.</p>
+<p>We will use the package <code class="docutils literal notranslate"><span class="pre">LlamaIndex</span></code> and the LLM <code class="docutils literal notranslate"><span class="pre">phi-3-mini-4k-instruct</span></code> model as the backbone for the implementation. We will use the <code class="docutils literal notranslate"><span class="pre">BAAI/bge-small-en-v1.5</span></code> model as our embedding model.</p>
+<p>We will use unstructured data in the form of a recipe dataset <code class="docutils literal notranslate"><span class="pre">m3hrdadfi/recipe_nlg_lite</span></code>. This dataset will be indexed and it will be used to supplement information for the LLM, additionally to the query. The train split of the dataset should be used for the index, and a sample from the test dataset will be used for sampling queries with which the system will be tested.</p>
+<p>For this task, please complete the following steps:</p>
+<ol class="arabic simple">
+<li><p>Download the dataset from Huggingface.</p></li>
+<li><p>Briefly familiarize yourself with the dataset.</p></li>
+<li><p>Briefly familiarize yourself with <a class="reference external" href="https://docs.llamaindex.ai/en/stable/getting_started/starter_example_local/">this</a> LLamaIndex example RAG system.</p></li>
+<li><p>Complete the code below (in place of “### YOUR CODE HERE ####”), following the instructions in the comments to build a working RAG system that will generate recipes. Note that you will have to work with the LlamaIndex documentation to complete and understand the code. Some links are already provided.</p></li>
+<li><p>Answer the questions at the end of the exercise.</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># uncomment and run in your environment / on Colab, if you haven&#39;t installed these packages yet</span>
+<span class="c1"># !pip install llama-index-embeddings-huggingface</span>
+<span class="c1"># !pip install llama-index-llms-huggingface</span>
+<span class="c1"># !pip install sentence-transformers</span>
+<span class="c1">#!%pip install llama-index-llms-huggingface</span>
+<span class="c1"># !pip install datasets</span>
+<span class="c1"># !pip install llama-index</span>
+<span class="c1"># !pip install &quot;transformers[torch]&quot; &quot;huggingface_hub[inference]&quot;</span>
+<span class="c1"># from IPython.display import clear_output</span>
+<span class="c1"># clear_output()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">VectorStoreIndex</span><span class="p">,</span> <span class="n">SimpleDirectoryReader</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Document</span> 
+<span class="kn">from</span> <span class="nn">llama_index.readers.file</span> <span class="kn">import</span> <span class="n">CSVReader</span>
+<span class="c1"># from llama_index.embeddings.ollama import OllamaEmbedding</span>
+<span class="kn">from</span> <span class="nn">llama_index.embeddings.huggingface</span> <span class="kn">import</span> <span class="n">HuggingFaceEmbedding</span>
+<span class="kn">from</span> <span class="nn">llama_index.llms.huggingface</span> <span class="kn">import</span> <span class="n">HuggingFaceLLM</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load dataset from HF</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;m3hrdadfi/recipe_nlg_lite&quot;</span><span class="p">)</span>
+<span class="c1"># convert train split to pandas dataframe</span>
+<span class="n">dataset_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># explore</span>
+<span class="n">dataset_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># 1. In order to construct a VectorStorageIndex with the texts from the train dataset split, we need to </span>
+<span class="c1"># create list of formatted texts.</span>
+<span class="c1"># We want to construct texts of the form: &quot;Name of recipe \n\n ingredients \n\n steps&quot;</span>
+
+
+<span class="n">texts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1">#### YOUR CODE HERE #####</span>
+<span class="p">]</span>
+<span class="n">texts</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. We construct single Documents from the texts</span>
+<span class="c1"># these documents will be used to construct the vector database</span>
+<span class="n">documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">Document</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">]</span>
+<span class="n">documents</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. We prepare some utility functions which are required for the LLM to generate maximally accurate responses </span>
+<span class="c1"># this includes correctly formatting the query and the context into the prompt and special tokens</span>
+<span class="c1"># that are expected by the chosen LLM backbone.</span>
+
+<span class="c1"># we format the texts into the Phi-3 prompt format</span>
+<span class="c1"># See https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</span>
+<span class="c1"># to heck here how the prompt should look like!</span>
+<span class="k">def</span> <span class="nf">completion_to_prompt</span><span class="p">(</span><span class="n">completion</span><span class="p">):</span>
+    
+    <span class="k">return</span> <span class="c1">### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the next cell, the RAG building blocks are put together. Your task is to find out what the different configurations mean and correctly complete the code.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. Save setting that are reused by our RAG system across queries</span>
+<span class="c1"># you can learn more about the Settings object here: https://docs.llamaindex.ai/en/stable/module_guides/supporting_modules/settings/</span>
+
+<span class="c1"># the embedding model is defined</span>
+<span class="n">Settings</span><span class="o">.</span><span class="n">embed_model</span> <span class="o">=</span> <span class="n">HuggingFaceEmbedding</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># backbone LLM is passed to the settings</span>
+<span class="c1"># this is actually the model that is used to generate the response to the query, given retrieved info</span>
+<span class="c1"># https://docs.llamaindex.ai/en/stable/understanding/using_llms/using_llms/ </span>
+<span class="c1"># and here: https://docs.llamaindex.ai/en/stable/module_guides/models/llms/usage_custom/</span>
+<span class="n">Settings</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">HuggingFaceLLM</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="n">model_name</span><span class="o">=</span> <span class="p">,</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="n">tokenizer_name</span><span class="o">=</span> <span class="p">,</span> <span class="c1"># </span>
+    <span class="c1">#### YOUR CODE HERE ###</span>
+    <span class="n">context_window</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="n">generate_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;do_sample&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">completion_to_prompt</span><span class="o">=</span><span class="n">completion_to_prompt</span><span class="p">,</span>
+    <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">model_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;torch_dtype&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="s2">&quot;load_in_8bit&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;trust_remote_code&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> 
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set LLM!&quot;</span><span class="p">)</span>
+
+<span class="c1"># https://docs.llamaindex.ai/en/stable/module_guides/indexing/vector_store_index/</span>
+<span class="c1"># we create a vector store from our documents</span>
+<span class="c1"># here, we let the VectorStore convert the documents to nodes automatically</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">VectorStoreIndex</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span>
+    <span class="c1">#### YOUR CODE HERE ###</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Created index!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below is a single example for running a query with the RAG system, and inspecting various interesting aspects of the response generated by the model. Your task is, in the following, to set up a testing loop, which will test different queries with the RAG system and vanilla generation with the same LLM. Use the example as help. Provide comments explaning the single paramters for the following example, in place of “### YOUR COMMENT HERE ###”.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># https://docs.llamaindex.ai/en/stable/module_guides/deploying/query_engine/</span>
+<span class="c1"># we define the query engine: generic interface that allows to ask questions over data</span>
+<span class="n">query_engine</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">as_query_engine</span><span class="p">(</span>
+    <span class="c1">### YOUR COMMENT HERE ###</span>
+    <span class="n">response_mode</span><span class="o">=</span><span class="s2">&quot;compact&quot;</span><span class="p">,</span> 
+    <span class="c1">### YOUR COMMENT HERE ###</span>
+    <span class="n">similarity_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="c1"># text_qa_template=text_qa_template, </span>
+<span class="p">)</span>
+<span class="c1"># https://docs.llamaindex.ai/en/stable/module_guides/querying/response_synthesizers/</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">query_engine</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;How do I make pork chop noodle soup?&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">source_nodes</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;----- Node </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> -----&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">get_content</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;score&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># testing loop</span>
+<span class="n">rag_responses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">vanilla_responses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">retrieved_node_texts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">retrieved_node_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># retrieve 20 random dish names from test dataset to test the system on</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">test_queries</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">f</span><span class="s1">&#39;How do I make </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">?&#39;</span> <span class="k">for</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test_queries</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">test_queries</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="c1"># run the query against the RAG system</span>
+    <span class="n">response_rag</span> <span class="o">=</span> 
+    <span class="n">rag_responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">response_rag</span><span class="p">))</span>
+    
+    <span class="c1"># record the texts of the nodes that were retrieved for this query</span>
+    <span class="n">retrieved_node_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="p">[</span><span class="c1">### YOUR CODE HERE ### ]</span>
+    <span class="p">)</span>
+    
+    <span class="c1"># record the scores of the texts of the retrieved nodes</span>
+    <span class="n">retrieved_node_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="p">[</span><span class="c1">### YOUR CODE HERE ###]</span>
+    <span class="p">)</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="c1"># implement the &quot;vanilla&quot; (i.e., straightforward) generation of the response to the same query with the backbone LLM</span>
+    <span class="c1"># Hint: check the intro-to-hf sheet for examples how to generate text with an LM</span>
+    <span class="n">response_vanilla</span> <span class="o">=</span> 
+    <span class="n">vanilla_responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response_vanilla</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">retrieved_node_scores</span>
+<span class="n">test_queries</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong>Questions:</strong></p>
+<ol class="arabic simple">
+<li><p>Inspect the results of the testing. (a) How often do you prefer the RAG response over the vanilla response? (b) Do you observe differences between the RAG and vanilla responses? If yes, what are these? (c) Inpsect the retrieved documents and their scores. Do they make sense for the queries? Do the scores match your intuition about their relevance for the query?</p></li>
+<li><p>What could be advantages and disadvantages of using RAG? Name 1 each.</p></li>
+<li><p>What is the difference between documents and nodes in the RAG system?</p></li>
+<li><p>What does the embedding model do? What is the measure that underlies retrieval of relevant documents?</p></li>
+<li><p>What are different response modes of the query engine? Is the chosen mode a good choice for our application? Why (not)?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="exercise-2-rlhf-for-summarization">
+<h2>Exercise 2: RLHF for summarization<a class="headerlink" href="#exercise-2-rlhf-for-summarization" title="Permalink to this heading">#</a></h2>
+<p>In this exercise, we want to fine-tune GPT-2 to generate human-like news summaries, following a procedure that is very similar to the example of the movie review generation from <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/04a-finetuning-RL.html">sheet 4.1</a>. The exercise is based on the paper by <a class="reference external" href="https://arxiv.org/pdf/1909.08593">Ziegler et al. (2020)</a>.</p>
+<p>To this end, we will use the following components:</p>
+<ul class="simple">
+<li><p>in order to initialize the policy, we use GPT-2 that was already fine-tuned for summarization, i.e., our SFT model is <a class="reference external" href="https://huggingface.co/Ayham/albert_gpt2_Full_summarization_cnndm">this</a></p></li>
+<li><p>as our reward model, we will use a task-specific reward signal, namely, the ROUGE score that evaluates a summary generated by a model against a human “gold standard” summary.</p></li>
+<li><p>a dataset of CNN news texts and human-written summaries (for computing the rewards) for the fine-tuning which can be found <a class="reference external" href="https://huggingface.co/datasets/abisee/cnn_dailymail">here</a>. Please note that we will use the <em>validation</em> split because we only want to run short fine-tuning.</p></li>
+</ul>
+<p><strong>NOTE:</strong> for building the datset and downloading the pretrained model, ~4GB of space will be used.</p>
+<blockquote>
+<div><p><strong>YOUR TASK:</strong></p>
+<p>Your job for this task is to set up the PPO-based training with the package <code class="docutils literal notranslate"><span class="pre">trl</span></code>, i.e., the set up step 3 of <a class="reference external" href="https://cdn.openai.com/instruction-following/draft-20220126f/methods.svg">this</a> figure.</p>
+<ol class="arabic simple">
+<li><p>Please complete the code or insert comments what a particular line of code does below where the comments says “#### YOUR CODE / COMMENT HERE ####”. For this and for answering the questions, you might need to dig a bit deeper into the working of proximal policy optimization (PPO), the algorithm that we are using for training. You can find relevant information, e.g., <a class="reference external" href="https://huggingface.co/docs/trl/main/en/ppo_trainer">here</a>.</p></li>
+<li><p>To test your implementation, you can run the training for some steps, but you are NOT required to train the full model since it will take too long.</p></li>
+<li><p>Answer the questions below.</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install trl accelerate==0.27.2 evaluate rouge_score datasets</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import libraries </span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">tqdm</span><span class="o">.</span><span class="n">pandas</span><span class="p">()</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="kn">from</span> <span class="nn">trl</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PPOTrainer</span><span class="p">,</span>
+    <span class="n">PPOConfig</span><span class="p">,</span>
+    <span class="n">AutoModelForCausalLMWithValueHead</span>
+<span class="p">)</span>
+<span class="kn">import</span> <span class="nn">evaluate</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">PPOConfig</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gavin124/gpt2-finetuned-cnn-summarization-v2&quot;</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1.41e-5</span><span class="p">,</span>
+    <span class="n">steps</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+    <span class="c1">#### YOUR COMMENT HERE (what is batch_size) ####</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">mini_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="c1">#### YOUR COMMENT HERE (what is ppo_epochs) ####</span>
+    <span class="n">ppo_epochs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We load the CNN dataset into a DataFrame and and truncate the texts to 500 tokens, because we don’t want the training to be too memory heavy and we want to have “open” some tokens for the generation (GPT-2’s context window size is 1024). Then we tokenize each text and pad it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">build_dataset</span><span class="p">(</span> 
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;abisee/cnn_dailymail&quot;</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build dataset for training. This builds the dataset from `load_dataset`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset_name (`str`):</span>
+<span class="sd">            The name of the dataset to be loaded.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dataloader (`torch.utils.data.DataLoader`):</span>
+<span class="sd">            The dataloader for the dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="c1">#### YOUR CODE HERE ####)</span>
+    <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
+    <span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span>
+    <span class="c1"># load the datasets</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;validation&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+        <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+            <span class="c1">#### YOUR CODE HERE (hint: inspect the dataset to see how to access the input text)####, </span>
+            <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> 
+            <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> 
+            <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># get the truncated natural text, too</span>
+        <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">sample</span>
+
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># build the dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">build_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">collator</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect a sample of the dataset</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We load the finetuned GPT2 model with a value head and the tokenizer. We load the model twice; the first model is the one that will be optimized while the second model serves as a reference to calculate the KL-divergence from the starting point.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLMWithValueHead</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="c1">#### YOUR CODE / COMMENT HERE ####)</span>
+<span class="n">ref_model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLMWithValueHead</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="c1">#### YOUR CODE / COMMENT HERE ####)</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="c1">#### YOUR CODE / COMMENT HERE ####)</span>
+
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><em>AutoModelForCausalLMWithValueHead</em> is a model class provided by <code class="docutils literal notranslate"><span class="pre">trl</span></code> that is used for training models with RL with a <em>baseline</em>. The baseline is used as shown, e.g., on slide 76-78 of lecture 05. Specifically, the baseline is simultaneously learned during training, and learns to predict the so-called action value, namely the expected reward for generating a particular completion, given the query. This baseline is implemented as an additional (scalar output) head next to the next-token prediction head of the policy, and is called the value head. Based on the query and completion representation, it learns to predict a scalar reward which is compared to the ground truth reward from the reward model.</p>
+<p>The PPOTrainer takes care of device placement and optimization later on:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ppo_trainer</span> <span class="o">=</span> <span class="n">PPOTrainer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">ref_model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_collator</span><span class="o">=</span><span class="n">collator</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">ppo_trainer</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">device</span>
+<span class="k">if</span> <span class="n">ppo_trainer</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">num_processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>  <span class="c1"># to avoid a `pipeline` bug</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Device: &quot;</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rouge</span> <span class="o">=</span> <span class="n">evaluate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;rouge&quot;</span><span class="p">)</span>  
+
+<span class="k">def</span> <span class="nf">reward_fn</span><span class="p">(</span>
+        <span class="n">output</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">original_summary</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    #### YOUR COMMENT HERE ####</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">original_summary</span><span class="p">)):</span>
+      <span class="n">score</span> <span class="o">=</span> <span class="n">rouge</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()],</span> <span class="n">references</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="p">])[</span><span class="s2">&quot;rouge1&quot;</span><span class="p">]</span>
+      <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
+      
+    <span class="k">return</span> <span class="n">scores</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">output_max_length</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="c1">#### YOUR COMMENT HERE: explain what kind of decoding scheme these parameters initialize ####</span>
+<span class="n">generation_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;min_length&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;top_k&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;do_sample&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;pad_token_id&quot;</span><span class="p">:</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
+    <span class="s2">&quot;max_new_tokens&quot;</span><span class="p">:</span> <span class="n">output_max_length</span>
+<span class="p">}</span>
+
+
+<span class="k">for</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">ppo_trainer</span><span class="o">.</span><span class="n">dataloader</span><span class="p">)):</span>
+    <span class="n">query_tensors</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span>
+    <span class="n">query_tensors</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">query_tensors</span><span class="p">]</span>
+    <span class="c1">#### Get response from gpt2</span>
+    <span class="n">response_tensors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">query_tensors</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">ppo_trainer</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">generation_kwargs</span><span class="p">)</span>
+        <span class="n">response_tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()[</span><span class="o">-</span><span class="n">output_max_length</span><span class="p">:])</span>
+    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">response_tensors</span><span class="p">]</span>
+
+    <span class="c1">#### Compute score with the reward_fn above</span>
+    <span class="n">rewards</span> <span class="o">=</span> <span class="c1">#### YOUR CODE HERE ####</span>
+    
+    <span class="c1">#### Run PPO step</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">ppo_trainer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">query_tensors</span><span class="p">,</span> <span class="n">response_tensors</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+    <span class="n">ppo_trainer</span><span class="o">.</span><span class="n">log_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">rewards</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong>QUESTIONS:</strong></p>
+<ol class="arabic simple">
+<li><p>What are the three main steps in the training loop? Please name them (in descriptive words, you don’t need to cite the code).</p></li>
+<li><p>Suppose the plots below show training metrics for different runs of the summarization model training. Interpret what each of them tells us about training success; i.e., did the training go well on this run? Do we expect to get good summaries? Why? Be concise!</p></li>
+<li><p>We have truncated the query articles to maximally 512 tokens. Given that we are using ROUGE with respect to ground truth summaries as a reward, why might this be problematic?</p></li>
+<li><p>[Bonus 2pts] The overall loss that is optimized during training with PPO consists of two components: the policy loss that is computed based on the completion log probability and the reward, and the value function loss which is computed based on the the predicted and received reward for a completion. These two loss components are weighed in the total loss function with the value function coefficient (<code class="docutils literal notranslate"><span class="pre">vf_coef</span></code>). Intuitively, how does it affect training if the coefficient is set to a high value?</p></li>
+</ol>
+</div></blockquote>
+<p><img alt="img" src="../_images/rewards.png" /></p>
+</section>
+<section id="exercise-3-aspects-of-fine-tuning-xxx-points">
+<h2>Exercise 3: Aspects of fine-tuning (XXX points)<a class="headerlink" href="#exercise-3-aspects-of-fine-tuning-xxx-points" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><p>Please answer the following questions. Be concise!</p>
+<ol class="arabic simple">
+<li><p>When assistants are trained with RLHF, they are often optimized to be helpful and harmless. However, it has been observed that the goals of being harmless and helpful at the same time may be at odds. In particular, the problem of evasive behavior has been observed for models optimized for these goals. For example, <a class="reference external" href="https://arxiv.org/pdf/2212.08073.pdf">this paper</a> mentions this problem. In your own words, please briefly describe what evasive behavior of LLMs is, give an example, and why it is a problem.</p></li>
+<li><p><strong>TODO</strong>: a few more questions.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./homework"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">Exercise 1: Building a retrieval-augmented generation system (XXX points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization">Exercise 2: RLHF for summarization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-xxx-points">Exercise 3: Aspects of fine-tuning (XXX points)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
