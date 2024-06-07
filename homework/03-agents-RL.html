@@ -461,9 +461,9 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">Exercise 1: Building a retrieval-augmented generation system (XXX points)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization">Exercise 2: RLHF for summarization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-xxx-points">Exercise 3: Aspects of fine-tuning (XXX points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-30-points">Exercise 1: Building a retrieval-augmented generation system (30 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization-15-points">Exercise 2: RLHF for summarization (15 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-5-points">Exercise 3: Aspects of fine-tuning (5 points)</a></li>
 </ul>
             </nav>
         </div>
@@ -491,8 +491,8 @@ document.write(`
 <li><p>please note that we will need a lot of GPU memory for both Ex. 1 and Ex. 2 – therefore, it might be best to do the tasks in <strong>separate runtimes on Colab</strong>, otherwise you might run into out of memory issues.</p></li>
 </ul>
 </section>
-<section id="exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">
-<h2>Exercise 1: Building a retrieval-augmented generation system (XXX points)<a class="headerlink" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points" title="Permalink to this heading">#</a></h2>
+<section id="exercise-1-building-a-retrieval-augmented-generation-system-30-points">
+<h2>Exercise 1: Building a retrieval-augmented generation system (30 points)<a class="headerlink" href="#exercise-1-building-a-retrieval-augmented-generation-system-30-points" title="Permalink to this heading">#</a></h2>
 <p>An increasingly popular approach to language generation is so called <em>retrieval-augmented generation</em> (RAG) wherein a language model is supplied with additional (textual) information retrieved from some storage, in addition to the actual task query. It has been found that this additional context improves model performance, and, e.g., allows to use LLMs with custom information (e.g., proprietary documents etc).</p>
 <p>The general set up of a RAG system is as follows:</p>
 <ol class="arabic simple">
@@ -535,7 +535,6 @@ document.write(`
 <span class="c1"># !pip install llama-index-embeddings-huggingface</span>
 <span class="c1"># !pip install llama-index-llms-huggingface</span>
 <span class="c1"># !pip install sentence-transformers</span>
-<span class="c1">#!%pip install llama-index-llms-huggingface</span>
 <span class="c1"># !pip install datasets</span>
 <span class="c1"># !pip install llama-index</span>
 <span class="c1"># !pip install &quot;transformers[torch]&quot; &quot;huggingface_hub[inference]&quot;</span>
@@ -551,8 +550,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">VectorStoreIndex</span><span class="p">,</span> <span class="n">SimpleDirectoryReader</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Document</span> 
-<span class="kn">from</span> <span class="nn">llama_index.readers.file</span> <span class="kn">import</span> <span class="n">CSVReader</span>
+<span class="kn">from</span> <span class="nn">llama_index.core</span> <span class="kn">import</span> <span class="n">VectorStoreIndex</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">Document</span> 
 <span class="c1"># from llama_index.embeddings.ollama import OllamaEmbedding</span>
 <span class="kn">from</span> <span class="nn">llama_index.embeddings.huggingface</span> <span class="kn">import</span> <span class="n">HuggingFaceEmbedding</span>
 <span class="kn">from</span> <span class="nn">llama_index.llms.huggingface</span> <span class="kn">import</span> <span class="n">HuggingFaceLLM</span>
@@ -675,7 +673,6 @@ document.write(`
     <span class="c1">### YOUR COMMENT HERE ###</span>
     <span class="n">similarity_top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-    <span class="c1"># text_qa_template=text_qa_template, </span>
 <span class="p">)</span>
 <span class="c1"># https://docs.llamaindex.ai/en/stable/module_guides/querying/response_synthesizers/</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">query_engine</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;How do I make pork chop noodle soup?&quot;</span><span class="p">)</span>
@@ -749,8 +746,8 @@ document.write(`
 </ol>
 </div></blockquote>
 </section>
-<section id="exercise-2-rlhf-for-summarization">
-<h2>Exercise 2: RLHF for summarization<a class="headerlink" href="#exercise-2-rlhf-for-summarization" title="Permalink to this heading">#</a></h2>
+<section id="exercise-2-rlhf-for-summarization-15-points">
+<h2>Exercise 2: RLHF for summarization (15 points)<a class="headerlink" href="#exercise-2-rlhf-for-summarization-15-points" title="Permalink to this heading">#</a></h2>
 <p>In this exercise, we want to fine-tune GPT-2 to generate human-like news summaries, following a procedure that is very similar to the example of the movie review generation from <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/04a-finetuning-RL.html">sheet 4.1</a>. The exercise is based on the paper by <a class="reference external" href="https://arxiv.org/pdf/1909.08593">Ziegler et al. (2020)</a>.</p>
 <p>To this end, we will use the following components:</p>
 <ul class="simple">
@@ -972,13 +969,14 @@ document.write(`
 </div></blockquote>
 <p><img alt="img" src="../_images/rewards.png" /></p>
 </section>
-<section id="exercise-3-aspects-of-fine-tuning-xxx-points">
-<h2>Exercise 3: Aspects of fine-tuning (XXX points)<a class="headerlink" href="#exercise-3-aspects-of-fine-tuning-xxx-points" title="Permalink to this heading">#</a></h2>
+<section id="exercise-3-aspects-of-fine-tuning-5-points">
+<h2>Exercise 3: Aspects of fine-tuning (5 points)<a class="headerlink" href="#exercise-3-aspects-of-fine-tuning-5-points" title="Permalink to this heading">#</a></h2>
 <blockquote>
 <div><p>Please answer the following questions. Be concise!</p>
 <ol class="arabic simple">
 <li><p>When assistants are trained with RLHF, they are often optimized to be helpful and harmless. However, it has been observed that the goals of being harmless and helpful at the same time may be at odds. In particular, the problem of evasive behavior has been observed for models optimized for these goals. For example, <a class="reference external" href="https://arxiv.org/pdf/2212.08073.pdf">this paper</a> mentions this problem. In your own words, please briefly describe what evasive behavior of LLMs is, give an example, and why it is a problem.</p></li>
-<li><p><strong>TODO</strong>: a few more questions.</p></li>
+<li><p>What special tokens are commonly used for chat model fine-tuning, and what is their purpose?</p></li>
+<li><p>Please name two parameter-efficient fine-tuning techniques and briefly explain one advantage of using each technique over full-scale fine-tuning.</p></li>
 </ol>
 </div></blockquote>
 </section>
@@ -1030,9 +1028,9 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-xxx-points">Exercise 1: Building a retrieval-augmented generation system (XXX points)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization">Exercise 2: RLHF for summarization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-xxx-points">Exercise 3: Aspects of fine-tuning (XXX points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-building-a-retrieval-augmented-generation-system-30-points">Exercise 1: Building a retrieval-augmented generation system (30 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-rlhf-for-summarization-15-points">Exercise 2: RLHF for summarization (15 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-aspects-of-fine-tuning-5-points">Exercise 3: Aspects of fine-tuning (5 points)</a></li>
 </ul>
   </nav></div>
 
