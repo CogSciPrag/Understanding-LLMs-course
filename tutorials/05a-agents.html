@@ -511,7 +511,6 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
 <span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">StrOutputParser</span>
 <span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">PromptTemplate</span>
@@ -540,10 +539,7 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load env file with the OpenAI API key</span>
-<span class="n">load_dotenv</span><span class="p">()</span>
-
-<span class="c1"># instantiate model</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># instantiate model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-0125&quot;</span><span class="p">,</span>
     <span class="n">openai_api_key</span><span class="o">=</span><span class="c1">### YOUR KEY HERE,</span>
@@ -699,7 +695,7 @@ document.write(`
 </section>
 <section id="memory-handling">
 <h2>Memory handling<a class="headerlink" href="#memory-handling" title="Permalink to this heading">#</a></h2>
-<p>One of the main issues of agents is that they are by default <em>stateless</em>; i.e., at each step of execution there is no memory of what happened before. This is handled by adding <em>memory components</em>. An overview of this can be found <span class="xref myst">here</span>.</p>
+<p>One of the main issues of agents is that they are by default <em>stateless</em>; i.e., at each step of execution there is no memory of what happened before. This is handled by adding <em>memory components</em>. An overview of this can be found <a class="reference external" href="https://python.langchain.com/v0.2/docs/tutorials/agents/#adding-in-memory">here</a>.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.4: Memory</span></strong></p>
 <ol class="arabic simple">
