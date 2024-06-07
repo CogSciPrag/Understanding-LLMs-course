@@ -27,6 +27,7 @@ parts:
   chapters:
   - file: lectures/05-finetuning-RLHF
   - file: tutorials/04a-finetuning-RL
+  - file: lectures/06-agents
   - file: tutorials/05a-agents
 - caption: Homework
   chapters:
