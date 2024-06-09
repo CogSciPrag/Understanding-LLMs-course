@@ -33,3 +33,4 @@ parts:
   chapters:
   - file: homework/01-language-modeling
   - file: homework/02-prompting
+  - file: homework/03-agents-RL
