@@ -29,6 +29,8 @@ parts:
   - file: tutorials/04a-finetuning-RL
   - file: lectures/06-agents
   - file: tutorials/05a-agents
+  - file: lectures/07-attribution
+  - file: tutorials/06a-attribution
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
