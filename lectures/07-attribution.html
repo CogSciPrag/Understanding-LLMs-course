@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>LLM systems &amp; agents &#8212; Understanding LLMs</title>
+    <title>Attribution methods &#8212; Understanding LLMs</title>
   
   
   
@@ -62,11 +62,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/06-agents';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/07-attribution';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="5.1 LLM agents" href="../tutorials/05a-agents.html" />
-    <link rel="prev" title="4.1 Supervised fine-tuning and RL fine-tuning" href="../tutorials/04a-finetuning-RL.html" />
+    <link rel="next" title="Sheet 6.1 LLM probing &amp; attribution" href="../tutorials/06a-attribution.html" />
+    <link rel="prev" title="5.1 LLM agents" href="../tutorials/05a-agents.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -194,9 +194,9 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">4.1 Supervised fine-tuning and RL fine-tuning</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06-agents.html">LLM systems &amp; agents</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">5.1 LLM agents</a></li>
-<li class="toctree-l1"><a class="reference internal" href="07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Attribution methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
@@ -275,7 +275,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/06-agents.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/07-attribution.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -305,7 +305,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/lectures/06-agents.md" target="_blank"
+      <li><a href="../_sources/lectures/07-attribution.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -389,7 +389,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>LLM systems & agents</h1>
+    <h1>Attribution methods</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -411,17 +411,16 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="llm-systems-agents">
-<h1>LLM systems &amp; agents<a class="headerlink" href="#llm-systems-agents" title="Permalink to this heading">#</a></h1>
-<p>Slides of the session which looks at LLMs as part of larger systems / as agents (which can use various tools including, e.g., additional database tools etc), can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/06-agents-applications-neuroSymbolic.pdf">here</a>.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="attribution-methods">
+<h1>Attribution methods<a class="headerlink" href="#attribution-methods" title="Permalink to this heading">#</a></h1>
+<p>Slides of the session which looks at the internal workings of LLMs and different techniques for trying to understand them (e.g., transformer attention visualization, feature attribution methods, probing), can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/07-Probing-Attribution.pdf">here</a>.</p>
 <section id="additional-materials">
 <h2>Additional materials<a class="headerlink" href="#additional-materials" title="Permalink to this heading">#</a></h2>
-<p>If you want to dig a bit deeper, here are (optional!) supplementary readings on some of the topics covered in class. References to papers covered in the slides can be found in the slides:</p>
+<p>If you want to dig a bit deeper, here are (optional!) supplementary readings:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://lilianweng.github.io/posts/2023-06-23-agent/">Blogpost on LLM Powered Autonomous Agents</a></p></li>
-<li><p><a class="reference external" href="https://dl.acm.org/doi/pdf/10.1145/3586183.3606763">Park et al. (2023) Generative agents: Interactive Simulacra of Human Behavior</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/2309.17288">Chen et al. (2024) AutoAgents: A Framework for Automatic Agent Generation</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/2204.01691">Ahn et al. (2022) Do As I Can, Not As I Say: Grounding Language in Robotic Affordances</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1902.01007">McCoy et al. (2019) Right for the Wrong Reasons: Diagnosing Syntactic Heuristics in Natural Language Inference</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1905.06316">Tenney et al. (2019) What do you learn from context? Probing for sentence structure in contextualized word representations</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2006.00995">Elazar et al. (2021) Amnesic Probing: Behavioral Explanation with Amnesic Counterfactuals</a></p></li>
 </ul>
 </section>
 </section>
@@ -457,20 +456,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../tutorials/04a-finetuning-RL.html"
+       href="../tutorials/05a-agents.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">4.1 Supervised fine-tuning and RL fine-tuning</p>
+        <p class="prev-next-title">5.1 LLM agents</p>
       </div>
     </a>
     <a class="right-next"
-       href="../tutorials/05a-agents.html"
+       href="../tutorials/06a-attribution.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">5.1 LLM agents</p>
+        <p class="prev-next-title">Sheet 6.1 LLM probing &amp; attribution</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

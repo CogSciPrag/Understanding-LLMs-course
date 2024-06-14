@@ -1,0 +1,1174 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 6.1 LLM probing &amp; attribution &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/06a-attribution';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Homework 1: Language models (50 points)" href="../homework/01-language-modeling.html" />
+    <link rel="prev" title="Attribution methods" href="../lectures/07-attribution.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Fine-tuning &amp; RLHF</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04a-finetuning-RL.html">4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05a-agents.html">5.1 LLM agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Sheet 6.1 LLM probing &amp; attribution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/06a-attribution.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/06a-attribution.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/06a-attribution.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/06a-attribution.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 6.1 LLM probing & attribution</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attention-visualization">Attention visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attribution-methods">Attribution methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#probing">Probing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-6-1-llm-probing-attribution">
+<h1>Sheet 6.1 LLM probing &amp; attribution<a class="headerlink" href="#sheet-6-1-llm-probing-attribution" title="Permalink to this heading">#</a></h1>
+<p><strong>Author:</strong> Polina Tsvilodub</p>
+<p>In this sheet, we will familiarize ourselves with some methods of looking “under the hood” of transformers. In particular, we will see how we can visualize and trace which inputs are processed where in the model and how they contribute to the output, and what kinds of information is processed. Specifically, the learning goals for this sheet are:</p>
+<ul class="simple">
+<li><p>familiarization with transformer attention visualization for inspecting attention patterns</p></li>
+<li><p>understanding how to extract representations of a model from different layers</p></li>
+<li><p>familiarization with probing of a transformer’s syntactic ‘knowledge’.</p></li>
+</ul>
+<section id="attention-visualization">
+<h2>Attention visualization<a class="headerlink" href="#attention-visualization" title="Permalink to this heading">#</a></h2>
+<p>One of the core processing mechanisms in the transformer is the attention mechanism. As discussed in the lecture on transformers, depending on the architecture of the model, there might be various attention blocks:</p>
+<ul class="simple">
+<li><p>if the model is an encoder-only model (e.g., BERT), it has encoder self-attention;</p></li>
+<li><p>if it is a decoder-only model (e.g., all GPT models), it has a decoder (i.e., causal) self-attention;</p></li>
+<li><p>if it is an encoder-decoder model (e.g., translation models, architectures like T5), it has those and additionally cross-attention between the encoder and the decoder.</p></li>
+</ul>
+<p>First, we will inspect attention visualizations, which indicate the magnitudes of attention scores between a specific token <span class="math notranslate nohighlight">\(i\)</span> and other tokens. (Reminder: the scores are computed as the dot product of the <span class="math notranslate nohighlight">\(i\)</span> token’s query vecor and the other tokens’ key vectors.) Intuitively, the larger a score, the more will the respective representation of some other token contribute to predicting the output based on <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>First, we will explore the example from the lecture (slide 46) hands-on. In the example, a sequence-to-sequence (i.e., encoder-decoder) model is used for translation the English sentence “The brown dog ran.” into the French sentence “Le chien brun a couru.”. We will load the <a class="reference external" href="https://huggingface.co/google/flan-t5-small">FLAN-T5 small model</a>, a seq2seq model fine-tuned to follow various task instructions (including translation).</p>
+<p>We will use the package <a class="reference external" href="https://github.com/jessevig/bertviz">BertViz</a> for the visualization. It allows to explore parts of the model interactively, i.e., select specific model parts (e.g., encoder or decoder), specific layers (i.e., attention layers in transformer blocks), and attention heads.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># install the packages required for running the visualization</span>
+<span class="c1">#!pip install bertviz ipywidgets</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForSeq2SeqLM</span>
+<span class="kn">from</span> <span class="nn">bertviz</span> <span class="kn">import</span> <span class="n">model_view</span><span class="p">,</span> <span class="n">head_view</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the model</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;google/flan-t5-small&quot;</span><span class="p">)</span>
+<span class="n">model_t5</span> <span class="o">=</span> <span class="n">AutoModelForSeq2SeqLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;google/flan-t5-small&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define input and target</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;Translate to French: The brown dog ran.&quot;</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+<span class="n">target_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;Le chien brun a couru.&quot;</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+<span class="c1"># Run model and get the attentions by setting output_attentions=True</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">model_t5</span><span class="p">(</span><span class="n">input_ids</span><span class="o">=</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">target_ids</span><span class="p">,</span> <span class="n">output_attentions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+
+
+<span class="c1"># we will need to pass the attiontion to the visualization function</span>
+<span class="c1"># therefore, we look at the output of the model to see how to access the attention scores</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we retrieve various attention scores from the output</span>
+<span class="n">encoder_attention</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">encoder_attentions</span>
+<span class="n">cross_attention</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">cross_attentions</span>
+<span class="n">decoder_attention</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">decoder_attentions</span>
+
+<span class="c1"># furthermore, for ease of interpreting the visualization, we convert the token ids to string corresponding to those tokens</span>
+<span class="n">input_tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">input_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
+<span class="n">decoder_tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">target_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now we use the overall model attention visualization</span>
+<span class="c1"># select the attention parts you want to look at via the drop-down</span>
+<span class="c1"># click on the facets to zoom in on the attention heads in a specific layer</span>
+<span class="n">model_view</span><span class="p">(</span>
+    <span class="n">encoder_attention</span><span class="o">=</span><span class="n">encoder_attention</span><span class="p">,</span>
+    <span class="n">decoder_attention</span><span class="o">=</span><span class="n">decoder_attention</span><span class="p">,</span>
+    <span class="n">cross_attention</span><span class="o">=</span><span class="n">cross_attention</span><span class="p">,</span>
+    <span class="n">encoder_tokens</span><span class="o">=</span> <span class="n">input_tokens</span><span class="p">,</span>
+    <span class="n">decoder_tokens</span> <span class="o">=</span> <span class="n">decoder_tokens</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we zoom in on the encoder attention which is used to create representations of the instruction + source sentence. Therefore, we inspect the <code class="docutils literal notranslate"><span class="pre">encoder_attention</span></code> below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># there is a also a head view that allows you to look at the attention of a single head </span>
+<span class="c1"># which can be selected by double-clicking on the colored tile</span>
+<span class="c1"># for a single layer (can be selected via the drop-down)</span>
+<span class="n">head_view</span><span class="p">(</span><span class="n">encoder_attention</span><span class="p">,</span> <span class="n">input_tokens</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we look at the <em>cross-attention</em>, i.e., the attention weights computed based on query vectors of the decoder representations and key vectors from the encoder. Intuitively, these represent the importance of input representations (the English sentence) for computing the output (French sentence).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># by default, the head view visualizes self-attention (i.e., attention between the same tokens). </span>
+<span class="c1"># For cross-attention, one should specify the cross_attention parameters</span>
+<span class="n">head_view</span><span class="p">(</span>
+    <span class="n">cross_attention</span><span class="o">=</span><span class="n">cross_attention</span><span class="p">,</span> 
+    <span class="n">encoder_tokens</span><span class="o">=</span><span class="n">input_tokens</span><span class="p">,</span> 
+    <span class="n">decoder_tokens</span><span class="o">=</span><span class="n">decoder_tokens</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 6.1.1: Interpreting attention scores</span></strong></p>
+<ol class="arabic simple">
+<li><p>Inspect the visualization above. How many layers does the model have? How many attention heads per layer are there? Access visualizations of scores of a single attention head. Do you observe any interesting patterns across layers and / or attention heads?</p></li>
+<li><p>Consider the input “What is the capital of France?” and output “The capital is Paris”. Intuitively, which token do you think will receive high attention scores in which part of the model, from which tokens? Complete the code below and inspect the output. Do the results match your intuition?</p></li>
+<li><p>Use the functions above to inspect decoder attention. Make sure you identify the causal part of the attention scores.</p></li>
+</ol>
+</div></blockquote>
+<p>Finally, the package also offer a <em>neuron view</em> which allows to inspect the query and key vectors, i.e., the full process of computing the attention scores. It is only supported for a few models; for purposes of an example, please inspect the  notebook provided by BertViz <a class="reference external" href="https://colab.research.google.com/drive/1m37iotFeubMrp9qIf9yscXEL1zhxTN2b">here</a>.</p>
+</section>
+<section id="attribution-methods">
+<h2>Attribution methods<a class="headerlink" href="#attribution-methods" title="Permalink to this heading">#</a></h2>
+<p>Looking at attention as we have seen above provides a window into seeing “post-hoc” traces of how a model arrives at a given output, given the input. Yet as discussed in the lecture, these results should be treated carefully and cannot be fully seen as explanations of <em>why</em> a model arrived at the give output.</p>
+<p>For addressing this question more carefully, alternative methods have been develop which attempt to identify aspects of the input that are crucial for generating the particular prediction. This might help gain insights in, e.g., whether the model is sensitive to spurious aspects of the prompt etc.
+There are different methods for doing so, and the lecture mentioned integrated gradients as one method that would be applicable to LMs. The code below provides examples of using a few slightly different approaches for attributing predictions to input features, specifically:</p>
+<ul class="simple">
+<li><p>Gradient tracing</p></li>
+</ul>
+<p>We will use the package <a class="reference external" href="https://inseq.org/en/latest/"><code class="docutils literal notranslate"><span class="pre">inseq</span></code></a> for looking at these different attribution techniques. It supports seq2seq and causal models available through HuggingFace. It supports:</p>
+<ul class="simple">
+<li><p>gradient-based methods</p>
+<ul>
+<li><p>Gradient-based methods use backpropagation through the network and the resulting gradients to assess the contribution of individual features.</p></li>
+</ul>
+</li>
+<li><p>perturbation-based methods</p>
+<ul>
+<li><p>Perturbation-based methods change or obscure the input and observe the changes in the output.</p></li>
+</ul>
+</li>
+<li><p>as well as attention weight extraction methods (similar to what we have seen above).</p></li>
+</ul>
+<p>To use these various attribution methods, the core endpoint for the package is to call <code class="docutils literal notranslate"><span class="pre">inseq.load_model(&lt;HF</span> <span class="pre">model</span> <span class="pre">name&gt;,</span> <span class="pre">&lt;method&gt;)</span></code>, allowing to use a specific method on models from HF.</p>
+<p>The code below walks through an example of using <em>integrated gradients</em> (discussed in the lecture) and more <em>contrastive explanation</em> methods using GPT-2. Contrastive explanation refers to the idea of comparing the attributions for a target output text A to a different <em>contrastive</em> output B, in order to answer the question “How much is feature X contributing to predicting A rather than B?” The latter will use a saliency attribution method which simply returns the absolute value of the gradients with respect to inputs.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># install the package</span>
+<span class="c1">#!pip install inseq</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inseq</span>
+<span class="c1"># load GPT-2 and hook it with the integrated gradients method</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">inseq</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">,</span> <span class="s2">&quot;integrated_gradients&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate the output for input_texts and attribute inputs at every steps of the generation</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">input_texts</span><span class="o">=</span><span class="s2">&quot;The capital of France is &quot;</span><span class="p">)</span>
+
+<span class="c1"># Visualize the attributions and step scores</span>
+<span class="n">out</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can also pass a generated text for a given input text to answer the question</span>
+<span class="c1"># “How would the following output be justified in light of the inputs by the model?”</span>
+
+<span class="n">out_with_generated</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span>
+    <span class="n">input_texts</span><span class="o">=</span><span class="s2">&quot;The capital of France is&quot;</span><span class="p">,</span> 
+    <span class="n">generated_texts</span><span class="o">=</span><span class="s2">&quot;The capital of France is Paris.&quot;</span>
+<span class="p">)</span>
+<span class="n">out_with_generated</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># there are more parameters that allow to customize the attributions even further</span>
+<span class="c1"># see, e.g., here: https://inseq.org/en/latest/examples/quickstart.html</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Perform the contrastive attribution:</span>
+<span class="c1"># Regular (forced) target -&gt; &quot;The capital of France is Paris.&quot;</span>
+<span class="c1"># Contrastive (incorrect) target -&gt; &quot;The capital of France is Berlin.&quot;</span>
+
+<span class="c1"># for this method, integrated gradients are actually not supported yet</span>
+<span class="c1"># therefore, we look at the saliency based attribution method here</span>
+<span class="n">attribution_model</span> <span class="o">=</span> <span class="n">inseq</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">,</span> <span class="s2">&quot;saliency&quot;</span><span class="p">)</span>
+
+<span class="n">out_contrastive</span> <span class="o">=</span> <span class="n">attribution_model</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span>
+    <span class="s2">&quot;The capital of France is&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The capital of France is Paris.&quot;</span><span class="p">,</span>
+    <span class="n">attributed_fn</span><span class="o">=</span><span class="s2">&quot;contrast_prob_diff&quot;</span><span class="p">,</span>
+    <span class="c1"># Special argument to specify the contrastive target, used by the contrast_prob_diff function</span>
+    <span class="n">contrast_targets</span><span class="o">=</span><span class="s2">&quot;The capital of France is Berlin.&quot;</span><span class="p">,</span>
+    <span class="n">attribute_target</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># We also visualize the score used as target using the same function as step score</span>
+    <span class="n">step_scores</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;contrast_prob_diff&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">out_contrastive</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 6.1.3: Feature attribution</span></strong></p>
+<ol class="arabic simple">
+<li><p>Try the examples above for a few other inputs. Do the results match your intuition? I.e., do those features contribute to a particular prediction that you would expect?</p></li>
+<li><p>Implement the examples above for the FLAN-T5-small model that we ahve seen above and run the attribution for the same translation example. How do the results compare to your attention visualization results?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="probing">
+<h2>Probing<a class="headerlink" href="#probing" title="Permalink to this heading">#</a></h2>
+<p>This approach attempts to identify whether certain kinds of (linguistic) information is contained in a pre-trained model’s representations. One of the ideas behind this approach is trying to identify whether information that humans deem to be critical for completing linguistic tasks (e.g., knowing which part-of-speech (POS) a certain word is) is actually represented, and therefore, potentially used, by the model (rather than relying on some spurious correlations). Another motivation is trying to identify in which layers in the model which information is represented (<a class="reference external" href="https://aclanthology.org/P19-1452.pdf">Tenney et al., 2019</a>).</p>
+<p>Below, we will look at probing BERT for POS representations (as demonstrated on slide 75).</p>
+<p>The following exercise code is largely taken from <a class="reference external" href="https://colab.research.google.com/github/SIDN-IAP/global-model-repr/blob/master/notebooks/probing_exercise_student.ipynb">this</a> notebook.</p>
+<p>For training the classifier and evaluating the representations we will use data files called “en-ud*” which can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/tutorials/files">here</a>. If you are using this notebook on Colab, please upload these to a local directory (same as notebook location) named <code class="docutils literal notranslate"><span class="pre">files</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install spacy ftfy==4.4.3</span>
+<span class="c1"># !python -m spacy download en</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">BertTokenizer</span><span class="p">,</span> <span class="n">BertModel</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># utils</span>
+
+<span class="n">DATA_DIR</span> <span class="o">=</span> <span class="s2">&quot;files&quot;</span>
+<span class="n">UD_EN_PREF</span> <span class="o">=</span> <span class="s2">&quot;en-ud-&quot;</span>
+
+<span class="k">def</span> <span class="nf">get_model_and_tokenizer</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">random_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">model_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert&#39;</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">BertModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">output_hidden_states</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;##&#39;</span>
+        <span class="n">emb_dim</span> <span class="o">=</span> <span class="mi">1024</span> <span class="k">if</span> <span class="s2">&quot;large&quot;</span> <span class="ow">in</span> <span class="n">model_name</span> <span class="k">else</span> <span class="mi">768</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized model name:&#39;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">random_weights</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Randomizing weights&#39;</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">init_weights</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">emb_dim</span>
+
+<span class="c1"># this follows the HuggingFace API for pytorch-transformers</span>
+<span class="k">def</span> <span class="nf">get_sentence_repr</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get representations for one sentence</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">ids</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># Hugging Face format: list of torch.FloatTensor of shape (batch_size, sequence_length, hidden_size) (hidden_states at output of each layer plus initial embedding outputs)</span>
+        <span class="n">all_hidden_states</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># convert to format required for contexteval: numpy array of shape (num_layers, sequence_length, representation_dim)</span>
+        <span class="n">all_hidden_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">hidden_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">hidden_states</span> <span class="ow">in</span> <span class="n">all_hidden_states</span><span class="p">]</span>
+        <span class="n">all_hidden_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_hidden_states</span><span class="p">)</span>
+
+    <span class="c1"># For each word, take the representation of its last sub-word</span>
+    <span class="n">segmented_tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">segmented_tokens</span><span class="p">)</span> <span class="o">==</span> <span class="n">all_hidden_states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;incompatible tokens and states&#39;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segmented_tokens</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">model_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert&#39;</span><span class="p">):</span>
+        <span class="c1"># if next token is not a continuation, take current token&#39;s representation</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segmented_tokens</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">segmented_tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;[CLS]&quot;</span> <span class="ow">or</span> <span class="n">segmented_tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;[SEP]&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">segmented_tokens</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">sep</span><span class="p">):</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized model name:&#39;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+
+    <span class="n">all_hidden_states</span> <span class="o">=</span> <span class="n">all_hidden_states</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">all_hidden_states</span>
+
+
+<span class="k">def</span> <span class="nf">get_pos_data</span><span class="p">(</span><span class="n">probing_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="n">probing_dir</span><span class="o">=</span><span class="n">probing_dir</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="n">frac</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">probing_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">data_pref</span><span class="o">=</span><span class="n">UD_EN_PREF</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">probing_dir</span><span class="p">,</span> <span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">data_pref</span> <span class="o">+</span> <span class="s2">&quot;train.txt&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">train_sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">probing_dir</span><span class="p">,</span> <span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">data_pref</span> <span class="o">+</span> <span class="s2">&quot;test.txt&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">test_sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">probing_dir</span><span class="p">,</span> <span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">data_pref</span> <span class="o">+</span> <span class="s2">&quot;train.&quot;</span> <span class="o">+</span> <span class="n">data_type</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">probing_dir</span><span class="p">,</span> <span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">data_pref</span> <span class="o">+</span> <span class="s2">&quot;test.&quot;</span> <span class="o">+</span> <span class="n">data_type</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">test_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+
+    <span class="c1"># take a fraction of the data</span>
+    <span class="n">train_sentences</span> <span class="o">=</span> <span class="n">train_sentences</span><span class="p">[:</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">)</span><span class="o">*</span><span class="n">frac</span><span class="p">)]</span>
+    <span class="n">test_sentences</span> <span class="o">=</span> <span class="n">test_sentences</span><span class="p">[:</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_sentences</span><span class="p">)</span><span class="o">*</span><span class="n">frac</span><span class="p">)]</span>
+    <span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_labels</span><span class="p">[:</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_labels</span><span class="p">)</span><span class="o">*</span><span class="n">frac</span><span class="p">)]</span>
+    <span class="n">test_labels</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[:</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_labels</span><span class="p">)</span><span class="o">*</span><span class="n">frac</span><span class="p">)]</span>
+
+    <span class="n">unique_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">train_labels</span> <span class="o">+</span> <span class="n">test_labels</span> <span class="p">]))</span>
+    <span class="n">label2index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">unique_labels</span><span class="p">:</span>
+        <span class="n">label2index</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">label2index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">label2index</span><span class="p">))</span>
+
+    <span class="n">train_labels</span> <span class="o">=</span> <span class="p">[[</span><span class="n">label2index</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span> <span class="k">for</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">train_labels</span><span class="p">]</span>
+    <span class="n">test_labels</span> <span class="o">=</span> <span class="p">[[</span><span class="n">label2index</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span> <span class="k">for</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">test_labels</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">test_sentences</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">label2index</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the data</span>
+<span class="n">train_sentences</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">test_sentences</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">label2index</span> <span class="o">=</span> <span class="n">get_pos_data</span><span class="p">()</span> <span class="c1"># frac=0.1</span>
+<span class="n">num_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label2index</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training sentences:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_sentences</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unique labels:&quot;</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect </span>
+<span class="n">label2index</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A probing experiment also requires a probing model, also known as an auxiliary classifier. Here we define a simple linear classifier, which takes a word representation as input and applies a linear transformation to map it to the label space.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Classifier</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Classifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+    
+    
+<span class="k">def</span> <span class="nf">build_classifier</span><span class="p">(</span><span class="n">emb_dim</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+
+    <span class="n">classifier</span> <span class="o">=</span> <span class="n">Classifier</span><span class="p">(</span><span class="n">emb_dim</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span>
+
+
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s1">&#39;bert-base-cased&#39;</span>
+<span class="c1"># get model and tokenizer from Transformers</span>
+<span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">emb_dim</span> <span class="o">=</span> <span class="n">get_model_and_tokenizer</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="c1"># build classifier</span>
+<span class="n">classifier</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">build_classifier</span><span class="p">(</span><span class="n">emb_dim</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">classifier</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="training">
+<h3>Training<a class="headerlink" href="#training" title="Permalink to this heading">#</a></h3>
+<p>Given a pre-trained model, a probing classifier, and supervised linguistic annotations (i.e., POS tags), we can run a probing experiment. First, we’ll define a training function that trains the classifier on the tags. This is a simple implementation, but one could implement various checks like early stopping on a development set, etc.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train</span><span class="p">(</span>
+    <span class="n">num_epochs</span><span class="p">,</span> 
+    <span class="n">train_representations</span><span class="p">,</span> 
+    <span class="n">train_labels</span><span class="p">,</span> 
+    <span class="n">model</span><span class="p">,</span> 
+    <span class="n">tokenizer</span><span class="p">,</span> 
+    <span class="n">sep</span><span class="p">,</span> 
+    <span class="n">model_name</span><span class="p">,</span> 
+    <span class="n">device</span><span class="p">,</span> 
+    <span class="n">classifier</span><span class="p">,</span> 
+    <span class="n">criterion</span><span class="p">,</span> 
+    <span class="n">optimizer</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>
+<span class="p">):</span>
+    
+    <span class="n">num_total</span> <span class="o">=</span> <span class="n">train_representations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">num_correct</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_total</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">batch_repr</span> <span class="o">=</span> <span class="n">train_representations</span><span class="p">[</span><span class="n">batch</span><span class="p">:</span> <span class="n">batch</span><span class="o">+</span><span class="n">batch_size</span><span class="p">]</span>
+            <span class="n">batch_labels</span> <span class="o">=</span> <span class="n">train_labels</span><span class="p">[</span><span class="n">batch</span><span class="p">:</span> <span class="n">batch</span><span class="o">+</span><span class="n">batch_size</span><span class="p">]</span>
+
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            
+            <span class="n">out</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="n">batch_repr</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">num_correct</span> <span class="o">+=</span> <span class="n">pred</span><span class="o">.</span><span class="n">long</span><span class="p">()</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">())</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">batch_labels</span><span class="p">)</span>
+            <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="c1">#         print(&#39;Training epoch: {}, loss: {}, accuracy: {}&#39;.format(i, total_loss/num_total, num_correct/num_total))</span>
+    <span class="k">return</span> <span class="n">total_loss</span><span class="o">/</span><span class="n">num_total</span><span class="p">,</span> <span class="n">num_correct</span><span class="o">/</span><span class="n">num_total</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="evaluation">
+<h3>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">#</a></h3>
+<p>Given the trained classifier, we’ll evaluate its performance on the test set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
+    <span class="n">test_representations</span><span class="p">,</span> 
+    <span class="n">test_labels</span><span class="p">,</span> 
+    <span class="n">model</span><span class="p">,</span> 
+    <span class="n">tokenizer</span><span class="p">,</span> 
+    <span class="n">sep</span><span class="p">,</span> 
+    <span class="n">model_name</span><span class="p">,</span> 
+    <span class="n">device</span><span class="p">,</span> 
+    <span class="n">classifier</span><span class="p">,</span> 
+    <span class="n">criterion</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>
+<span class="p">):</span>
+    
+    <span class="n">num_correct</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">num_total</span> <span class="o">=</span> <span class="n">test_representations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_total</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">batch_repr</span> <span class="o">=</span> <span class="n">test_representations</span><span class="p">[</span><span class="n">batch</span><span class="p">:</span> <span class="n">batch</span><span class="o">+</span><span class="n">batch_size</span><span class="p">]</span>
+            <span class="n">batch_labels</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[</span><span class="n">batch</span><span class="p">:</span> <span class="n">batch</span><span class="o">+</span><span class="n">batch_size</span><span class="p">]</span>
+            
+            <span class="n">out</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="n">batch_repr</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">num_correct</span> <span class="o">+=</span> <span class="n">pred</span><span class="o">.</span><span class="n">long</span><span class="p">()</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">())</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">batch_labels</span><span class="p">)</span>
+
+<span class="c1">#     print(&#39;Testing loss: {}, accuracy: {}&#39;.format(total_loss/num_total, num_correct/num_total))</span>
+    <span class="k">return</span> <span class="n">total_loss</span><span class="o">/</span><span class="n">num_total</span><span class="p">,</span> <span class="n">num_correct</span><span class="o">/</span><span class="n">num_total</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we put together the functions and perform a probing experiment:</p>
+<ol class="arabic simple">
+<li><p>We retrieve word representations from each layer of the model.</p></li>
+<li><p>Train and evaluate the linear classifier, first only on the last-layer representations.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># top-level list: sentences, second-level lists: layers, third-level tensors of num_words x representation_dim</span>
+<span class="n">train_sentence_representations</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sentence_repr</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> 
+                                  <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">train_sentences</span><span class="p">]</span>
+<span class="n">test_sentence_representations</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sentence_repr</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> 
+                                  <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">test_sentences</span><span class="p">]</span>
+
+<span class="c1"># top-level list: layers, second-level lists: sentences</span>
+<span class="n">train_sentence_representations</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">train_sentence_representations</span><span class="p">)]</span>
+<span class="n">test_sentence_representations</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">test_sentence_representations</span><span class="p">)]</span>                           
+
+<span class="c1"># concatenate all word represenations</span>
+<span class="n">train_representations_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">train_layer_representations</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">train_layer_representations</span> <span class="ow">in</span> <span class="n">train_sentence_representations</span><span class="p">]</span>
+<span class="n">test_representations_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_layer_representations</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">test_layer_representations</span> <span class="ow">in</span> <span class="n">test_sentence_representations</span><span class="p">]</span>
+<span class="c1"># concatenate all labels</span>
+<span class="n">train_labels_all</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">train_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">test_labels_all</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Take final layer representations</span>
+<span class="n">train_representations</span> <span class="o">=</span> <span class="n">train_representations_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">test_representations</span> <span class="o">=</span> <span class="n">test_representations_all</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># train</span>
+<span class="n">train_loss</span><span class="p">,</span> <span class="n">train_accuracy</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">train_representations</span><span class="p">,</span> <span class="n">train_labels_all</span><span class="p">,</span> 
+          <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> 
+          <span class="n">classifier</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
+<span class="c1"># test</span>
+<span class="n">test_loss</span><span class="p">,</span> <span class="n">test_accuracy</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">test_representations</span><span class="p">,</span> <span class="n">test_labels_all</span><span class="p">,</span> 
+         <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> 
+         <span class="n">classifier</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train accuracy: </span><span class="si">{}</span><span class="s2">, Test accuracy: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">train_accuracy</span><span class="p">,</span> <span class="n">test_accuracy</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 6.1.2: Probing</span></strong></p>
+<ol class="arabic simple">
+<li><p>Run the code above and inspect the testing results. Based on these, do you think the model learned representations of parts-of-speech?</p></li>
+<li><p>Run another round of training based on representations from some earlier layer of the model. Do you observe any differences? If yes, interpret them with respect to what the model’s representations seem to encode.</p></li>
+<li><p>[Optional] Instead of using a linear classifier, try to set up a (simple) non-linear classifier. Do the results change?</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../lectures/07-attribution.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Attribution methods</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../homework/01-language-modeling.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Homework 1: Language models (50 points)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attention-visualization">Attention visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attribution-methods">Attribution methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#probing">Probing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
