@@ -545,6 +545,26 @@ Inspect it, perhaps search for other resources, so as to get a conceptual unders
 <li><p>translation</p></li>
 </ul>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<ol class="arabic simple">
+<li><p>It has another linear layer which takes the representation of the last token in the sequence and predicts a class. The number of nodes in this layer depends on the nuber of classes we want to predict. For the loss function we have to distinguish three cases:</p></li>
+</ol>
+<ul class="simple">
+<li><p>We have only one class (sentiment analysis with continuous values between -1 and 1): <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html">MSE loss</a></p></li>
+<li><p>We have multiple classes but only one class can be assignes to a given input (e.g. sentiment analysis, negative, positive, neutral): <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html">Cross Entropy loss</a></p></li>
+<li><p>We have multiple classes and multiple classes can be assigned to a given input (e.g. topic classification, a sequence can have multiple topics): <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">Binary Cross Entropy loss with logits loss</a></p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>It would probably generate “lazy brown dog”, because it determines a span with the relevant tokens and outputs a start and end index.</p></li>
+<li></li>
+</ol>
+<p>POS tagging:  GPT2ForTokenClassification<br />
+sentiment classification: GPT2ForSequenceClassification<br />
+summarization: GPT2LMHeadModel<br />
+multiple-choice question answering: GPT2DoubleHeadsModel<br />
+translation: GPT2LMHeadModel</p>
+</div>
 </section>
 <section id="training-utilities">
 <h2>Training utilities<a class="headerlink" href="#training-utilities" title="Permalink to this heading">#</a></h2>
@@ -573,6 +593,10 @@ Inspect it, perhaps search for other resources, so as to get a conceptual unders
 <li><p>Find out what cosine learning rate scheduling is (as a high-level concept), how to use it in PyTorch, and write a few lines of code that could be added to the model in sheet 2.4 to use it in training.</p></li>
 </ol>
 </div></blockquote>
+<p>Click below to see the solution.</p>
+<div class="toggle docutils container">
+<p>The learning rate is dynamically changed during training. It starts with a certain value defined by the user and decreases over epochs until a certain minimum is reached. After that it increases again until it reaches the initial value again. The changes of the learning rate follow the cosine function. The benefit is that it has a higher change to find the minimum in respect to the loss.</p>
+</div>
 <section id="interpreting-training-dynamics">
 <h3>Interpreting training dynamics<a class="headerlink" href="#interpreting-training-dynamics" title="Permalink to this heading">#</a></h3>
 <p>Lastly, an important part of training a model is being able to understand whether it is actually successfully learning. There are different ways of doing so. For instance, we could stop the training every now and then and test the model on our desired task, and check if it performs the task correctly on a held out test set. Since we want to <em>quantify</em> the quality of the performance, we might compute a test accuracy (if applicable for the task). Alternatively, we could look at the test loss.
@@ -656,9 +680,10 @@ The helper class <code class="docutils literal notranslate"><span class="pre">Da
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.2.3: Optional exercises</span></strong></p>
 <ol class="arabic simple">
 <li><p>Implement the character-level name generation model from sheet 2.4, but now use an LSTM cell instead of an RNN cell.</p></li>
-<li><p>Re-implement the model from ex. 3 of HW1 as an extractive question answering model (rather than a generative question answering system). Hint: Note see <span class="xref myst">here</span> for inspiration.</p></li>
+<li><p>Re-implement the model from ex. 3 of HW1 as an extractive question answering model (rather than a generative question answering system).</p></li>
 </ol>
 </div></blockquote>
+<p>To see an example implementation of a character based bidirectional LSTM see <a class="reference external" href="https://github.com/cicl-iscl/TueCICL_SemEval2024/blob/main/taskC/src/models/char_bilstm.py">here</a></p>
 </section>
 </section>
 
