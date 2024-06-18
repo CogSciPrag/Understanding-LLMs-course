@@ -469,7 +469,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decoding-schemes">Decoding schemes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-1">Exercise 3.3.3.1.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-2">Exercise 3.3.3.2.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-3">Exercise 3.3.3.3</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -823,12 +828,551 @@ This prompting technique is used to answer this multiple-choice question from th
 <li><p>Try to vary the few-shot and the chain-of-thought prompt by introducing mistakes and inconsistencies. Do these mistakes affect the result of your prediction? Feel free to use any example queries of your choice or reuse the examples above.</p></li>
 </ol>
 </div></blockquote>
+<section id="exercise-3-3-3-1">
+<h3>Exercise 3.3.3.1.<a class="headerlink" href="#exercise-3-3-3-1" title="Permalink to this heading">#</a></h3>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">,</span>
+    <span class="c1"># trust_remote_code=True,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Where would you expect to find a pizzeria while shopping?&quot;</span>
+<span class="n">answers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chicago&quot;</span><span class="p">,</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span> <span class="s2">&quot;little italy&quot;</span><span class="p">,</span> <span class="s2">&quot;food court&quot;</span><span class="p">,</span> <span class="s2">&quot;capital cities&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. generate knowledge statements</span>
+<span class="c1"># tokenize few shot prompt together with our actual question</span>
+<span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">knowledge_statements</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt_input_ids</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+<span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span>
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Where would you expect to find a pizzeria while shopping? We know that 
+a good Italian pizzeria is one of the best places to eat
+Generated knowledge  
+a good Italian pizzeria is one of the best places to eat
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
+<span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
+
+<span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="c1"># NOTE: This can take a moment</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+    <span class="c1"># construct the full prompt</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># construct the prompt without the answer to create a mask which will</span>
+    <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+    <span class="n">context_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># tokenize the prompt</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                          <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># tokenize the context prompt</span>
+    <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                  <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+    <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+    <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+    <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mask &quot;</span><span class="p">,</span> <span class="n">masked_labels</span><span class="p">)</span>
+    <span class="c1"># generate the answer</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+    <span class="p">)</span>
+    <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Average log P &quot;</span><span class="p">,</span> <span class="n">log_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100,  448, 7298]], device=&#39;cuda:0&#39;)
+Answer  chicago Average log P  6.203125
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 6406]], device=&#39;cuda:0&#39;)
+Answer  street Average log P  10.5625
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 1652,  352, 5242]], device=&#39;cuda:0&#39;)
+Answer  little italy Average log P  6.84765625
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 2739, 1302]], device=&#39;cuda:0&#39;)
+Answer  food court Average log P  6.85546875
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 5347, 8238]], device=&#39;cuda:0&#39;)
+Answer  capital cities Average log P  8.84375
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. retrieve the answer option with the highest score</span>
+<span class="c1"># find max probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">],</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>All answers  [&#39;chicago&#39;, &#39;street&#39;, &#39;little italy&#39;, &#39;food court&#39;, &#39;capital cities&#39;]
+Answer probabilities  [-6.203125, -10.5625, -6.84765625, -6.85546875, -8.84375]
+Selected answer  chicago with log P  -6.203125
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3-3-3-2">
+<h3>Exercise 3.3.3.2.<a class="headerlink" href="#exercise-3-3-3-2" title="Permalink to this heading">#</a></h3>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">,</span>
+    <span class="c1"># trust_remote_code=True,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. construct few-shot example</span>
+
+<span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Where would you expect to find a pizzeria while shopping?&quot;</span>
+<span class="n">answers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chicago&quot;</span><span class="p">,</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span> <span class="s2">&quot;little italy&quot;</span><span class="p">,</span> <span class="s2">&quot;food court&quot;</span><span class="p">,</span> <span class="s2">&quot;capital cities&quot;</span><span class="p">]</span>
+
+<span class="n">examples_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;knowledge_examples_chain.csv&quot;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+
+<span class="n">few_shot_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{q}</span><span class="s2"> A: We know that </span><span class="si">{k}</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="n">few_shot_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;knowledge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">examples_df</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructed few shot prompt</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constructed few shot prompt
+ Q: How many wings do penguins have? A: We know that a: birds have two wings. penguin is a kind of bird. therefore, a penguin has two wings.
+Q: What is the number of limbs a typical human being has? A: We know that a: human beings have four limbs. therefore, four is the correct answer.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. generate knowledge statements</span>
+<span class="c1"># tokenize few shot prompt together with our actual question</span>
+<span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">knowledge_statements</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt_input_ids</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+<span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span>
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Q: How many wings do penguins have? A: We know that a: birds have two wings. penguin is a kind of bird. therefore, a penguin has two wings.
+Q: What is the number of limbs a typical human being has? A: We know that a: human beings have four limbs. therefore, four is the correct answer.
+Where would you expect to find a pizzeria while shopping? We know that 
+a pizzeria is a place where pizza is sold.
+So
+Generated knowledge  
+a pizzeria is a place where pizza is sold.
+So
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
+<span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
+
+<span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="c1"># NOTE: This can take a moment</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+    <span class="c1"># construct the full prompt</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># construct the prompt without the answer to create a mask which will</span>
+    <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+    <span class="n">context_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># tokenize the prompt</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                          <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># tokenize the context prompt</span>
+    <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                  <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+    <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+    <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+    <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mask &quot;</span><span class="p">,</span> <span class="n">masked_labels</span><span class="p">)</span>
+    <span class="c1"># generate the answer</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+    <span class="p">)</span>
+    <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Average log P &quot;</span><span class="p">,</span> <span class="n">log_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100,  448, 7298]], device=&#39;cuda:0&#39;)
+Answer  chicago Average log P  7.39453125
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 6406]], device=&#39;cuda:0&#39;)
+Answer  street Average log P  13.3515625
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 1652,  352, 5242]], device=&#39;cuda:0&#39;)
+Answer  little italy Average log P  8.625
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 2739, 1302]], device=&#39;cuda:0&#39;)
+Answer  food court Average log P  8.1796875
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 5347, 8238]], device=&#39;cuda:0&#39;)
+Answer  capital cities Average log P  10.453125
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. retrieve the answer option with the highest score</span>
+<span class="c1"># find max probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">],</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>All answers  [&#39;chicago&#39;, &#39;street&#39;, &#39;little italy&#39;, &#39;food court&#39;, &#39;capital cities&#39;]
+Answer probabilities  [-7.39453125, -13.3515625, -8.625, -8.1796875, -10.453125]
+Selected answer  chicago with log P  -7.39453125
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3-3-3-3">
+<h3>Exercise 3.3.3.3<a class="headerlink" href="#exercise-3-3-3-3" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;EleutherAI/Pythia-1.4b&quot;</span><span class="p">,</span>
+    <span class="c1"># trust_remote_code=True,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. construct few-shot example</span>
+
+<span class="n">question</span> <span class="o">=</span> <span class="s2">&quot;Where would you expect to find a pizzeria while shopping?&quot;</span>
+<span class="n">answers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chicago&quot;</span><span class="p">,</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span> <span class="s2">&quot;little italy&quot;</span><span class="p">,</span> <span class="s2">&quot;food court&quot;</span><span class="p">,</span> <span class="s2">&quot;capital cities&quot;</span><span class="p">]</span>
+
+<span class="n">examples_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;knowledge_examples_chain_incorrect.csv&quot;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+
+<span class="n">few_shot_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{q}</span><span class="s2"> A: We know that </span><span class="si">{k}</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="n">few_shot_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">examples_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;knowledge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">examples_df</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructed few shot prompt</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constructed few shot prompt
+ Q: How many wings do penguins have? A: We know that a: birds have two wings. penguin is a kind of bird. therefore, a penguin has two legs.
+Q: What is the number of limbs a typical human being has? A: We know that a: human beings have four limbs. therefore, 1000  is the correct answer.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. generate knowledge statements</span>
+<span class="c1"># tokenize few shot prompt together with our actual question</span>
+<span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">knowledge_statements</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt_input_ids</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+<span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span>
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Q: How many wings do penguins have? A: We know that a: birds have two wings. penguin is a kind of bird. therefore, a penguin has two legs.
+Q: What is the number of limbs a typical human being has? A: We know that a: human beings have four limbs. therefore, 1000  is the correct answer.
+Where would you expect to find a pizzeria while shopping? We know that 
+A: We know that a: pizzeria is a kind of
+Generated knowledge  
+A: We know that a: pizzeria is a kind of
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
+<span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
+
+<span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="c1"># NOTE: This can take a moment</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+    <span class="c1"># construct the full prompt</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># construct the prompt without the answer to create a mask which will</span>
+    <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+    <span class="n">context_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># tokenize the prompt</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                          <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># tokenize the context prompt</span>
+    <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                  <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+    <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+    <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+    <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mask &quot;</span><span class="p">,</span> <span class="n">masked_labels</span><span class="p">)</span>
+    <span class="c1"># generate the answer</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+    <span class="p">)</span>
+    <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Average log P &quot;</span><span class="p">,</span> <span class="n">log_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100,  448, 7298]], device=&#39;cuda:0&#39;)
+Answer  chicago Average log P  5.01171875
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 6406]], device=&#39;cuda:0&#39;)
+Answer  street Average log P  8.859375
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 1652,  352, 5242]], device=&#39;cuda:0&#39;)
+Answer  little italy Average log P  7.06640625
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 2739, 1302]], device=&#39;cuda:0&#39;)
+Answer  food court Average log P  5.7734375
+Mask  tensor([[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100,
+         -100, -100, -100, -100, 5347, 8238]], device=&#39;cuda:0&#39;)
+Answer  capital cities Average log P  6.984375
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. retrieve the answer option with the highest score</span>
+<span class="c1"># find max probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">],</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>All answers  [&#39;chicago&#39;, &#39;street&#39;, &#39;little italy&#39;, &#39;food court&#39;, &#39;capital cities&#39;]
+Answer probabilities  [-5.01171875, -8.859375, -7.06640625, -5.7734375, -6.984375]
+Selected answer  chicago with log P  -5.01171875
+</pre></div>
+</div>
+</div>
+</div>
 <p><strong>Outlook</strong></p>
 <p>As always, here are a few optional resources on this topic to llok at (although there is definitely much more online):</p>
 <ul class="simple">
 <li><p>a <a class="reference external" href="https://www.promptingguide.ai/">prompting webbook</a> providing an overview of various approaches</p></li>
 <li><p>a framework / package, LangChain, which provides very useful utilities for more complex schemes like <a class="reference external" href="https://github.com/langchain-ai/langchain/blob/master/cookbook/tree_of_thought.ipynb">tree of thought prompting</a> (spoiler: we will look closer at this package in future sessions, but you can already take a look if you are curious!)</p></li>
 </ul>
+</section>
 </section>
 </section>
 
@@ -896,7 +1440,12 @@ This prompting technique is used to answer this multiple-choice question from th
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decoding-schemes">Decoding schemes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prompting-strategies">Prompting strategies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-1">Exercise 3.3.3.1.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-2">Exercise 3.3.3.2.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-3-3-3">Exercise 3.3.3.3</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
