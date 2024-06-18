@@ -467,6 +467,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain">LangChain</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#excercise-5-1-1-2">Excercise 5.1.1.2</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#agents">Agents</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-agent-with-tools">LangChain agent with tools</a></li>
 </ul>
@@ -583,6 +584,86 @@ document.write(`
 <li><p>Add a third course to our menu! Of course, you can also play around with the other prompts and the sequence.</p></li>
 </ol>
 </div></blockquote>
+<section id="excercise-5-1-1-2">
+<h3>Excercise 5.1.1.2<a class="headerlink" href="#excercise-5-1-1-2" title="Permalink to this heading">#</a></h3>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set some hyperparameters for the generation</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="mf">0.7</span>
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">ingredients</span> <span class="o">=</span> <span class="s2">&quot;cauliflower, tomatoes.&quot;</span>
+
+<span class="n">instructions_text_appetizer</span> <span class="o">=</span> <span class="s2">&quot;I have the following ingredients in my fridge: </span><span class="se">\n</span><span class="si">{ingredients}</span><span class="se">\n\n</span><span class="s2">Which Italian appetizer can I make for dinner with these ingredients?&quot;</span>
+
+<span class="n">instructions_text_main</span> <span class="o">=</span> <span class="s2">&quot;I am planning to make the following appetizer: </span><span class="se">\n</span><span class="si">{appetizer}</span><span class="se">\n\n</span><span class="s2">Which Italian main course can I make for my dinner?&quot;</span>
+
+<span class="n">instructions_text_dessert</span> <span class="o">=</span> <span class="s2">&quot;I am planning to make the following appetizer: </span><span class="se">\n</span><span class="si">{appetizer}</span><span class="se">\n\n</span><span class="s2">Which dessert can I make for my dinner?&quot;</span>
+
+<span class="n">instructions_menu_summary</span> <span class="o">=</span> <span class="s2">&quot;I am planning the following recipes for my dinner: </span><span class="se">\n</span><span class="s2">Appetizer: </span><span class="si">{appetizer}</span><span class="se">\n</span><span class="s2">Main course: </span><span class="si">{main_course}</span><span class="se">\n</span><span class="s2">Dessert: </span><span class="si">{dessert}</span><span class="se">\n\n</span><span class="s2">Please write a menu summary for my dinner.&quot;</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load env file with the OpenAI API key</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># instantiate model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-0125&quot;</span><span class="p">,</span>
+    <span class="n">openai_api_key</span><span class="o">=</span><span class="s1">&#39;YOUR_API_KEY&#39;</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+
+<span class="c1"># construct prompts for our calls</span>
+<span class="n">prompt_template_appetizer</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">instructions_text_appetizer</span><span class="p">,</span>
+    <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ingredients&#39;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">prompt_template_main</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">instructions_text_main</span><span class="p">,</span>
+    <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;appetizer&#39;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">prompt_template_dessert</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">instructions_text_main</span><span class="p">,</span>
+    <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;main_course&#39;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">prompt_template_summary</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">instructions_menu_summary</span><span class="p">,</span>
+    <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;appetizer&#39;</span><span class="p">,</span> <span class="s1">&#39;main_course&#39;</span><span class="p">,</span> <span class="s1">&#39;dessert&#39;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="c1"># construct sub-chains for each course</span>
+<span class="n">appetizer_chain</span> <span class="o">=</span> <span class="n">prompt_template_appetizer</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">main_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">dessert_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">composed_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">,</span> <span class="s2">&quot;dessert&quot;</span><span class="p">:</span> <span class="n">dessert_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_summary</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+
+<span class="c1"># actually call the execution of the entire chain</span>
+<span class="n">composed_result</span> <span class="o">=</span> <span class="n">composed_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;ingredients&quot;</span><span class="p">:</span> <span class="n">ingredients</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result: &quot;</span><span class="p">,</span> <span class="n">composed_result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
 <section id="agents">
 <h3>Agents<a class="headerlink" href="#agents" title="Permalink to this heading">#</a></h3>
 <p>In the system above, we have decomposed the task of creating a dinner menu into “bite-sized” pieces for LLM calls ourselves; i.e., we have specified the order and the specific prompt for the single calls ourselves. Next, we will try to avoid these steps, and use an <em>agent</em> instead: i.e., we will pass our overall task description to an LLM and let it figure out the necessary substeps on its own. Specifically, we will use a <a class="reference external" href="https://react-lm.github.io/">React agent</a>.</p>
@@ -777,6 +858,7 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain">LangChain</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#excercise-5-1-1-2">Excercise 5.1.1.2</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#agents">Agents</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-agent-with-tools">LangChain agent with tools</a></li>
 </ul>
