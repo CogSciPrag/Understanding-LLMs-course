@@ -614,6 +614,17 @@ document.write(`
 <li><p>Can you see pros and cons to using some of these schemes over others?</p></li>
 </ol>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The temperature affects the final probabilities from the Softmax. A low temperature makes the the model more confident. But it can lead to overfitting. On the other hand, a high temperature makes the model less confident and give it more randomness. This can be call more creative. A high temperature can prevent from overfitting. It also can smoothen the probability distribution</p></li>
+<li><p>see picture</p></li>
+<li><p>in our case, the top-k sampling was the best</p></li>
+<li><p>Top_p is a special case of Top_k, where the sampling is not restricted to the most likely words but the set of the most likely words exceeding the threshold p when summend up.</p></li>
+<li><p>the softmax sampling can be helpful to reduce overfitting, but the temperature must be adjust accordingly. Otherwise the sentence just does not make sense. The greedy algorithm and beam are very fast in comparision to top p.</p></li>
+</ol>
+</div></blockquote>
+</div>
 <p><strong>Outlook</strong></p>
 <p>There are also other more recent schemes, e.g., <a class="reference external" href="https://arxiv.org/abs/2202.00666">locally typical sampling</a> introduced by Meister et al. (2022).</p>
 </section>
