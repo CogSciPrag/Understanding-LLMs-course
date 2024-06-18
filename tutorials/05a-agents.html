@@ -709,6 +709,19 @@ document.write(`
 <li><p>Compare the results to the chain above. Do you observe differences?</p></li>
 </ol>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><p>The model is trying out different possibilities to get the the right result The answer is, that its experiments are not valid. And it gives itself a suggestion what to try out next. Unfortunatelly the model is caged in a loop of making the same step over and over again:</p></li>
+</ol>
+</div></blockquote>
+<p>I should try searching for vegetarian Italian cauliflower and tomato recipes on a popular recipe website like Allrecipes or Food Network</p>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>As a result, it is not finding an satisfiying answer. Nonetheless, the model ‘understands’ that the results is not correct. In comparision the first model finds a dinnerplan - but with different ingredients (e.g. tiramiu for dessert) than I have offered.</p></li>
+</ol>
+</div></blockquote>
+</div>
 </section>
 <section id="langchain-agent-with-tools">
 <h3>LangChain agent with tools<a class="headerlink" href="#langchain-agent-with-tools" title="Permalink to this heading">#</a></h3>
@@ -738,6 +751,15 @@ document.write(`
 <li><p>Is the Wikipedia tool a good choice for the task at hand? What else might we consider?</p></li>
 </ol>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><p>The model is searching stepwise. In the firt step it searches for the whole information, getting more concrete from step to step. It even focuses on specific ingredients, like a human would do.</p></li>
+<li><p>The results the model found are vegetarian, using the given ingredients and are italien. Therefore, the results are better than the outputs from the models before.</p></li>
+<li><p>Wikipedia is interesting for theoretical information about italian food and vegetarian food, but does not provide detailed recipies. The possibilities are rather limited. Therefore, a tool concentrating on recipies might be helpful to get a better variety of recipies. Nonetheless, the results the model found are better than the results of the other models.</p></li>
+</ol>
+</div></blockquote>
+</div>
 <p>For the sake of seeing the top possible performance of agents, we have used OpenAI models. But since they are behind a paywall, we might also want to use open-source models as a backbone for the agent. LangChain also provides integration with many <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/">various</a> LLMs, including HuggingFace models that can be used via the HF <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/huggingface_endpoint/">API endpoint</a> which might not always be available and requires and HuggingFace <a class="reference external" href="https://huggingface.co/welcome">account</a>, or with a <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/huggingface_pipelines/">local</a> model loaded via <code class="docutils literal notranslate"><span class="pre">transformers</span></code> as we have learned. The latter requires downloading the model; since agent LLM systems require good performance of the backbone LLM, it can rather be tested with large models with at least a few billion parameters (mind their size for downloads!).</p>
 <p>In case you do have a HuggingFace account or don’t mind signing up for one, you can optionally test the example below which uses the HF API.</p>
 <div class="cell docutils container">
