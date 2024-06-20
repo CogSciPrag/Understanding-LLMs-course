@@ -684,8 +684,8 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 $$
 E =</p></li>
 </ol>
-<div class="amsmath math notranslate nohighlight" id="equation-bd97dedd-0b2e-47a3-b662-e5f3acd46b7e">
-<span class="eqno">(1)<a class="headerlink" href="#equation-bd97dedd-0b2e-47a3-b662-e5f3acd46b7e" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
+<div class="amsmath math notranslate nohighlight" id="equation-7ace8058-5d58-40a3-9669-a2d581f1d362">
+<span class="eqno">(1)<a class="headerlink" href="#equation-7ace8058-5d58-40a3-9669-a2d581f1d362" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
 &gt;0.11 &amp; 0.02 &amp; 0.37\\
 &gt;0.56 &amp; 0.89 &amp; 0.41 \\
 &gt;0.60 &amp; 0.89 &amp; 0 \\
@@ -731,7 +731,12 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -789,6 +794,7 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.5: Simple transformers in PyTorch</span></strong></p>
