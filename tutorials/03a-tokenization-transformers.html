@@ -524,6 +524,14 @@ document.write(`
 <li><p>What is the range of indices representing tokens in sheet 2.4? I.e., how many different tokens are there?</p></li>
 </ol>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The minimal unit is 1 ASCII letter.</p></li>
+<li><p>vocabulary: All ASCII letters (plus tokens [EOS], [SOS]): 60 token</p></li>
+</ol>
+</div></blockquote>
+</div>
 <p>However, this simple approach has several limitations. Specifically, the vocabulary is very limited and is manually defined a priori. While such an approach may work for simple tasks or very specific domains like predicting names, it is not very useful for dealing with more general texts which may include numbers, emojis, or different languages with different alphabets. Under this simple approach, we wouldn’t be able to represent any of these things.</p>
 <p>To allow for more flexibility but avoid having to manually specify all possible tokens, special tokenization approaches have been developed. The most prominent tokenization algorithm used, e.g., for the GPT models, is the so-called <em>byte-pair-encoding</em> (BPE) tokenization. BPE tokenizers are trained, i.e., the can be adjusted on specific texts so as to optimally represent the data.</p>
 <section id="bpe-tokenization">
@@ -645,6 +653,18 @@ document.write(`
 <li><p>Find out what kind of special Llama-2 chat tokens there are (look for <code class="docutils literal notranslate"><span class="pre">meta-llama/Llama-2-7b-chat-hf</span></code> on HF). How should they be used to represent the system prompt and the user input? (Hint: use the HF documentation. You can also find out more about LLama-chat prompting <a class="reference external" href="https://huggingface.co/blog/llama2#how-to-prompt-llama-2">here</a>)</p></li>
 </ol>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>First tokenization: Byte-Pair Encoding tokenization. Computes unique set of words used in the corpus, containing all ASCII characters and some Unicode characters plus unknown token. Starts with small vocabulary and adds vocabulary.<br />
+Second tokenization: WordPiece Tokenization. Each word is initally split by adding a prefix # to all the characters inside the word. Starts with small vocabulary and adds vocabulary.<br />
+score=(freq_of_pair)/(freq_of_first_element×freq_of_second_element)<br />
+Third tokenization: Unigram Tokenization. Starts with large vocabulary and removes tokens. Apply BPE on a large vocabulary size. Loss computation. How much would the overall loss increase by reducing the symbol?</p></li>
+<li><p>Our GPT-2-model uses the Byte-Pair Encoding tokenization.</p></li>
+<li><p>According to the website, a Byte-Pair Encoding tokenization were used with by an implementation from Sentence Piece</p></li>
+</ol>
+</div></blockquote>
+</div>
 <p>After tokenization, each token is mapped onto an <em>embedding</em>. As discussed in the lecture, there are different types of embeddings: type-based and contextualized embeddings. In both cases, the token IDs are mapped to vector representations as the first processing step in an LM. For type-based representations, these vectors are already pretrained static embeddings. For contextualized cases, these vectores are passed through the net and only the processed vectors are considered embeddings.</p>
 <p>The initial mapping is done by creating <em>one-hot vector</em> as a representation of each index. These are then multipled with the embedding matrix, which results in embedding representations of each token. These are then further processed.</p>
 <section id="attention-masks">
@@ -664,8 +684,8 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 $$
 E =</p></li>
 </ol>
-<div class="amsmath math notranslate nohighlight" id="equation-43497279-8630-46be-94a4-03d096c02775">
-<span class="eqno">(1)<a class="headerlink" href="#equation-43497279-8630-46be-94a4-03d096c02775" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
+<div class="amsmath math notranslate nohighlight" id="equation-bd97dedd-0b2e-47a3-b662-e5f3acd46b7e">
+<span class="eqno">(1)<a class="headerlink" href="#equation-bd97dedd-0b2e-47a3-b662-e5f3acd46b7e" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
 &gt;0.11 &amp; 0.02 &amp; 0.37\\
 &gt;0.56 &amp; 0.89 &amp; 0.41 \\
 &gt;0.60 &amp; 0.89 &amp; 0 \\
@@ -676,6 +696,15 @@ E =</p></li>
 Extract the embedding for the token with the ID 2 (assume 0-indexing). Write down the respective calculation step.
 3. What is a very well known masked LM architecture?</p>
 </div></blockquote>
+<div class="toggle docutils container">
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The attention mask for the sentence “The quick fox jumped”, predicting word after “fox” would be [0 0 1 0 0]</p></li>
+<li><p>The embedding is to be found in the third line of the embedding matrix: [0.60 0.89 0]</p></li>
+<li><p>BERT</p></li>
+</ol>
+</div></blockquote>
+</div>
 <p>The contents of the first part of the sheet were inspired by <a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter2/2">this</a> tutorial.</p>
 </section>
 </section>
@@ -787,6 +816,15 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 </pre></div>
 </div>
 </div>
+</div>
+<div class="toggle docutils container">
+<p>transformer_model = TransformerModel(
+128, # size of the dictionary of embeddings
+32, # the size of each embedding vector &amp; d_model of the Positional Encoding
+1, # the number of dim for the feed forward process
+64, # nlayers: number of layers for both the encoder and the decoder
+3, # the dropout value
+)</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
