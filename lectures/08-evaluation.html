@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>LSTMs &amp; Transformers &#8212; Understanding LLMs</title>
+    <title>Evaluation &amp; behavioral assessment &#8212; Understanding LLMs</title>
   
   
   
@@ -62,11 +62,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/03-LSTMs-Transformers';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lectures/08-evaluation';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Sheet 3.1: Tokenization &amp; Transformers" href="../tutorials/03a-tokenization-transformers.html" />
-    <link rel="prev" title="Sheet 2.5: Introduction to HuggingFace &amp; LMs" href="../tutorials/02e-intro-to-hf.html" />
+    <link rel="next" title="Sheet 7.1: Behavioral assessment &amp; Evaluation" href="../tutorials/07a-behavioral-assessment.html" />
+    <link rel="prev" title="Sheet 6.1 LLM probing &amp; attribution" href="../tutorials/06a-attribution.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -183,22 +183,22 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">LSTMs &amp; Transformers</a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Fine-tuning &amp; RLHF</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="06-agents.html">LLM systems &amp; agents</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
 <li class="toctree-l1"><a class="reference internal" href="07-attribution.html">Attribution methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Evaluation &amp; behavioral assessment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
@@ -277,7 +277,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/03-LSTMs-Transformers.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Flectures/08-evaluation.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -307,7 +307,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/lectures/03-LSTMs-Transformers.md" target="_blank"
+      <li><a href="../_sources/lectures/08-evaluation.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -391,7 +391,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>LSTMs & Transformers</h1>
+    <h1>Evaluation & behavioral assessment</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -413,17 +413,15 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="lstms-transformers">
-<h1>LSTMs &amp; Transformers<a class="headerlink" href="#lstms-transformers" title="Permalink to this heading">#</a></h1>
-<p>Slides from the third lecture introducing a more advanced RNN architecture - LSTMs - and transformers - the architecture behind modern LLMs - can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/03-LSTMs-Transformers.pdf">here</a>.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="evaluation-behavioral-assessment">
+<h1>Evaluation &amp; behavioral assessment<a class="headerlink" href="#evaluation-behavioral-assessment" title="Permalink to this heading">#</a></h1>
+<p>This session covers the important topic of trying to evaluating how well LLMs do with respect to various tasks and evaluation methods, with the goal of assessing the quality and the performance of the LLMs. Slides of the session can be found <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/08-behavioral-assessment.pdf">here</a>.</p>
 <section id="additional-materials">
 <h2>Additional materials<a class="headerlink" href="#additional-materials" title="Permalink to this heading">#</a></h2>
-<p>If you want to dig a bit deeper, here are (optional!) supplementary readings, a general textbook on deep learning and the paper that first introduced backpropagation for training neural networks:</p>
+<p>If you want to dig a bit deeper, here are (optional!) supplementary readings. More papers discussed in the lecture are provided in the slides.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://deeplearning.cs.cmu.edu/S23/document/readings/LSTM.pdf">Hochreiter &amp; Schmidhuber (1997) Long Short-Term Memory</a></p></li>
-<li><p><a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">Vaswani et al. (2017) Attention is all you need</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/pdf/1810.04805.pdf">Devlin et al. (2019) BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></p></li>
-<li><p><a class="reference external" href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">Radford et al. (2019) Language Models are Unsupervised Multitask Learners (GPT-2)</a></p></li>
+<li><p><a class="reference external" href="https://syntaxgym.org/">SyntaxGym benchmark for testing syntactic generalization of LMs</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/2211.09110">Giant overview paper of Holistic Evaluation of Lnaguage Models (HELM)</a></p></li>
 </ul>
 </section>
 </section>
@@ -459,20 +457,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../tutorials/02e-intro-to-hf.html"
+       href="../tutorials/06a-attribution.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Sheet 2.5: Introduction to HuggingFace &amp; LMs</p>
+        <p class="prev-next-title">Sheet 6.1 LLM probing &amp; attribution</p>
       </div>
     </a>
     <a class="right-next"
-       href="../tutorials/03a-tokenization-transformers.html"
+       href="../tutorials/07a-behavioral-assessment.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Sheet 3.1: Tokenization &amp; Transformers</p>
+        <p class="prev-next-title">Sheet 7.1: Behavioral assessment &amp; Evaluation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
