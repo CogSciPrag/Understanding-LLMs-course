@@ -1,0 +1,14 @@
+masked_sentence,grammatical_sentence,ungrammatical_sentence
+The authors [MASK].,The author laughs.,The author laugh.
+The authors [MASK].,The authors laugh.,The authors laughs.
+The bankers knew the officer [MASK].,The bankers knew the officer smiles.,The bankers knew the officer smile.
+The farmers near the parents [MASK].,The farmers near the parents smile.,The farmers near the parents smiles.
+The officers that love the skater [MASK].,The officers that love the skater smile.,The officers that love the skater smiles.
+The senator  smiles and [MASK].,The senator  smiles and laughs.,The senator  smiles and laugh.
+The manager writes a letter every day and [MASK] sweets. ,The manager writes a letter every day and likes sweets. ,The manager writes a letter every day and like sweets.
+The farmer  that the parents love  [MASK].,The farmer  that the parents love  swims.,The farmer  that the parents love  swim.
+The farmers that the parent  loves [MASK].,The farmers that the parent  loves swim.,The farmers that the parent  loves swims.
+The farmers that the parent  loves [MASK].,The farmers that the parent  loves swim.,The farmers that the parent  love  swim.
+The senators embarrassed [MASK].,The senators embarrassed themselves.,The senators embarrassed herself.
+The bankers thought the pilot embarrassed [MASK].,The bankers thought the pilot embarrassed herself.,The bankers thought the pilot embarrassed themselves.
+The manager that the architects like doubted [MASK].,The manager that the architects like doubted herself.,The manager that the architects like doubted themselves.
