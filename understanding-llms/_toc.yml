@@ -31,6 +31,7 @@ parts:
   - file: tutorials/05a-agents
   - file: lectures/07-attribution
   - file: tutorials/06a-attribution
+  - file: tutorials/07a-behavioral-assessment
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
