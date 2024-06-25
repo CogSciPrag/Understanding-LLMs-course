@@ -1,0 +1,699 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Sheet 7.2: Advanced evaluation &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/07b-biases-assessment';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Fine-tuning &amp; RLHF</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05a-agents.html">Sheet 5.1 LLM agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/07b-biases-assessment.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/07b-biases-assessment.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Ftutorials/07b-biases-assessment.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/07b-biases-assessment.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sheet 7.2: Advanced evaluation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knowledge-problem-solving-benchmarks">Knowledge &amp; Problem solving benchmarks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hallucinations">Hallucinations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process-consistency">Process consistency</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reasoning-benchmarks">Reasoning benchmarks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#social-aspects">Social aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evals">Assistant evals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="sheet-7-2-advanced-evaluation">
+<h1>Sheet 7.2: Advanced evaluation<a class="headerlink" href="#sheet-7-2-advanced-evaluation" title="Permalink to this heading">#</a></h1>
+<p><strong>Author:</strong> Polina Tsvilodub</p>
+<p>The main learning goal of this sheet is diving deeper into SOTA evaluations of LLMs; specifically, it is the familiarization with benchmarks which evaluate more intricate aspects of LLM I/O behavior.
+Since recent LLMs exhibit in-context learning behavior and have shown good performance on various tasks going beyond simple text completion, this sheet will zoom in on the more recent benchmarks like <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a>, and evaluations of aspects connected to safety and fairness of LLMs. As mentioned in the previous sheet, the latter aspect became especially relevant as LLMs are embedded in user facing applications. Furthermore, awareness of questions of algorithmic fairness and biases in ML is increasingly rising in the community.</p>
+<p>The methods used for evaluating such aspects are already familiar to you from the previous sheet. Therefore, this sheet is more conceptual and aims rather at sharpening your critical thinking and result interpretation skills.</p>
+<section id="knowledge-problem-solving-benchmarks">
+<h2>Knowledge &amp; Problem solving benchmarks<a class="headerlink" href="#knowledge-problem-solving-benchmarks" title="Permalink to this heading">#</a></h2>
+<p>Two of the most popular recent benchmarks for LLMs are the <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a> and the <a class="reference external" href="https://arxiv.org/abs/2206.04615">BIG-Bench</a> datasets.
+The authors of MMLU describe it as a multi-task dataset for text models; according to the paper, in order to obtain high accuracy on it, models must possess world knowledge and problem solving capabilities. It contains tasks like elementary mathematics, US history, computer science, law etc.
+The BIG Bench also contains various tasks drawing problems from linguistics, childhood development, math, common-sense reasoning, biology, physics, social bias, software development etc. Interestingly, its composition is driven by what is / was believed to be beyond the capabilities of SOTA LMs of 2022.</p>
+<p>Both of these benchmarks strongly focus on what can be considered rather <em>factual knowledge</em> and <em>formal</em> problem solving (e.g., puzzle solving, logical reasoning, math tasks) etc.
+Most recent evaluations, e.g., of <a class="reference external" href="https://arxiv.org/abs/2303.08774">GPT-4</a>, were extended to domain knowledge-intensive tasks like the the US bar exam or coding (ironically, according to the name of one of the recent benchmarks, <a class="reference external" href="https://arxiv.org/abs/2107.03374">HumanEval</a>, coding is apparently an indicator of human-level abilities of LLMs…)</p>
+<p>These tasks can be seen in contrast to tasks that require more intuitive <em>common-sense</em>. There are other datasets which focus more on common-sense, for instance, <a class="reference external" href="https://arxiv.org/abs/1811.00937">CommonsenseQA</a> or <a class="reference external" href="https://arxiv.org/abs/1905.07830">HellaSwag</a>. All of these are multiple-choice benchmarks.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.1: Understanding knowledge benchmarks</span></strong></p>
+<ol class="arabic simple">
+<li><p>Consider the following datasets:</p></li>
+</ol>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arxiv.org/abs/1606.06031">LAMBADA</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/1705.03551">TriviaQA</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1604.01696v1">StoryCloze</a></p></li>
+<li><p><a class="reference external" href="https://research.google/pubs/natural-questions-a-benchmark-for-question-answering-research/">NaturalQA</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/abs/2110.14168">GSM8K</a>
+Which of these would you say test: general world knowledge, common sense, factual knowledge, reasoning (or something else)?</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>Performance of LLMs on these benchmarks are sometimes taken to support arguments about LMs being models of human (general) <a class="reference external" href="https://arxiv.org/pdf/2303.12712">intelligence</a>. Do you think performance on these benchmarks tests intelligence? Is yes, why? If no, what is (intuitively) missing? (Hint: you might want to think about children and what they would know / how we think about their capabilities)</p></li>
+<li><p>Consider the following plot (source <a class="reference external" href="https://arxiv.org/abs/2206.04615">here</a>). What can you conclude about LMs in general from this plot? Does your conclusion play into your answer to the question above?
+<img alt="img" src="../_images/big-scaling.png" /></p></li>
+<li><p>Now consider this plot (source <a class="reference external" href="https://scale-llm-24.pages.dev/pdf/inverse_scaling_prize_paper.pdf">here</a>). This plot presents the performance of different models on tasks like the following:
+Context: Write a quote that ends in the word “heavy”: Absence makes the heart grow …</p></li>
+</ol>
+<p>Classes [“ heavy.”, “ fonder.”]</p>
+</div></blockquote>
+<blockquote>
+<div><p>Answer “heavy.”</p>
+<p>What can you conclude about LMs in general from this plot? Does your conclusion play into your answer to the question above?</p>
+<p><img alt="img" src="../_images/inverse-scaling.png" /></p>
+</div></blockquote>
+<section id="hallucinations">
+<h3>Hallucinations<a class="headerlink" href="#hallucinations" title="Permalink to this heading">#</a></h3>
+<p>One core problem of LLMs are so-called <em>hallucinations</em> – outputs generated by LLMs which sound <em>plausible</em> but are actually <em>wrong</em> with respect to real-world facts. This is a problematic phenomenon when we think about LLMs as part of user-facing applications where the developers would want the users to be able to rely on the system’s outputs. Additionally, this issue might provide an interesting perspective on the questions regarding human-likeness of LLM performance.</p>
+<p>Hallucinations have been distinguished into factual hallucinations, i.e., those where LLMs output factually wrong information, and faithfulness hallucinations, where the LLM is inconsistent with user inputs or prior generations. Identifying, minimizing hallucinations and scalably evaluating LLMs’ hallucination propensity remains a core challenge for the field. One commonly used benchmark for detecting hallucinations is the <a class="reference external" href="https://arxiv.org/abs/2109.07958">TruthfulQA dataset</a>.
+<a class="reference external" href="https://arxiv.org/pdf/2311.05232">This</a> paper provides more details and an overview of recent advances in the field.
+*</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.2: Hallucinations</span></strong></p>
+<ol class="arabic simple">
+<li><p>Skim section 3 of the hallucinations overview paper. What are possible reasons for hallucinations in LLMs?</p></li>
+<li><p>Look at the TruthfulQA dataset. Which type of hallucination (faithfulness or factuality) would be more likely to evaluate? Do you think this is a robust strategy to evaluate hallucinations? Which metric could be used to evaluate a model on this dataset (see last sheet)?</p></li>
+<li><p>[Optional] One metric introduced specifically in the context of factuality evaluations is FACTSCORE. It is a metric specifically for long-form text generation, which decomposes the generation content into atomic facts and subsequently computes the percentage of the facts supported by reliable knowledge sources. The knowledge source are provded, e.g., by corpora. If you are interested, you can check the package implementing FACTSCORE <a class="reference external" href="https://github.com/shmsw25/FActScore">here</a>.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="process-consistency">
+<h3>Process consistency<a class="headerlink" href="#process-consistency" title="Permalink to this heading">#</a></h3>
+<p>One aspect of LLM evaluation that is missing for the approaches discussed so far is closer (behvaioral) inspection of <em>how a model got to its answer</em>. That is, although it has been shown that explicit solution steps elicited via chain-of-thought prompting and similar techniques are beneficial for model performance, the actual consistency and correctness of these steps is rarely evaluated! In fact, it has been shown that models can be “right for the wrong reasons”, i.e., their performance might not be sensitive to wrong intermediate steps <a class="reference external" href="https://aclanthology.org/2022.naacl-main.167/">(Webson &amp; Pavlick, 2022)</a>.</p>
+<p>One interesting approach that attempts to target this problem is <a class="reference external" href="https://openai.com/index/improving-mathematical-reasoning-with-process-supervision/"><em>process supervision</em></a>. This approach is related to RLHF, where a reward model is trained to assign higher rewards to more desirable outcomes. Under process supervision, however, the reward model is trained to also check intermediate solution steps. This is tested on math tasks.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.3: Process supervision</span></strong></p>
+<ol class="arabic simple">
+<li><p>Do you think process supervision is transferable to other tasks, e.g., question answering in dialogues?</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+<section id="reasoning-benchmarks">
+<h2>Reasoning benchmarks<a class="headerlink" href="#reasoning-benchmarks" title="Permalink to this heading">#</a></h2>
+<p>Another capability that has been recently tested distinctly from knowledge tasks and respective problems is <em>abstract reasoning</em>. Specifically, the Abstraction and Reasoning Corpus (ARC) (<a class="reference external" href="https://arxiv.org/pdf/1911.01547">Chollet, 2019</a>) tests different models (primarily, vision models, but more recently also LLMs) on reasoning about abstract visual shapes and their relations. This remains one of the most challenging tests for machines. <a class="reference external" href="https://lab42.global/arc/">This</a> blogpost provides a short overview of the benchmark.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.3: ARC</span></strong></p>
+<ol class="arabic simple">
+<li><p>Does information about ARC change your perspective on the benchmarks described above, and their bearing on discussions about intelligence of LLMs?</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="social-aspects">
+<h2>Social aspects<a class="headerlink" href="#social-aspects" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>gender biases: WInoGrande (bigger version of WinoGender, BBQ)</p></li>
+<li><p>language biases?</p></li>
+<li><p>Whose opinion do LMs reflect?</p></li>
+<li><p>RealToxicityPrompts</p></li>
+</ul>
+</section>
+<section id="assistant-evals">
+<h2>Assistant evals<a class="headerlink" href="#assistant-evals" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>HHH</p></li>
+<li><p>red teaming</p></li>
+</ul>
+</section>
+<section id="outlook">
+<h2>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Perez et al.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#knowledge-problem-solving-benchmarks">Knowledge &amp; Problem solving benchmarks</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hallucinations">Hallucinations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process-consistency">Process consistency</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reasoning-benchmarks">Reasoning benchmarks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#social-aspects">Social aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evals">Assistant evals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
