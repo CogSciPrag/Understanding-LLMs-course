@@ -473,8 +473,7 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reasoning-benchmarks">Reasoning benchmarks</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#social-aspects">Social aspects</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evals">Assistant evals</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evaluation">Assistant evaluation</a></li>
 </ul>
             </nav>
         </div>
@@ -492,6 +491,7 @@ document.write(`
 <p>The main learning goal of this sheet is diving deeper into SOTA evaluations of LLMs; specifically, it is the familiarization with benchmarks which evaluate more intricate aspects of LLM I/O behavior.
 Since recent LLMs exhibit in-context learning behavior and have shown good performance on various tasks going beyond simple text completion, this sheet will zoom in on the more recent benchmarks like <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a>, and evaluations of aspects connected to safety and fairness of LLMs. As mentioned in the previous sheet, the latter aspect became especially relevant as LLMs are embedded in user facing applications. Furthermore, awareness of questions of algorithmic fairness and biases in ML is increasingly rising in the community.</p>
 <p>The methods used for evaluating such aspects are already familiar to you from the previous sheet. Therefore, this sheet is more conceptual and aims rather at sharpening your critical thinking and result interpretation skills.</p>
+<p><strong>Disclaimer:</strong> this sheet does NOT provide exhaustive information or perspectives on these topics. It is intended as a starting resource for thinking and researching more on these topics, if you are interested.</p>
 <section id="knowledge-problem-solving-benchmarks">
 <h2>Knowledge &amp; Problem solving benchmarks<a class="headerlink" href="#knowledge-problem-solving-benchmarks" title="Permalink to this heading">#</a></h2>
 <p>Two of the most popular recent benchmarks for LLMs are the <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a> and the <a class="reference external" href="https://arxiv.org/abs/2206.04615">BIG-Bench</a> datasets.
@@ -566,25 +566,34 @@ Context: Write a quote that ends in the word “heavy”: Absence makes the hear
 </section>
 <section id="social-aspects">
 <h2>Social aspects<a class="headerlink" href="#social-aspects" title="Permalink to this heading">#</a></h2>
+<p>There are many important social aspects of LLM performance. Some of these have been outlined in the hallmark paper about whether LLMs are stochastic parrots <a class="reference external" href="https://dl.acm.org/doi/10.1145/3442188.3445922">(Bender et al., 2021)</a>, i.e., whether they perpetuate (parrot) patterns in their training data, and in particular, undesirable patterns.</p>
+<p>Some examples and discussions in the lecture and previous sheets already highlighted some of these undesirable aspects. These include stereotypes (e.g., gender stereotypes), toxicity (i.e., use of harmful language) and other social biases.
+Below are some examples for datasets commonly used to evaluate whether an LLM exhibits those biases.</p>
 <ul class="simple">
-<li><p>gender biases: WInoGrande (bigger version of WinoGender, BBQ)</p></li>
-<li><p>language biases?</p></li>
-<li><p>Whose opinion do LMs reflect?</p></li>
-<li><p>RealToxicityPrompts</p></li>
+<li><p>gender bias evaluation: <a class="reference external" href="https://arxiv.org/pdf/1907.10641">WinoGrande</a>, <a class="reference external" href="https://aclanthology.org/2022.findings-acl.165/">BBQ</a></p></li>
+<li><p>evaluation of political opinion endorsement: <a class="reference external" href="https://arxiv.org/abs/2303.17548">Santurkar et al. (2023) Whose opinions do LMs reflect?</a></p></li>
+<li><p>toxicity evaluation: <a class="reference external" href="https://arxiv.org/abs/2009.11462">RealToxicityPrompts</a></p></li>
+<li><p>evaluation of LLMs’ ‘knowledge’ of morality concepts: <a class="reference external" href="https://arxiv.org/abs/2008.02275">ETHICS dataset</a></p></li>
 </ul>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.4: Social evaluations</span></strong></p>
+<ol class="arabic simple">
+<li><p>Look at the outline of <a class="reference external" href="https://arxiv.org/pdf/2108.07258">this</a> paper on the opprotunities and risks of LMs as foundation models in different application areas. Select one area that hasn’t been discussed above and try to find a dataset / benchmark that would evaluate LMs in the context of this area.</p></li>
+</ol>
+</div></blockquote>
 </section>
-<section id="assistant-evals">
-<h2>Assistant evals<a class="headerlink" href="#assistant-evals" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p>HHH</p></li>
-<li><p>red teaming</p></li>
-</ul>
-</section>
-<section id="outlook">
-<h2>Outlook<a class="headerlink" href="#outlook" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Perez et al.</p></li>
-</ul>
+<section id="assistant-evaluation">
+<h2>Assistant evaluation<a class="headerlink" href="#assistant-evaluation" title="Permalink to this heading">#</a></h2>
+<p>Finally, as recent LLMs have been trained to be <em>helpful, honest and harmless assitants</em>, there are respective evaluations assessing whether trained assistant indeed meet these criteria. Evaluations of harmlessness often assess the toxicity of LM outputs, with methods / datasets mentioned above.
+The process of identifying topics or inputs for which LLMs exhibit unsafe or undesired behavior is also sometimes called <em>red teaming</em>. Here, teams of experts come up with prompts or topics which might elicit undesirable behavior by the LLMs. The results are often used to construct targeted fine-tuning datasets which aim to adjust the LLM behavior, and for evaluation of the models throughout the fine-tuning.</p>
+<p>Evaluations of honesty are often largely evaluations related to factuality and hallucinations.</p>
+<p>Finally, evaluations of helpfulness are quite tricky to realize, since what counts as helpful strongly depends on the context and the task. This evaluation is mostly done by human annotation where, e.g., humans are asked to compare outputs of an assitant model and a base model / some reference model, or, more recently, the same comparison is done by GPT-4. These strategies have been employed with GPT-4 and LLama-2.</p>
+<blockquote>
+<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.5: Assistant evaluations</span></strong></p>
+<ol class="arabic simple">
+<li><p>What are possible limitations of the comparative approach?</p></li>
+</ol>
+</div></blockquote>
 </section>
 </section>
 
@@ -640,8 +649,7 @@ Context: Write a quote that ends in the word “heavy”: Absence makes the hear
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reasoning-benchmarks">Reasoning benchmarks</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#social-aspects">Social aspects</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evals">Assistant evals</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook">Outlook</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assistant-evaluation">Assistant evaluation</a></li>
 </ul>
   </nav></div>
 
