@@ -544,7 +544,8 @@ document.write(`
 <span class="c1"># !pip install sentence-transformers</span>
 <span class="c1"># !pip install datasets</span>
 <span class="c1"># !pip install llama-index</span>
-<span class="c1"># !pip install &quot;transformers[torch]&quot; &quot;huggingface_hub[inference]&quot;</span>
+<span class="c1"># !pip install &quot;huggingface_hub[inference]&quot;</span>
+<span class="c1"># !pip install accelerate bitsandbytes</span>
 <span class="c1"># from IPython.display import clear_output</span>
 <span class="c1"># clear_output()</span>
 </pre></div>
@@ -851,6 +852,7 @@ document.write(`
         <span class="p">)</span>
         <span class="c1"># get the truncated natural text, too</span>
         <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> 
         <span class="k">return</span> <span class="n">sample</span>
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
