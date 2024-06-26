@@ -523,6 +523,24 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Click</span> <span class="n">below</span> <span class="n">to</span> <span class="n">see</span> <span class="n">the</span> <span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>```{toggle}
+1. The dataset contains generative fine-tuning examples on a broad range of tasks, from calculations to writing stories to cooking recipes.
+2. The assistant tutor model has to be finetuned such that it can have natural-sounding conversations with students on a range of subjects, i.e., we need dialogues from a teaching context as data for training. For the medical knowledge base, it is probably necessary to implement an integrated retrieval system that allows the language model to access the database, rather than just generating everything from next-token predictions. For writing abstracts of scientific papers, we have to optimise the model on summarisation, possibly already using scientific papers in the training.
+3. You can use something like &quot;Please write a sentence where every word begins with &quot;a&quot;. Answer: &quot;. In this case, the output was &quot;Alice admired&quot; for the instruction-tuned model (which fulfills the instruction), but &quot;&quot;A&quot; is a noun&quot; for GPT-2, which does not.
+```
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
 
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
@@ -636,6 +654,23 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 <li><p>Suppose that we wanted to use rank <span class="math notranslate nohighlight">\(r=4\)</span> LoRA for fine-tuning the decoder self-attention block of GPT-2. How many parameters would the lower rank matrices A and B have (see slides 27-29 for reference)?</p></li>
 </ol>
 </div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Click</span> <span class="n">below</span> <span class="n">to</span> <span class="n">see</span> <span class="n">the</span> <span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>````{toggle}
+1. Number of trainable parameters before freezing: 124 million, after freezing: 7 million. Although intuitively, one might think that the performance will be worse when fewer parameters are fine-tuned, PEFT has turned out to be efficient and even have further advantages over fine-tuning all parameters, e.g. with regard to catastrophic forgetting.
+2. The attention weight matrix has a size of 768×2304, so the lower rank matrices have the dimensions 768×4 and 4×2304.
+```
+</pre></div>
+</div>
+</div>
+</div>
 <section id="outlook-peft-in-practice">
 <h3>Outlook: PEFT in practice<a class="headerlink" href="#outlook-peft-in-practice" title="Permalink to this heading">#</a></h3>
 <p>Below, more optional resources for the other types of fine-tuning introduced in the (LoRA, QLoRA) can be found.</p>
@@ -683,6 +718,24 @@ Therefore, the SFT dataset usually consists of examples of target outputs writte
 <li><p>Below is an example of using the <code class="docutils literal notranslate"><span class="pre">trl</span></code> library for the <a class="reference external" href="https://huggingface.co/docs/trl/en/sft_trainer#quickstart">SFT step</a>. Please go through the code and make sure you understand it. Look at the docs for the training arguments class which is used by default by the SFTTrainer <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">here</a>. By default, for how many epochs is the model trained?</p></li>
 </ol>
 </div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Click</span> <span class="n">below</span> <span class="n">to</span> <span class="n">see</span> <span class="n">the</span> <span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>```{toggle}
+1. For summarization, a dataset for supervised fine-tuning would have to include text and good summaries of them.
+2. Aspects that are to be kept in mind are, for example, truthfulness of answers, length of answers, potentially harmful content (although filtering this out is one of the task that RL will help with), and answers should generally make sense (since nonsensical answers will alienate annotators).
+3. By default, the model is trained for 3 epochs.
+```
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># uncomment and run on Colab / install the package in your enironment if you haven&#39;t yet</span>
@@ -748,14 +801,33 @@ Specifically, the reward model is usually initialized from a pretrained LLM (may
 <li><p>An example of a model trained with the approach above can be found <a class="reference external" href="https://huggingface.co/reciprocate/openllama-13b_rm_oasst-hh">here</a>. Feel free to explore the repository, if you want. We will not test this model since it is quite large.</p></li>
 </ol>
 </div></blockquote>
-<p>However, there are also alternative ways of providing rewards. For instance, some work has used other models to provide feedback, an approach that is called <a class="reference external" href="https://arxiv.org/pdf/2212.08073">RLAIF</a> (RL from AI feedback).
-Alternatively, more task-specific reward models can be constructed. For instance, if one wants to use RL-tuning for training a summarization model, the score for evaluating summaries (ROUGE) can be used as the numerical reward. If one wants to train a model for generating positive-sentiment texts only, one can train a reward model on labelled sentiment classification data like, e.g., the IMDB dataset.</p>
-<blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 4.1.5: Task-specific reward modeling</span></strong></p>
-<ol class="arabic simple">
-<li><p>The code below provides an example loading a trained reward model. This model was trained on movie reviews, in particular to assign high scores to positive reviews and low scores to negative reviews, as described above. Please look at the code and make sure to understand it. Test it on a few of your own intuitive examples; do the scores (ordinally) correspond to your intuition?</p></li>
-</ol>
-</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Click</span> <span class="n">below</span> <span class="n">to</span> <span class="n">see</span> <span class="n">the</span> <span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>```{toggle}
+1. $x$ is the input and $y_1, y_2$ are the outputs (whose nature depends on the chosen sample).
+```
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">However</span><span class="p">,</span> <span class="n">there</span> <span class="n">are</span> <span class="n">also</span> <span class="n">alternative</span> <span class="n">ways</span> <span class="n">of</span> <span class="n">providing</span> <span class="n">rewards</span><span class="o">.</span> <span class="n">For</span> <span class="n">instance</span><span class="p">,</span> <span class="n">some</span> <span class="n">work</span> <span class="n">has</span> <span class="n">used</span> <span class="n">other</span> <span class="n">models</span> <span class="n">to</span> <span class="n">provide</span> <span class="n">feedback</span><span class="p">,</span> <span class="n">an</span> <span class="n">approach</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">called</span> <span class="p">[</span><span class="n">RLAIF</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">arxiv</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pdf</span><span class="o">/</span><span class="mf">2212.08073</span><span class="p">)</span> <span class="p">(</span><span class="n">RL</span> <span class="kn">from</span> <span class="nn">AI</span> <span class="n">feedback</span><span class="p">)</span><span class="o">.</span>
+<span class="n">Alternatively</span><span class="p">,</span> <span class="n">more</span> <span class="n">task</span><span class="o">-</span><span class="n">specific</span> <span class="n">reward</span> <span class="n">models</span> <span class="n">can</span> <span class="n">be</span> <span class="n">constructed</span><span class="o">.</span> <span class="n">For</span> <span class="n">instance</span><span class="p">,</span> <span class="k">if</span> <span class="n">one</span> <span class="n">wants</span> <span class="n">to</span> <span class="n">use</span> <span class="n">RL</span><span class="o">-</span><span class="n">tuning</span> <span class="k">for</span> <span class="n">training</span> <span class="n">a</span> <span class="n">summarization</span> <span class="n">model</span><span class="p">,</span> <span class="n">the</span> <span class="n">score</span> <span class="k">for</span> <span class="n">evaluating</span> <span class="n">summaries</span> <span class="p">(</span><span class="n">ROUGE</span><span class="p">)</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span> <span class="k">as</span> <span class="n">the</span> <span class="n">numerical</span> <span class="n">reward</span><span class="o">.</span> <span class="n">If</span> <span class="n">one</span> <span class="n">wants</span> <span class="n">to</span> <span class="n">train</span> <span class="n">a</span> <span class="n">model</span> <span class="k">for</span> <span class="n">generating</span> <span class="n">positive</span><span class="o">-</span><span class="n">sentiment</span> <span class="n">texts</span> <span class="n">only</span><span class="p">,</span> <span class="n">one</span> <span class="n">can</span> <span class="n">train</span> <span class="n">a</span> <span class="n">reward</span> <span class="n">model</span> <span class="n">on</span> <span class="n">labelled</span> <span class="n">sentiment</span> <span class="n">classification</span> <span class="n">data</span> <span class="n">like</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="n">the</span> <span class="n">IMDB</span> <span class="n">dataset</span><span class="o">.</span>
+
+<span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;&lt;</span><span class="n">span</span> <span class="n">style</span><span class="o">=&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">color</span><span class="p">:</span><span class="c1">#D83D2B;&amp;rdquo;&gt;Exercise 4.1.5: Task-specific reward modeling&lt;/span&gt;&lt;/strong&gt;</span>
+<span class="o">&gt;</span> <span class="mf">1.</span> <span class="n">The</span> <span class="n">code</span> <span class="n">below</span> <span class="n">provides</span> <span class="n">an</span> <span class="n">example</span> <span class="n">loading</span> <span class="n">a</span> <span class="n">trained</span> <span class="n">reward</span> <span class="n">model</span><span class="o">.</span> <span class="n">This</span> <span class="n">model</span> <span class="n">was</span> <span class="n">trained</span> <span class="n">on</span> <span class="n">movie</span> <span class="n">reviews</span><span class="p">,</span> <span class="ow">in</span> <span class="n">particular</span> <span class="n">to</span> <span class="n">assign</span> <span class="n">high</span> <span class="n">scores</span> <span class="n">to</span> <span class="n">positive</span> <span class="n">reviews</span> <span class="ow">and</span> <span class="n">low</span> <span class="n">scores</span> <span class="n">to</span> <span class="n">negative</span> <span class="n">reviews</span><span class="p">,</span> <span class="k">as</span> <span class="n">described</span> <span class="n">above</span><span class="o">.</span> <span class="n">Please</span> <span class="n">look</span> <span class="n">at</span> <span class="n">the</span> <span class="n">code</span> <span class="ow">and</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">understand</span> <span class="n">it</span><span class="o">.</span> <span class="n">Test</span> <span class="n">it</span> <span class="n">on</span> <span class="n">a</span> <span class="n">few</span> <span class="n">of</span> <span class="n">your</span> <span class="n">own</span> <span class="n">intuitive</span> <span class="n">examples</span><span class="p">;</span> <span class="n">do</span> <span class="n">the</span> <span class="n">scores</span> <span class="p">(</span><span class="n">ordinally</span><span class="p">)</span> <span class="n">correspond</span> <span class="n">to</span> <span class="n">your</span> intuition<span class="o">?</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
@@ -809,6 +881,22 @@ Specifically, the theorem behind this class of methods shows that the policy can
 <li><p>An example of using the <code class="docutils literal notranslate"><span class="pre">trl</span></code> library for training a model to generate positive model reviews (using the reward model above!) with PPO can be found <a class="reference external" href="https://github.com/huggingface/trl/blob/main/examples/notebooks/gpt2-sentiment.ipynb">here</a>. Please look at the code and try to understand all of it! Please ask questions or research if anything is unclear, this approach might be relevant for your own future exercise ;)</p></li>
 </ol>
 </div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Click</span> <span class="n">below</span> <span class="n">to</span> <span class="n">see</span> <span class="n">the</span> <span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>```{toggle}
+1. For reference about typical hyperparameter settings: This is what the Llama report tells about RLHF training details: &quot;Training Details. We train for one epoch over the training data. In earlier experiments, we found that training longer can lead to over-fitting. We use the same optimizer parameters as for the base model. The maximum learning rate is 5 × 10−6 for the 70B parameter Llama 2-Chat and 1 × 10−5 for the rest. The learning rate is decreased on a cosine learning rate schedule, down to 10% of the maximum learning rate. We use a warm-up of 3% of the total number of steps, with a minimum of 5. The effective batch size is kept fixed at 512 pairs, or 1024 rows per batch.“
+```
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="optional-outlook">
 <h3>Optional outlook<a class="headerlink" href="#optional-outlook" title="Permalink to this heading">#</a></h3>
