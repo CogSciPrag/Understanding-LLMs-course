@@ -33,6 +33,7 @@ parts:
   - file: tutorials/06a-attribution
   - file: lectures/08-evaluation
   - file: tutorials/07a-behavioral-assessment
+  - file: tutorials/07b-biases-assessment
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
