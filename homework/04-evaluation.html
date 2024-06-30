@@ -1,0 +1,909 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Homework 4: LLM evaluation &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/04-evaluation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Homework 3: LLM agents &amp; RL fine-tuning" href="03-agents-RL.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Fine-tuning &amp; RLHF</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07b-biases-assessment.html">Sheet 7.2: Advanced evaluation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Homework 4: LLM evaluation</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/04-evaluation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/04-evaluation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/04-evaluation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/homework/04-evaluation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Homework 4: LLM evaluation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-grammatical-capabilities-of-llms-10-points">Exercise 1: Understanding grammatical capabilities of LLMs (10 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-evaluating-societal-biases-13-points">Exercise 2: Evaluating societal biases (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-llm-evaluations-with-llms-5-points">Exercise 3: LLM evaluations with LLMs (5 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-how-human-like-are-llama-s-surprisals-22-points">Exercise 4: How human-like are Llama’s surprisals? (22 points)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="homework-4-llm-evaluation">
+<h1>Homework 4: LLM evaluation<a class="headerlink" href="#homework-4-llm-evaluation" title="Permalink to this heading">#</a></h1>
+<p>The third homework zooms in on evaluating LLMs, specifically, on the following skills: using log probabilities of string under a trained LM to evaluate it, coming up with items to test particular aspets of LLMs, and comparing LLM measures to measures of human performance.</p>
+<section id="logistics">
+<h2>Logistics<a class="headerlink" href="#logistics" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>submission deadline: July 13th th 23:59 German time via Moodle</p>
+<ul>
+<li><p>please upload a <strong>SINGLE .IPYNB FILE named Surname_FirstName_HW4.ipynb</strong> containing your solutions of the homework. Make sure that your <strong>plots</strong> for the last exercise are either rendered in the notebook or submitted together with it in a zip file.</p></li>
+</ul>
+</li>
+<li><p>please solve and submit the homework <strong>individually</strong>!</p></li>
+<li><p>if you use Colab, to speed up the execution of the code on Colab, you can use the available GPU (if Colab resources allow). For that, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save.</p></li>
+</ul>
+</section>
+<section id="exercise-1-understanding-grammatical-capabilities-of-llms-10-points">
+<h2>Exercise 1: Understanding grammatical capabilities of LLMs (10 points)<a class="headerlink" href="#exercise-1-understanding-grammatical-capabilities-of-llms-10-points" title="Permalink to this heading">#</a></h2>
+<p>In this task, we look at <a class="reference external" href="https://aclanthology.org/2020.tacl-1.25/">BLiMP</a>, the benchmark of linguistic minimal pairs. This is a well-known benchmark for evaluating linguistic capabilities of language models. It consists of 67 individual datasets, each containing 1,000 minimal pairs – that is, pairs of minimally different sentences that contrast in grammatical acceptability and isolate specific phenomenon in syntax, morphology, or semantics. The authors suggest to use the benchmark to evaluate LMs by observing whether they assign a higher probability to the acceptable sentence in each minimal pair.</p>
+<blockquote>
+<div><p>Your task is to evaluate an open-source model, <a class="reference external" href="https://huggingface.co/EleutherAI/pythia-160m">Pythia-160m</a>, on this benchmark by completing the code below. Based on your evaluation results, please answer the following questions.
+Please use the following test suites to answer them: anaphor_gender_agreement, determiner_noun_agreement_with_adjective_1, animate_subject_passive, complex_NP_island, npi_present_1, superlative_quantifiers_1, existential_there_object_raising, principle_A_case_1.</p>
+<p>The entire benchmark can be found <a class="reference external" href="https://huggingface.co/datasets/nyu-mll/blimp">here</a>.</p>
+<ol class="arabic simple">
+<li><p>Plot the accuracy of the model on the different grammatical phenomena, represented in different test suites.</p></li>
+<li><p>Calculate the average accuracies and the confidence intervals in the different fields: syntax, morphology, syntax-semantics, semantics. Is the performance the same across the different fields? Which field is the most difficult one?</p></li>
+<li><p>What is the easiest grammatical phenomenon, what is the most difficult gramamtical phenomenon (as captured by the single test suites) for the model?</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">minicons</span> <span class="kn">import</span> <span class="n">scorer</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;mps&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># iterate over the test suites </span>
+
+<span class="c1">#### YOUR CODE HERE ####</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;nyu-mll/blimp&quot;</span><span class="p">,</span> <span class="c1">#### YOUR TEST SUITE HERE ####)</span>
+<span class="c1"># inspect the dataset</span>
+<span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># iterate over the single items of the test suite</span>
+<span class="c1"># hint: you can use code similar to the one in sheet 7.1 </span>
+
+<span class="c1"># set up the model as a minicons scorer </span>
+<span class="n">lm_scorer</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">IncrementalLMScorer</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+<span class="p">)</span>
+
+<span class="c1"># create some lists to store the results</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]:</span>
+    <span class="c1"># get the sentence pair</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+    
+    <span class="c1"># compare the sentences as suggested in the task description</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># calculate the performance by test suite</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+<span class="c1"># plot the results in a bar plot</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># calculate the performance as described above by category and plot the results in a bar plot with CIs</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-2-evaluating-societal-biases-13-points">
+<h2>Exercise 2: Evaluating societal biases (13 points)<a class="headerlink" href="#exercise-2-evaluating-societal-biases-13-points" title="Permalink to this heading">#</a></h2>
+<p>In this exercise, we will consider aspects of LLM performance which may have social implications and that are deeply interconnected with how humans use language. This task evaluates whether LLMs overrepresent certain cultures over others, which could be due to, e.g., imbalances over training data sources and languages.</p>
+<blockquote>
+<div><p>Specifically, your task is to come up with an appropriate test item and evaluate whether LLMs exhibit certain cultural biases.
+In this task, you have to construct your own multiple-choice test item for investigating cultural biases of LLMs, where, given a context, the different available response / continuation options would reflect preferences for responses typical for different cultures.
+For instance, one response could be more acceptable under one particular cultural lense and another response under a different cultural background.
+Your task is then to evaluate the performance of two LLMs: the mostly monolingual <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> and the multilingual <code class="docutils literal notranslate"><span class="pre">bigscience/bloom-550m</span></code> model. The second part of the task is to compelte the evaluation code and interpret the results by answering the question below.</p>
+</div></blockquote>
+<p>Here is a simple example of a test item. More explanations are in parentheses. You should provide analogous explanations in the answers to the questions below, but not pass these to the LLMs during evaluations.</p>
+<p>Context 1: You are at a German supermarket. You walk up to the cashier and greet them by saying:</p>
+<p>Context 2: You are at an American supermarket. You walk up to the cashier and greet them by saying:</p>
+<p>A. Hello. (intuititvely, more likely in to be appropiate in the Germany context condition)</p>
+<p>B. Bye. (a generally inappropriate response)</p>
+<p>C. Hello, how are you? (intuitively, more likely to be appropriate in the US context condition; people usually don’t ask strangers ‘how are you’ in Germany)</p>
+<p>I would say: (insert each of the answer options separately here and calculate their log probability, given each of the contexts).</p>
+<p>For reference about constructing datasets and inspiration, feel free to take a look at the <a class="reference external" href="https://arxiv.org/pdf/2008.02275">ETHICS dataset</a>, e.g., Fig. 2, where the authors came up with different continuations tapping into different conditions, given a context.</p>
+<blockquote>
+<div><p><strong>Fill in your responses below.</strong></p>
+<ol class="arabic simple">
+<li><p>Your prompt (with explanations of the intuitive differences for each response option in respective cultural variations):</p></li>
+<li><p>Your model log probabilities (table cells are examples, please fill in with your respective item):</p></li>
+</ol>
+</div></blockquote>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Context / Option</p></th>
+<th class="head"><p>GPT-2</p></th>
+<th class="head"><p>Bloom</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Germany + A</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>USA + A</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Germany + B</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>USA + B</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Do the models show a preference for a particular cultural setting? Is there evidence for whether cultural biases might be caused by training data?</p></li>
+<li><p>Are there aspects of the prompt that might influence your results? Please provide a brief justification / example why (not).</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">minicons</span> <span class="kn">import</span> <span class="n">scorer</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># here is some starter code; please fill in your code / comments where it says #### YOUR CODE / COMMENT HERE ####</span>
+
+<span class="c1"># set up a scorer </span>
+<span class="n">gpt2_scorer</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">IncrementalLMScorer</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+<span class="p">)</span>
+
+<span class="n">bloom_scorer</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">IncrementalLMScorer</span><span class="p">(</span>
+    <span class="c1">### YOUR CODE HERE ###</span>
+<span class="p">)</span>
+<span class="c1"># initialize list for storing the predictions</span>
+<span class="n">gpt2_predictions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">bloom_predictions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">answer_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ger&quot;</span><span class="p">,</span> <span class="s2">&quot;nonsense&quot;</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">]</span>
+
+<span class="c1"># iterate over contexts</span>
+<span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="c1">### YOUR CODE HERE ###):</span>
+    <span class="c1"># format / provide  the possible answer options from your vignette</span>
+    <span class="n">answer_options</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+    <span class="c1"># pass a list of contexts and a list of continuations to be scored</span>
+    <span class="n">answer_scores_gpt2</span> <span class="o">=</span> <span class="n">gpt2_scorer</span><span class="o">.</span><span class="n">conditional_score</span><span class="p">(</span>
+        <span class="c1"># format the question into a list of same length as the number of answer options</span>
+        <span class="c1">### YOUR CODE HERE ###,</span>
+    <span class="p">)</span> 
+    <span class="n">answer_scores_bloom</span> <span class="o">=</span> <span class="n">bloom_scorer</span><span class="o">.</span><span class="n">conditional_score</span><span class="p">(</span>
+        <span class="c1"># format the question into a list of same length as the number of answer options</span>
+        <span class="c1">### YOUR CODE HERE ###,</span>
+    <span class="p">)</span>
+    
+    <span class="c1"># check / inspect which answer has the highest score and which answer type (i.e., &quot;culture&quot;) it corresponds to</span>
+    <span class="c1">### YOUR CODE / COMMENT HERE ### </span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3-llm-evaluations-with-llms-5-points">
+<h2>Exercise 3: LLM evaluations with LLMs (5 points)<a class="headerlink" href="#exercise-3-llm-evaluations-with-llms-5-points" title="Permalink to this heading">#</a></h2>
+<p>Building on the in-context learning capabilities of LLMs,, recent work, e.g., by <a class="reference external" href="https://arxiv.org/abs/2212.09251">Perez et al (2022)</a>, has been <em>using LLMs to generate evaluation datasets for LLMs</em>.</p>
+<blockquote>
+<div><p>Your task here is to:</p>
+<ol class="arabic simple">
+<li><p>write a pseudo-algorithm for generating more cultural bias evaluation items. The items should be of a similar structure as in the task above. Write maximally 5 steps. (Hint: feel free to try to elicit e.g. 10 different item with a model of your choice)</p></li>
+<li><p>What could be possible concerns with this approach? Name and briefly explain 2.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="exercise-4-how-human-like-are-llama-s-surprisals-22-points">
+<h2>Exercise 4: How human-like are Llama’s surprisals? (22 points)<a class="headerlink" href="#exercise-4-how-human-like-are-llama-s-surprisals-22-points" title="Permalink to this heading">#</a></h2>
+<p>More recently, work more informed by human language use and processing has compared LLMs’ performance to aspects of human behavior. Here, the assessment of LLMs is guided more by the question of how human-like certain aspects of its performance are. For instance, we might whether LLMs’ ‘knowledge’ of language is comparable to human knowledge, and, in particular, whether the processing of language, given the knowledge , can be compared via system-appropriate linking measurements.</p>
+<p>Your task in this exercise is to assess whether the <em>surprisal</em> of different language models is comparable to human <em>reading times</em>, when it comes to processing subject-verb agreement. The linking hypothesis is that these can be considered the respective predictability, and therefore, processing load indicators.
+The conceptual ideas and the data are taken from <a class="reference external" href="https://arxiv.org/pdf/2106.03232">Wilcox et al. (2021)</a> which was discussed in the lecture. Please read the sections 1-2.2 for the background (optionally, the rest, if you want).
+The data can be downloaded <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/homework/data/SVA_data.csv">here</a>.</p>
+<p>The data provides human RTs and LM surprisals in different conditions for sentences where the subject and the verb either match (i.e., agree) or mismatch in terms of number. This is the main condition. Furthermore, the agreement manipulation occurs in different syntactic conditions, and for plural and singular nouns. Here are examples from the different syntactic conditions:</p>
+<ul class="simple">
+<li><p>SRC (subject relative clause modifier):</p>
+<ul>
+<li><p>mismatch plural: The pilots that injured the teacher brings love to people.</p></li>
+<li><p>match plural: The pilots that injured the teacher bring love to people.</p></li>
+</ul>
+</li>
+<li><p>ORC (object relative clause modifier):</p>
+<ul>
+<li><p>mismatch plural: The ministers that the manager injured knows tennis.</p></li>
+<li><p>match plural: The ministers that the manager injured know tennis.</p></li>
+</ul>
+</li>
+<li><p>PP (prepositional phrase modifier):</p>
+<ul>
+<li><p>mismatch plural: The executives next to the teacher is good.</p></li>
+<li><p>match plural: The executives next to the teacher are good.</p></li>
+</ul>
+</li>
+</ul>
+<p>The prediction is that humans and models should have difficulty processing the mismatched noun, both in the singular and the plural condition.</p>
+<blockquote>
+<div><p>Your task is to complete / provide the following code and answer the following questions:</p>
+<ol class="arabic simple">
+<li><p>Formulate a quantitatively testable hypothesis operationalizing the prediction above. I.e., formulate something like: if the prediction is true, X should be larger than Y.</p></li>
+<li><p>Provide respective examples for the singular condition.</p></li>
+<li><p>Inspect the data. What are the units of the provided results?</p></li>
+<li><p>Based on your hypothesis above, for each trial, calculate whether it holds or not. Plot the proportion of trials where your hypothesis is borne out (i.e, the accuracy), for humans and each model, in the singular and the plural condition. (Hint: use a barplot)</p></li>
+<li><p>Based on visual inspection, does any model match human performance?</p></li>
+<li><p>Is either of the number conditions more difficult to process for humans or LMs?</p></li>
+<li><p>Select the results for Llama and humans only. Is the processing ‘difficulty’ of Llama correlated with the processing slowdown of humans (across singular / plural conditions)? Interpret the correlation coefficient.</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/SVA_data.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#### YOUR CODE HERE FOR CALCULATING HYPOTHESIS METRICS AND PLOTTING ####</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># barplot of the results, by model and by condition (plural vs. singular)</span>
+<span class="c1">### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># correlation analysis</span>
+<span class="c1">#### YOUR CODE HERE ###</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./homework"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03-agents-RL.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Homework 3: LLM agents &amp; RL fine-tuning</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-grammatical-capabilities-of-llms-10-points">Exercise 1: Understanding grammatical capabilities of LLMs (10 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-evaluating-societal-biases-13-points">Exercise 2: Evaluating societal biases (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-llm-evaluations-with-llms-5-points">Exercise 3: LLM evaluations with LLMs (5 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-how-human-like-are-llama-s-surprisals-22-points">Exercise 4: How human-like are Llama’s surprisals? (22 points)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
