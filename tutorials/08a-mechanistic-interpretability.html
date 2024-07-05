@@ -486,13 +486,12 @@ document.write(`
 <h1>Sheet 8.1: Mechanistic interpretability<a class="headerlink" href="#sheet-8-1-mechanistic-interpretability" title="Permalink to this heading">#</a></h1>
 <p><strong>Author</strong>: Polina Tsvilodub</p>
 <p>One criticism often raised in context of LLMs is their blackbox nature, i.e., the inscrutability of the mechanics of the models and how or why they arrive at predictions, given the input.
-We have seen some methods that help to map out how models behave on certain tasks (sheets XXX), what aspects of the input critically affect the output and which information the models process (sheet XXX).
+We have seen some methods that help to map out how models behave on certain tasks (<a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/07a-behavioral-assessment.html">sheet 7.1</a>), what aspects of the input critically affect the output and which information the models process (<a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/06a-attribution.html">sheet 6.1</a>).
 In this sheet, we will look at methods for identifying the <em>computational mechanisms</em> that lead to the outputs, i.e., at mechanistic interpretability. It can be seen as trying to reverse-engineer the computational algorithms the mdoel has learned during training and that are active during certain tasks.</p>
-<p>TODO: link sheets.</p>
 <section id="early-decoding">
 <h2>Early decoding<a class="headerlink" href="#early-decoding" title="Permalink to this heading">#</a></h2>
 <p>First, we will look at early decoding, i.e., at applying the “unembedding” layer (projecting hidden representations into vocabulary space by applying a linear and a softmax layer) to representations in layers throughout the model (not just the last layer). For this, we will need to output results of the calculations in the layers. There are various parameters that can be passed to
-Furthermore, it is helpful to be able to access different weights of the model, which we did in sheet XXX.</p>
+Furthermore, it is helpful to be able to access different weights of the model, which we did in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/03a-tokenization-transformers.html">sheet 3.1</a>.</p>
 <p>The code is largely based on <a class="reference external" href="https://github.com/jmerullo/lm_vector_arithmetic">this</a> repository which accompanies the paper by <a class="reference external" href="https://arxiv.org/pdf/2305.16130">Merullo et al. (2024)</a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -833,7 +832,6 @@ Essentially, we ask: given a corrupted input, if we inject certain representatio
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 8.1.3: Activation patching</span></strong></p>
 <ol class="arabic simple">
 <li><p>(For yourself) Read through the code above and make sure that you understand what it does and why.</p></li>
-<li><p>TODO: The functionality is wrapped under the endpoints of the library, but if you are curious, you can find details XXX.</p></li>
 </ol>
 </div></blockquote>
 <div class="cell docutils container">
