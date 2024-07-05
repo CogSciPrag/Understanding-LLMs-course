@@ -34,6 +34,7 @@ parts:
   - file: lectures/08-evaluation
   - file: tutorials/07a-behavioral-assessment
   - file: tutorials/07b-biases-assessment
+  - file: tutorials/08a-mechanistic-interpretability
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
