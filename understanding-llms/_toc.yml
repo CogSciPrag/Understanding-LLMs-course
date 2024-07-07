@@ -21,19 +21,29 @@ parts:
   - file: lectures/03-LSTMs-Transformers
   - file: tutorials/03a-tokenization-transformers
   - file: tutorials/03b-transformers-heads-training
+- caption: 04 Prompting
+  chapters:
   - file: lectures/04-LLMs-Prompting
   - file: tutorials/03c-decoding-prompting
-- caption: 04 Fine-tuning & RLHF
+- caption: 05 Fine-tuning & RLHF
   chapters:
   - file: lectures/05-finetuning-RLHF
   - file: tutorials/04a-finetuning-RL
+- caption: 06 Agents & applications
+  chapters:
   - file: lectures/06-agents
   - file: tutorials/05a-agents
+- caption: 07 Attribution
+  chapters:
   - file: lectures/07-attribution
   - file: tutorials/06a-attribution
+- caption: 08 Behavioral evaluation
+  chapters:
   - file: lectures/08-evaluation
   - file: tutorials/07a-behavioral-assessment
   - file: tutorials/07b-biases-assessment
+- caption: 09 Mechanistic interpretation
+  chapters:
   - file: lectures/10-mechanistic-interpretability
   - file: tutorials/08a-mechanistic-interpretability
 - caption: Homework
