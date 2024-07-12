@@ -1,0 +1,982 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Homework 2: Prompting &amp; Generation with LMs (50 points) &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/02-prompting_solution';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Prompting</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">05 Fine-tuning &amp; RLHF</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 Agents &amp; applications</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">07 Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">08 Behavioral evaluation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07b-biases-assessment.html">Sheet 7.2: Advanced evaluation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">09 Mechanistic interpretation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/10-mechanistic-interpretability.html">Mechanistic Interpretability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08a-mechanistic-interpretability.html">Sheet 8.1: Mechanistic interpretability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04-evaluation.html">Homework 4: LLM evaluation</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/02-prompting_solution.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/02-prompting_solution.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/02-prompting_solution.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/homework/02-prompting_solution.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Homework 2: Prompting & Generation with LMs (50 points)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-advanced-prompting-strategies-16-points">Exercise 1: Advanced prompting strategies (16 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points">Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">How was the context represented? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">What is the curse of dimensionality? Give a concrete example in the context of language modelling.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">Which training data was used? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#differences-per-section">differences per section</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#a-neural-model">A neural model</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-implementation">Parallel Implementation</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-results">Experimental Results</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-future-work">Extensions and Future Work</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="homework-2-prompting-generation-with-lms-50-points">
+<h1>Homework 2: Prompting &amp; Generation with LMs (50 points)<a class="headerlink" href="#homework-2-prompting-generation-with-lms-50-points" title="Permalink to this heading">#</a></h1>
+<p>The second homework zooms in on the following skills: on gaining a deeper understanding of different state-of-the-art prompting techniques and training your critical conceptual thinking regarding research on LMs.</p>
+<section id="logistics">
+<h2>Logistics<a class="headerlink" href="#logistics" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>submission deadline: June 2nd th 23:59 German time via Moodle</p>
+<ul>
+<li><p>please upload a <strong>SINGLE .IPYNB FILE named Surname_FirstName_HW2.ipynb</strong> containing your solutions of the homework.</p></li>
+</ul>
+</li>
+<li><p>please solve and submit the homework <strong>individually</strong>!</p></li>
+<li><p>if you use Colab, to speed up the execution of the code on Colab, you can use the available GPU (if Colab resources allow). For that, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save.</p></li>
+</ul>
+</section>
+<section id="exercise-1-advanced-prompting-strategies-16-points">
+<h2>Exercise 1: Advanced prompting strategies (16 points)<a class="headerlink" href="#exercise-1-advanced-prompting-strategies-16-points" title="Permalink to this heading">#</a></h2>
+<p>The lecture discussed various sophisticated ways of prompting language models for generating texts. Please answer the following questions about prompting techniques in context of different models, and write down your answers, briefly explaining them (max. 3 sentences). Feel free to actually implement some of the prompting strategies to play around with them and build your intuitions.</p>
+<blockquote>
+<div><p>Consider the following language models:</p>
+<ul class="simple">
+<li><p>GPT-2, GPT-4, Vicuna (an instruction-tuned version of Llama) and Llama-2-7b-base.</p></li>
+</ul>
+<p>Consider the following prompting / generation strategies:</p>
+<ul class="simple">
+<li><p>beam search, tree-of-thought reasoning, zero-shot CoT prompting, few-shot CoT prompting, few-shot prompting.</p></li>
+</ul>
+<p>For each model, which strategies do you think work well, and why? Do you think there are particular tasks or contexts, in which they work better, than in others?</p>
+</div></blockquote>
+<p><strong>Solution</strong>
+4p per model. Aspects that can be mentioned include:</p>
+<ul class="simple">
+<li><p>GPT-2:</p>
+<ul>
+<li><p>beam search: it has been shown that it improves results for “standard” LLMs</p></li>
+<li><p>few-shot prompting: GPT-2 might be able to do in-context learning if the examples are more liek text-completion.</p></li>
+<li><p>other strategies are too fancy</p></li>
+</ul>
+</li>
+<li><p>GPT-4:</p>
+<ul>
+<li><p>anything except beam search should work (it is probably too costly). depending on the task, few-shot CoT or tree of thought could be best for reasoning tasks</p></li>
+</ul>
+</li>
+<li><p>Vicuna:</p>
+<ul>
+<li><p>few-shot prompting or zero-shot CoT could work because it was instruction-tuned</p></li>
+</ul>
+</li>
+<li><p>Llama-base:</p>
+<ul>
+<li><p>few-shot prompting  or few-shot CoT could work, ToT or zero-shot might be too advanced because it wasn’t instruction- / RL-tuned</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="exercise-2-prompting-for-nli-multiple-choice-qa-14-points">
+<h2>Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)<a class="headerlink" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points" title="Permalink to this heading">#</a></h2>
+<p>In this exercise, you can let your creativity flow – your task is to come up with prompts for language models such that they achieve maximal accuracy on the following example tasks. Feel free to take inspiration from the in-class examples of the sentiment classification task. Also feel free to play around with the decoding scheme and see how it interacts with the different prompts.</p>
+<p><strong>TASK:</strong></p>
+<blockquote>
+<div><p>Use the code that was introduced in the Intro to HF sheet to load the model and generate predictions from it with your sample prompts.</p>
+<ul class="simple">
+<li><p>Please provide your code.</p></li>
+<li><p>Please report the best prompt that you found for each model and task (i.e., NLI and multiple choice QA), and the decoding scheme parameters that you used.</p></li>
+<li><p>Please write a brief summary of your explorations, stating what you tried, what worked (better), why you think that is.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>Models: Pythia-410m, Pythia-1.4b</p></li>
+<li><p>Tasks: please <strong>test</strong> the model on the following sentences and report the accuracy of the model with your best prompt and decoding configurations.</p>
+<ul>
+<li><p>Natural language inference: the task is to classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”. The gold labels are provided for reference here, but obviously shouldn’t be given to the model at test time.</p>
+<ul>
+<li><p>A person on a horse jumps over a broken down airplane. A person is training his horse for a competition. neutral</p></li>
+<li><p>A person on a horse jumps over a broken down airplane. A person is outdoors, on a horse. entailment</p></li>
+<li><p>Children smiling and waving at camera. There are children present. entailment</p></li>
+<li><p>A boy is jumping on skateboard in the middle of a red bridge. The boy skates down the sidewalk. contradiction</p></li>
+<li><p>An older man sits with his orange juice at a small table in a coffee shop while employees in bright colored shirts smile in the background. An older man drinks his juice as he waits for his daughter to get off work. neutral</p></li>
+<li><p>High fashion ladies wait outside a tram beside a crowd of people in the city. The women do not care what clothes they wear. contradiction</p></li>
+</ul>
+</li>
+<li><p>Multiple choice QA: the task is to predict the correct answer option for the question, given the question and the options (like in the task of Ex. 3 of homework 1). The gold labels are provided for reference here, but obviously shouldn’t be given to the model at test time.</p>
+<ul>
+<li><p>The only baggage the woman checked was a drawstring bag, where was she heading with it? [“garbage can”, “military”, “jewelry store”, “safe”, “airport”] – airport</p></li>
+<li><p>To prevent any glare during the big football game he made sure to clean the dust of his what? [“television”, “attic”, “corner”, “they cannot clean corner and library during football match they cannot need that”, “ground”] – television</p></li>
+<li><p>The president is the leader of what institution? [“walmart”, “white house”, “country”, “corporation”, “government”] – country</p></li>
+<li><p>What kind of driving leads to accidents? [“stressful”, “dangerous”, “fun”, “illegal”, “deadly”] – dangerous</p></li>
+<li><p>Can you name a good reason for attending school? [“get smart”, “boredom”, “colds and flu”, “taking tests”, “spend time”] – “get smart”</p></li>
+<li><p>Stanley had a dream that was very vivid and scary. He had trouble telling it from what? [“imagination”, “reality”, “dreamworker”, “nightmare”, “awake”] – reality</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Partial solution suggestion</strong></p>
+<ul class="simple">
+<li><p>6 pts / model, 2 pts for code</p>
+<ul>
+<li><p>for each model, there should be: a prompt, decoding parameters, accuracy for NLI, accuracy for QA, conclusion / summary</p></li>
+<li><p>the actual accuracies don’t matter that much as long as the response sensibly reflects upon what’s going on</p></li>
+</ul>
+</li>
+<li><p>any kind of code that does what is asked for in this task is of course acceptable, but below is one possibility (for one model). If people manually evaluated the accuracy, it’s also fine (code is not required here).</p></li>
+<li><p>intuition suggests that some kind of few shot prompting should work, especially if the prompt is formatted as text continuation rather than some structured format for the smaller model; for the larger model, even more advanced things might work, e.g., formatting the QA as multiple choice could work.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;EleutherAI/pythia-410m&quot;</span> <span class="c1"># &quot;EleutherAI/pythia-1.4b&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">model_name</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># prompt</span>
+<span class="n">input_text</span> <span class="o">=</span> <span class="s2">&quot;Given two pairs of sentences, decide whether they entail, contradict or are neutral to each other. The answer should be one of: </span><span class="se">\</span>
+<span class="s2">entailment, contradiction, neutral. Here are a 3 examples:</span><span class="se">\n\</span>
+<span class="s2">1. A man inspects the uniform of a figure in some East Asian country. The man is sleeping. contradiction.</span><span class="se">\</span>
+<span class="se">\n</span><span class="s2">2. An older and younger man smiling. Two men are smiling and laughing at the cats playing on the floor. neutral.</span><span class="se">\</span>
+<span class="se">\n</span><span class="s2">3. A soccer game with multiple males playing. Some men are playing a sport. entailment&quot;</span>
+
+<span class="c1"># there are various ways of doing this, e.g., people could have converted the examples above into a csv, or just use lists.</span>
+<span class="c1"># a list is used below. code should be functionally identical for both tasks (although the accuracy computation differs somewhat)</span>
+<span class="c1"># nli example, with labels in form of actual words (rather than e g A B C labels)</span>
+<span class="n">nli_inputs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A person on a horse jumps over a broken down airplane. A person is training his horse for a competition.&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A person on a horse jumps over a broken down airplane. A person is outdoors, on a horse.&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Children smiling and waving at camera. There are children present.&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A boy is jumping on skateboard in the middle of a red bridge. The boy skates down the sidewalk.&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">An older man sits with his orange juice at a small table in a coffee shop while employees in brightcolored shirts smile in the background. An older man drinks his juice as he waits for his daughter to get off work.&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">High fashion ladies wait outside a tram beside a crowd of people in the city. The women do not care what clothes they wear.&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">nli_labels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;entailment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;entailment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;contradiction&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;contradiction&quot;</span>
+<span class="p">]</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+<span class="n">predicted_answers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">predicted_answers_correctness</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">input_test</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nli_inputs</span><span class="p">,</span> <span class="n">nli_labels</span><span class="p">):</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_attention_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># generate predictions</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
+    <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">answer</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">):]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy: &quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The few shot learning approach at least gets the models to output one of the three labels. However the accuracy of 1/3 is most likely due to chance. The result is the same for both model and both seem to inhibit a strong bias towards contradiction.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Select the correct label from the list of options, that answers the question. Here is an example:</span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">Sammy wanted to go to where the people were. Where might he go? answer options: A: race track, B: populated areas, C: the desert, D: apartment, E: roadblock</span><span class="se">\n</span><span class="s2">answer: B&quot;</span>
+<span class="n">questions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;The only baggage the woman checked was a drawstring bag, where was she heading with it?&quot;</span><span class="p">,</span> 
+              <span class="s2">&quot;To prevent any glare during the big football game he made sure to clean the dust of his what?&quot;</span><span class="p">,</span> 
+              <span class="s2">&quot;The president is the leader of what institution?&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;What kind of driving leads to accidents?&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;Can you name a good reason for attending school?&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;Stanley had a dream that was very vivid and scary. He had trouble telling it from what?&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">answer_options = [&quot;garbage can, military, jewelry store, safe, airport&quot;,</span>
+<span class="sd">                  &quot;television, attic, corner, they cannot clean corner and library during football match they cannot need that, ground&quot;,</span>
+<span class="sd">                  &quot;walmart, white house, country, corporation, government&quot;,</span>
+<span class="sd">                  &quot;stressful, dangerous, fun, illegal, deadly&quot;,</span>
+<span class="sd">                  &quot;get smart, boredom, colds and flu, taking tests, spend time&quot;,</span>
+<span class="sd">                  &quot;imagination, reality, dreamworker, nightmare, awake&quot;]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">answer_options</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;garbage can&quot;</span><span class="p">,</span> <span class="s2">&quot;military&quot;</span><span class="p">,</span> <span class="s2">&quot;jewelry store&quot;</span><span class="p">,</span> <span class="s2">&quot;safe&quot;</span><span class="p">,</span> <span class="s2">&quot;airport&quot;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s2">&quot;television&quot;</span><span class="p">,</span> <span class="s2">&quot;attic&quot;</span><span class="p">,</span> <span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;they cannot clean corner and library during football match they cannot need that&quot;</span><span class="p">,</span> <span class="s2">&quot;ground&quot;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s2">&quot;walmart&quot;</span><span class="p">,</span> <span class="s2">&quot;white house&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;corporation&quot;</span><span class="p">,</span> <span class="s2">&quot;government&quot;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s2">&quot;stressful&quot;</span><span class="p">,</span> <span class="s2">&quot;dangerous&quot;</span><span class="p">,</span> <span class="s2">&quot;fun&quot;</span><span class="p">,</span> <span class="s2">&quot;illegal&quot;</span><span class="p">,</span> <span class="s2">&quot;deadly&quot;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s2">&quot;get smart&quot;</span><span class="p">,</span> <span class="s2">&quot;boredom&quot;</span><span class="p">,</span> <span class="s2">&quot;colds and flu&quot;</span><span class="p">,</span> <span class="s2">&quot;taking tests&quot;</span><span class="p">,</span> <span class="s2">&quot;spend time&quot;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s2">&quot;imagination&quot;</span><span class="p">,</span> <span class="s2">&quot;reality&quot;</span><span class="p">,</span> <span class="s2">&quot;dreamworker&quot;</span><span class="p">,</span> <span class="s2">&quot;nightmare&quot;</span><span class="p">,</span> <span class="s2">&quot;awake&quot;</span><span class="p">]]</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;airport&quot;</span><span class="p">,</span> <span class="s2">&quot;television&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;dangerous&quot;</span><span class="p">,</span> <span class="s2">&quot;get smart&quot;</span><span class="p">,</span> <span class="s2">&quot;reality&quot;</span><span class="p">]</span>
+<span class="n">predicted_answers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">predicted_answers_correctness</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">question</span><span class="p">,</span> <span class="n">answer_option</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">questions</span><span class="p">,</span> <span class="n">answer_options</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="n">option_list</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">answer_option</span><span class="p">,</span> <span class="n">chars</span><span class="p">):</span>
+        <span class="n">option_list</span> <span class="o">+=</span> <span class="n">c</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">option</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; answer options: &quot;</span> <span class="o">+</span> <span class="n">option_list</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">answer: &quot;</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_attention_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># generate predictions</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
+    <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">answer</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">):]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy: &quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3-first-neural-lm-20-points">
+<h2>Exercise 3: First neural LM (20 points)<a class="headerlink" href="#exercise-3-first-neural-lm-20-points" title="Permalink to this heading">#</a></h2>
+<p>Next to reading and understanding package documentations, a key skill for NLP researchers and practitioners is reading and critically assessing NLP literature. The density, but also the style of NLP literature has undergone a significant shift in the recent years with increasing acceleration of progress. Your task in this exercise is to read a paper about one of the first successful neural langauge models, understand its key architectural components and compare how these key components have evolved in modern systems that were discussed in the lecture.</p>
+<blockquote>
+<div><p>Specifically, please read this paper and answer the following questions: <a class="reference external" href="https://www.jmlr.org/papers/volume3/bengio03a/bengio03a.pdf">Bengio et al. (2003)</a></p>
+<ul class="simple">
+<li><p>How were words / tokens represented? What is the difference / similarity to modern LLMs?</p></li>
+<li><p>How was the context represented? What is the difference / similarity to modern LLMs?</p></li>
+<li><p>What is the curse of dimensionality? Give a concrete example in the context of language modeling.</p></li>
+<li><p>Which training data was used? What is the difference / similarity to modern LLMs?</p></li>
+<li><p>Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</p></li>
+<li><p>Please formulate one question about the paper (not the same as the questions above) and post it to the dedicated <strong>Forum</strong> space, and <strong>answer 1 other question</strong> about the paper.</p></li>
+</ul>
+</div></blockquote>
+<p>Furthermore, your task is to carefully dissect the paper by Bengio et al. (2003) and analyse its structure and style in comparison to another more recent paper:  <a class="reference external" href="https://arxiv.org/pdf/1810.04805">Devlin et al. (2019) BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></p>
+<p><strong>TASK:</strong></p>
+<blockquote>
+<div><p>For each section of the Bengio et al. (2003) paper, what are key differences between the way it is written, the included contents, to the BERT paper (Devlin et al., 2019)? What are key similarities? Write max. 2 sentences per section.</p>
+</div></blockquote>
+<section id="answers">
+<h3>Answers<a class="headerlink" href="#answers" title="Permalink to this heading">#</a></h3>
+<section id="how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">
+<h4>How were words / tokens represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<p>A continuous real-vector for each word was used to represent similarity between words (instead of using discrete random or deterministic variables). That way, each word is associated with a specific point in the vector space, while the number of features is smaller than the size of the vocabulary.
+That idea reminds of the feature vectors used in information retrieval. However, in this model we are not looking in the co-occurring of words but in the probability distribution of word sequences from natural language text.
+Like the Bengio et al. paper, LLMs using a vector representation. However, LLMs are not working with continuous real-vector but with context-sensitive embeddings. Also, they divide the word into sub words.</p>
+</section>
+<section id="how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">
+<h4>How was the context represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<p>The context vector is formed for a given sequence of words. Here, the word vectors of the preceding words in the sequence are getting combined through a neural network architecture.
+In contrast Modern LLM work with self-attention and Transformers. Furthermore, the context size is fixed in the neural network model, but not with the LLMs.</p>
+</section>
+<section id="what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">
+<h4>What is the curse of dimensionality? Give a concrete example in the context of language modelling.<a class="headerlink" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling" title="Permalink to this heading">#</a></h4>
+<p>The curse of dimensionality occurs while analysing data in high-dimensional spaces. When the dimensionality rises, the volume of the space increases exponentially.
+One example is a joint distribution of 10 consecutive words with a vocabulary size of 100,000. Here we have 100,000^10-1 = 10^50-1 free parameters.
+This model is using a joint probability function of word feature vector sequences which is a smooth function of this feature values with a neural network.
+Doing so, the method is crucially different to modern LLMs.</p>
+</section>
+<section id="which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">
+<h4>Which training data was used? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<p>The training set is a sequence of words, the vocabulary large but finite.
+Comparative experiments were performed on the Brown corpus, where the first 800,000 words were used for the training data set.
+Furthermore, a experiment was run on the Associated Press News texts, where the training set consist of a stream of about 14 million words.
+The training data of Modern LLMs is much larger and consist a lot more data than that.</p>
+</section>
+<section id="which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">
+<h4>Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?<a class="headerlink" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al.:</p>
+<ul class="simple">
+<li><p>Using neural networks with softmax</p></li>
+<li><p>generalize unseen words with similarity between word vectors</p></li>
+</ul>
+<p>LLMs:</p>
+<ul class="simple">
+<li><p>Self-Attention</p></li>
+<li><p>embeddings</p></li>
+<li><p>Masking</p></li>
+<li><p>Special Tokens</p></li>
+<li><p>Fine-Tuning</p></li>
+</ul>
+</section>
+</section>
+<section id="differences-per-section">
+<h3>differences per section<a class="headerlink" href="#differences-per-section" title="Permalink to this heading">#</a></h3>
+<p>The section are selected as the main section of the Bengio et al. paper</p>
+<section id="abstract">
+<h4>Abstract<a class="headerlink" href="#abstract" title="Permalink to this heading">#</a></h4>
+<p>Similar in both papers: introducing problem and solution.</p>
+</section>
+<section id="introduction">
+<h4>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al. describes the challenges of statistical modelling and offers a neural network solution. A special focus is here the curse of dimensionality.
+Devlin et al. explains the limitation of existing pre-trained techniques and introduced BERT.
+Therefore, Bengio et al. introduces a new theoretical framework whereas Denvio et. al introduces an entire alternative model.
+Bengio et al. looks into earlier neural networks and statistical models whereas Devlin et al. focusses on feature based models like ELMo.</p>
+</section>
+<section id="a-neural-model">
+<h4>A neural model<a class="headerlink" href="#a-neural-model" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al. describes a neural network architecture. Devlin et al. explains a pre-trained transformer with a giant corpus, masked language modelling and finetuning.
+Both papers are explaining there architecture detailed and with pictures.</p>
+</section>
+<section id="parallel-implementation">
+<h4>Parallel Implementation<a class="headerlink" href="#parallel-implementation" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al. emphasizes parallel computation where the hardware no longer exists. There is no comaprable section in the paper of Devlin et al.</p>
+</section>
+<section id="experimental-results">
+<h4>Experimental Results<a class="headerlink" href="#experimental-results" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al. uses only perplexity reduction on the Brown dataset and the AP News Corpora. The paper also compares to SOTA.  Devlin et al. uses different NLP benchmarks.</p>
+</section>
+<section id="extensions-and-future-work">
+<h4>Extensions and Future Work<a class="headerlink" href="#extensions-and-future-work" title="Permalink to this heading">#</a></h4>
+<p>Bengio et al. describes different possible improvements that can be tried out in the future. Devlin et al.is keeping this part very short.</p>
+</section>
+<section id="conclusion">
+<h4>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h4>
+<p>Both papers summarize their break throughs. Nonetheless, the conclusion in the BERT paper is shorter than in the paper introducing the neural network solution.</p>
+</section>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./homework"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-advanced-prompting-strategies-16-points">Exercise 1: Advanced prompting strategies (16 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points">Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">How was the context represented? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">What is the curse of dimensionality? Give a concrete example in the context of language modelling.</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">Which training data was used? What is the difference / similarity to modern LLMs?</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#differences-per-section">differences per section</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#a-neural-model">A neural model</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-implementation">Parallel Implementation</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-results">Experimental Results</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-future-work">Extensions and Future Work</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
