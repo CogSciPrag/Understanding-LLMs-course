@@ -62,6 +62,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'homework/02-prompting_solution';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -488,6 +490,18 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-advanced-prompting-strategies-16-points">Exercise 1: Advanced prompting strategies (16 points)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points">Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2">Exercise 2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment-scheme">Experiment Scheme</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-language-inference">Natural Language Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Natural Language Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-choice-qa">Multiple-choice QA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Experiment Scheme</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generated-knowledge-prompting-with-numersense-dataset">Generated Knowledge Prompting with NumerSense Dataset</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting-with-commonsenseqa">Few-Shot Prompting with CommonSenseQA</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
@@ -615,6 +629,9 @@ document.write(`
 </ul>
 </li>
 </ul>
+</section>
+<section id="exercise-2">
+<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this heading">#</a></h2>
 <p><strong>Partial solution suggestion</strong></p>
 <ul class="simple">
 <li><p>6 pts / model, 2 pts for code</p>
@@ -626,133 +643,1363 @@ document.write(`
 <li><p>any kind of code that does what is asked for in this task is of course acceptable, but below is one possibility (for one model). If people manually evaluated the accuracy, it’s also fine (code is not required here).</p></li>
 <li><p>intuition suggests that some kind of few shot prompting should work, especially if the prompt is formatted as text continuation rather than some structured format for the smaller model; for the larger model, even more advanced things might work, e.g., formatting the QA as multiple choice could work.</p></li>
 </ul>
+<p>The following solution was created by Karahan Sarıtaş. It is much more that what was expected, but shows a very good and systematic approach to ivestigate different combinations of prompting/decoding strategies.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;EleutherAI/pythia-410m&quot;</span> <span class="c1"># &quot;EleutherAI/pythia-1.4b&quot;</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_name</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="c1"># define computational device</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/pythia-410m&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/pythia-410m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>c:\Users\karab\Desktop\Intro-LLMs\env\lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Device: cuda
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># prompt</span>
-<span class="n">input_text</span> <span class="o">=</span> <span class="s2">&quot;Given two pairs of sentences, decide whether they entail, contradict or are neutral to each other. The answer should be one of: </span><span class="se">\</span>
-<span class="s2">entailment, contradiction, neutral. Here are a 3 examples:</span><span class="se">\n\</span>
-<span class="s2">1. A man inspects the uniform of a figure in some East Asian country. The man is sleeping. contradiction.</span><span class="se">\</span>
-<span class="se">\n</span><span class="s2">2. An older and younger man smiling. Two men are smiling and laughing at the cats playing on the floor. neutral.</span><span class="se">\</span>
-<span class="se">\n</span><span class="s2">3. A soccer game with multiple males playing. Some men are playing a sport. entailment&quot;</span>
-
-<span class="c1"># there are various ways of doing this, e.g., people could have converted the examples above into a csv, or just use lists.</span>
-<span class="c1"># a list is used below. code should be functionally identical for both tasks (although the accuracy computation differs somewhat)</span>
-<span class="c1"># nli example, with labels in form of actual words (rather than e g A B C labels)</span>
-<span class="n">nli_inputs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A person on a horse jumps over a broken down airplane. A person is training his horse for a competition.&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A person on a horse jumps over a broken down airplane. A person is outdoors, on a horse.&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Children smiling and waving at camera. There are children present.&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A boy is jumping on skateboard in the middle of a red bridge. The boy skates down the sidewalk.&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">An older man sits with his orange juice at a small table in a coffee shop while employees in brightcolored shirts smile in the background. An older man drinks his juice as he waits for his daughter to get off work.&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">High fashion ladies wait outside a tram beside a crowd of people in the city. The women do not care what clothes they wear.&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">set_seed</span>  <span class="c1"># reproducibility</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">set_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_set</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Input: A person on a horse jumps over a broken down airplane. A person is training his horse for a competition. Relation:&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: A person on a horse jumps over a broken down airplane. A person is outdoors, on a horse. Relation:&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: Children smiling and waving at camera. There are children present. Relation:&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: A boy is jumping on skateboard in the middle of a red bridge. The boy skates down the sidewalk. Relation:&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: An older man sits with his orange juice at a small table in a coffee shop while employees in bright colored shirts smile in the background. An older man drinks his juice as he waits for his daughter to get off work. Relation:&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: High fashion ladies wait outside a tram beside a crowd of people in the city. The women do not care what clothes they wear. Relation:&quot;</span> <span class="c1"># contradiction</span>
 <span class="p">]</span>
-<span class="n">nli_labels</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;entailment&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;entailment&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;contradiction&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;contradiction&quot;</span>
-<span class="p">]</span>
-<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
-<span class="n">predicted_answers</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">predicted_answers_correctness</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">input_test</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nli_inputs</span><span class="p">,</span> <span class="n">nli_labels</span><span class="p">):</span>
-    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_attention_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="c1"># generate predictions</span>
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-        <span class="n">input_ids</span><span class="p">,</span>
-        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
-    <span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
-    <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">answer</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">):]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy: &quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>The few shot learning approach at least gets the models to output one of the three labels. However the accuracy of 1/3 is most likely due to chance. The result is the same for both model and both seem to inhibit a strong bias towards contradiction.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Select the correct label from the list of options, that answers the question. Here is an example:</span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">Sammy wanted to go to where the people were. Where might he go? answer options: A: race track, B: populated areas, C: the desert, D: apartment, E: roadblock</span><span class="se">\n</span><span class="s2">answer: B&quot;</span>
-<span class="n">questions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;The only baggage the woman checked was a drawstring bag, where was she heading with it?&quot;</span><span class="p">,</span> 
-              <span class="s2">&quot;To prevent any glare during the big football game he made sure to clean the dust of his what?&quot;</span><span class="p">,</span> 
-              <span class="s2">&quot;The president is the leader of what institution?&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;What kind of driving leads to accidents?&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;Can you name a good reason for attending school?&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;Stanley had a dream that was very vivid and scary. He had trouble telling it from what?&quot;</span><span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">answer_options = [&quot;garbage can, military, jewelry store, safe, airport&quot;,</span>
-<span class="sd">                  &quot;television, attic, corner, they cannot clean corner and library during football match they cannot need that, ground&quot;,</span>
-<span class="sd">                  &quot;walmart, white house, country, corporation, government&quot;,</span>
-<span class="sd">                  &quot;stressful, dangerous, fun, illegal, deadly&quot;,</span>
-<span class="sd">                  &quot;get smart, boredom, colds and flu, taking tests, spend time&quot;,</span>
-<span class="sd">                  &quot;imagination, reality, dreamworker, nightmare, awake&quot;]</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="n">answer_options</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;garbage can&quot;</span><span class="p">,</span> <span class="s2">&quot;military&quot;</span><span class="p">,</span> <span class="s2">&quot;jewelry store&quot;</span><span class="p">,</span> <span class="s2">&quot;safe&quot;</span><span class="p">,</span> <span class="s2">&quot;airport&quot;</span><span class="p">],</span>
-                  <span class="p">[</span><span class="s2">&quot;television&quot;</span><span class="p">,</span> <span class="s2">&quot;attic&quot;</span><span class="p">,</span> <span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;they cannot clean corner and library during football match they cannot need that&quot;</span><span class="p">,</span> <span class="s2">&quot;ground&quot;</span><span class="p">],</span>
-                  <span class="p">[</span><span class="s2">&quot;walmart&quot;</span><span class="p">,</span> <span class="s2">&quot;white house&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;corporation&quot;</span><span class="p">,</span> <span class="s2">&quot;government&quot;</span><span class="p">],</span>
-                  <span class="p">[</span><span class="s2">&quot;stressful&quot;</span><span class="p">,</span> <span class="s2">&quot;dangerous&quot;</span><span class="p">,</span> <span class="s2">&quot;fun&quot;</span><span class="p">,</span> <span class="s2">&quot;illegal&quot;</span><span class="p">,</span> <span class="s2">&quot;deadly&quot;</span><span class="p">],</span>
-                  <span class="p">[</span><span class="s2">&quot;get smart&quot;</span><span class="p">,</span> <span class="s2">&quot;boredom&quot;</span><span class="p">,</span> <span class="s2">&quot;colds and flu&quot;</span><span class="p">,</span> <span class="s2">&quot;taking tests&quot;</span><span class="p">,</span> <span class="s2">&quot;spend time&quot;</span><span class="p">],</span>
-                  <span class="p">[</span><span class="s2">&quot;imagination&quot;</span><span class="p">,</span> <span class="s2">&quot;reality&quot;</span><span class="p">,</span> <span class="s2">&quot;dreamworker&quot;</span><span class="p">,</span> <span class="s2">&quot;nightmare&quot;</span><span class="p">,</span> <span class="s2">&quot;awake&quot;</span><span class="p">]]</span>
-
-<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;airport&quot;</span><span class="p">,</span> <span class="s2">&quot;television&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;dangerous&quot;</span><span class="p">,</span> <span class="s2">&quot;get smart&quot;</span><span class="p">,</span> <span class="s2">&quot;reality&quot;</span><span class="p">]</span>
-<span class="n">predicted_answers</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">predicted_answers_correctness</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">question</span><span class="p">,</span> <span class="n">answer_option</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">questions</span><span class="p">,</span> <span class="n">answer_options</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="n">option_list</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">chars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">answer_option</span><span class="p">,</span> <span class="n">chars</span><span class="p">):</span>
-        <span class="n">option_list</span> <span class="o">+=</span> <span class="n">c</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">option</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
-    <span class="n">input_text</span> <span class="o">=</span> <span class="n">prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; answer options: &quot;</span> <span class="o">+</span> <span class="n">option_list</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">answer: &quot;</span>
-    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_attention_mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="c1"># generate predictions</span>
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-        <span class="n">input_ids</span><span class="p">,</span>
-        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
-        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="c1"># decode the prediction (i.e., convert tokens back to text)</span>
-    <span class="n">answer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Predicted continuation: &quot;</span><span class="p">,</span> <span class="n">answer</span><span class="p">)</span>
-    <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">answer</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_text</span> <span class="o">+</span> <span class="n">input_test</span><span class="p">):]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">predicted_answers_correctness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy: &quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">predicted_answers_correctness</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">decoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># greedy decoding</span>
+<span class="k">def</span> <span class="nf">greedy_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span> <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">beam_search_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_beams</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">num_beams</span><span class="o">=</span><span class="n">num_beams</span><span class="p">,</span>
+        <span class="n">early_stopping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>   <span class="c1"># option `early_stopping` implies stopping when all beams reach the end-of-sentence token</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">pure_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">softmax_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">):</span>
+    <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>  <span class="c1"># higher temperature means more randomness</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">top_k_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="c1"># the set of most likely words the summed probability of which exceeds threshold p  (also called nucleus sampling)</span>
+<span class="k">def</span> <span class="nf">top_p_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+    <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">contrastive_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">penalty_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
+        <span class="n">penalty_alpha</span><span class="o">=</span><span class="n">penalty_alpha</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="experiment-scheme">
+<h2>Experiment Scheme<a class="headerlink" href="#experiment-scheme" title="Permalink to this heading">#</a></h2>
+<p>In our experiments we worked on the following configurations:</p>
+<ul class="simple">
+<li><p>Two models, <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code> and <code class="docutils literal notranslate"><span class="pre">pythia-1.4b</span></code> are used to generate the output.</p></li>
+</ul>
+<section id="natural-language-inference">
+<h3>Natural Language Inference<a class="headerlink" href="#natural-language-inference" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>We use “Instruction Prompting” to make LM better understand user intention and follow the instruction.</p></li>
+<li><p>Prefix of the input is given as follows:<br />
+“Please classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”.”</p></li>
+<li><p>For each model, we test the following prompt engineering techniques:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(k\)</span>-shot learning</p>
+<ul>
+<li><p>Zero-shot learning (no example is provided)</p></li>
+<li><p>One-shot learning (only one example is provided)</p></li>
+<li><p>Few-shot learning (<span class="math notranslate nohighlight">\(k\)</span> = 3) (1 example for each relation)</p></li>
+<li><p>Few-shot learning (<span class="math notranslate nohighlight">\(k\)</span> = 9) (3 examples for each relation)</p></li>
+</ul>
+</li>
+<li><p>Self-consistency prompting (softmax sampling) with majority vote</p></li>
+</ul>
+</li>
+<li><p>For each <span class="math notranslate nohighlight">\(k\)</span>-shot learning scenario, we test the following decoding strategies:</p>
+<ul>
+<li><p>Greedy decoding</p></li>
+<li><p>Pure sampling</p></li>
+<li><p>Softmax sampling (temperature = 0.7)</p></li>
+<li><p>Top-<span class="math notranslate nohighlight">\(k\)</span> sampling (<span class="math notranslate nohighlight">\(k\)</span> = 50)</p></li>
+<li><p>Top-<span class="math notranslate nohighlight">\(p\)</span> sampling (<span class="math notranslate nohighlight">\(p\)</span> = 0.9)</p></li>
+<li><p>Beam search (beam size = 5)</p></li>
+<li><p>Contrastive decoding (penalty=0.6, <span class="math notranslate nohighlight">\(k\)</span>=4)</p></li>
+</ul>
+</li>
+</ul>
+<p>In self-consistency, we apply majority vote on the outputs generate using softmax sampling.</p>
+<p>Disclaimer: As all these methods have different hyperparameters to tune, therefore the comparison is not completely fair. However, we believe that this comparison can give us a general idea of the performance of these methods.</p>
+</section>
+</section>
+<section id="id1">
+<h2>Natural Language Inference<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<p>Natural language inference: the task is to classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”.</p>
+<ul class="simple">
+<li><p>A person on a horse jumps over a broken down airplane. A person is training his horse for a competition. <strong>neutral</strong></p></li>
+<li><p>A person on a horse jumps over a broken down airplane. A person is outdoors, on a horse. <strong>entailment</strong></p></li>
+<li><p>Children smiling and waving at camera. There are children present. <strong>entailment</strong></p></li>
+<li><p>A boy is jumping on skateboard in the middle of a red bridge. The boy skates down the sidewalk. <strong>contradiction</strong></p></li>
+<li><p>An older man sits with his orange juice at a small table in a coffee shop while employees in bright colored shirts smile in the background. An older man drinks his juice as he waits for his daughter to get off work. <strong>neutral</strong></p></li>
+<li><p>High fashion ladies wait outside a tram beside a crowd of people in the city. The women do not care what clothes they wear. <strong>contradiction</strong></p></li>
+</ul>
+<p>Few-shot examples are collected from the Stanford Natural Language Inference (SNLI) Corpus. <br />
+Paper: https://arxiv.org/pdf/1508.05326</p>
+<p>We used two sets of few-shot examples to experiment on. First set consists of entirely independent sentences, while the second set consists of sentences that are related to each other. In the second set, three different “hypothesis” sentences are created for each “premise” sentence. The idea is to prevent the model from relying solely on the first sentence for the relation prediction.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Model</p></th>
+<th class="head text-center"><p>Prompt Engineering</p></th>
+<th class="head text-center"><p>Few-Shot Examples</p></th>
+<th class="head text-center"><p>Best Accuracy</p></th>
+<th class="head text-center"><p>Majority Vote Accuracy</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Zero-shot learning</p></td>
+<td class="text-center"><p>-</p></td>
+<td class="text-center"><p>0/6</p></td>
+<td class="text-center"><p>0/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>One-shot learning</p></td>
+<td class="text-center"><p>-</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>3/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Self-consistency  (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Self-consistency  (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Zero-shot learning</p></td>
+<td class="text-center"><p>-</p></td>
+<td class="text-center"><p>0/6</p></td>
+<td class="text-center"><p>0/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>One-shot learning</p></td>
+<td class="text-center"><p>-</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p><strong>4/6</strong> (softmax sampling)</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p><strong>4/6</strong> (contrastive decoding)</p></td>
+<td class="text-center"><p>3/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few-shot learning (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p>3/6</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Self-consistency  (<span class="math notranslate nohighlight">\(k = 3\)</span>)</p></td>
+<td class="text-center"><p>Independent</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Self-consistency  (<span class="math notranslate nohighlight">\(k = 9\)</span>)</p></td>
+<td class="text-center"><p>Related</p></td>
+<td class="text-center"><p>2/6</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Best Accuracy: For optimal accuracy, we generate outputs for each decoding scheme and select the one with the highest accuracy, disregarding the others.</p></li>
+<li><p>Majority Vote Accuracy (few-shot learning): Accuracy is determined by considering all outputs from different decoding schemes for a given input, with the final output decided by majority vote.</p></li>
+</ul>
+<p>Observations:</p>
+<ul class="simple">
+<li><p>When only the input is provided without any example or CoT prompting, the model doesn’t even seem to understand the task - although the task is explicitly stated in the prompt. It attempts to complete the sentence with irrelevant information.</p></li>
+<li><p>We tested all these approaches with and without CoT prompts. In this particular case, using the given models and few-shot examples, there doesn’t seem to be any difference between prompting for reasoning and not.</p></li>
+<li><p>There doesn’t appear to be a hierarchy among the different decoding strategies, as the leading one varies from experiment to experiment.</p></li>
+<li><p>The model seems to achieve the same accuracy for both independent and related few-shot examples.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pythia-1.4b</span></code> appears to outperform <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code> when the few-shot examples are provided. However, the test set needs to be larger to draw a solid conclusion. Best accuracies are achieved when <span class="math notranslate nohighlight">\(k=3\)</span> for both of the models.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># independent</span>
+<span class="n">few_shot_examples_v1</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Input: Children smiling and waving at camera. There are children present. Relation: entailment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Input: A man inspects the uniform of a figure in some East Asian country. The man is sleeping. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: An older and younger man smiling. Two men are smiling and laughing at the cats playing on the floor. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: This church choir sings to the masses as they sing joyous songs from the book at a church. The church is filled with song. Relation: entailment&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: A black race car starts up in front of a crowd of people. A man is driving down a lonely road. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: A smiling costumed woman is holding an umbrella. A happy woman in a fairy costume holds an umbrella. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: A soccer game with multiple males playing. Some men are playing a sport. Relation: entailment&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: Four dirty and barefooted children. Four kids won awards for &#39;cleanest feet&#39;. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: A woman with a green headscarf, blue shirt and a very big grin.	The woman is young. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># related</span>
+<span class="n">few_shot_examples_v2</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Input: Children smiling and waving at camera. There are children present. Relation: entailment&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: Children smiling and waving at camera. The kids are frowning. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: Children smiling and waving at camera. They are smiling at their parents. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: This church choir sings to the masses as they sing joyous songs from the book at a church. The church is filled with song. Relation: entailment&quot;</span><span class="p">,</span>  <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: This church choir sings to the masses as they sing joyous songs from the book at a church. A choir singing at a baseball game. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: This church choir sings to the masses as they sing joyous songs from the book at a church. The church has cracks in the ceiling. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+    <span class="s2">&quot;Input: A woman with a green headscarf, blue shirt and a very big grin.	The woman is very happy. Relation: entailment&quot;</span><span class="p">,</span> <span class="c1"># entailment</span>
+    <span class="s2">&quot;Input: A woman with a green headscarf, blue shirt and a very big grin.	The woman has been shot. Relation: contradiction&quot;</span><span class="p">,</span> <span class="c1"># contradiction</span>
+    <span class="s2">&quot;Input: A woman with a green headscarf, blue shirt and a very big grin.	The woman is young. Relation: neutral&quot;</span><span class="p">,</span> <span class="c1"># neutral</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">experiment</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decoding scheme: </span><span class="si">{</span><span class="n">decoding</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">few_shot</span> <span class="o">=</span> <span class="n">few_shot_examples</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">few_shot</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;Please classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”. </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">input_text</span> <span class="o">=</span> <span class="n">task</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span>  <span class="n">test</span>
+
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">) &quot;</span> <span class="o">+</span> <span class="n">test</span><span class="p">)</span>
+        <span class="n">pretty_print</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="n">input_text</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">majority_vote</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">few_shot</span> <span class="o">=</span> <span class="n">few_shot_examples</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">few_shot</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;Please classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”. </span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">task</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span>  <span class="n">test</span>
+
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">) &quot;</span> <span class="o">+</span> <span class="n">test</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">decoding</span> <span class="ow">in</span> <span class="p">[</span><span class="n">greedy_decoding</span><span class="p">,</span> <span class="n">beam_search_decoding</span><span class="p">,</span> <span class="n">pure_sampling_decoding</span><span class="p">,</span> <span class="n">softmax_sampling_decoding</span><span class="p">,</span> <span class="n">top_k_sampling_decoding</span><span class="p">,</span> <span class="n">top_p_sampling_decoding</span><span class="p">,</span> <span class="n">contrastive_decoding</span><span class="p">]:</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+      <span class="n">decoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># decoding strategies: greedy, beam search, pure sampling, softmax sampling, top-k sampling, top-p sampling, contrastive decoding</span>
+<span class="k">for</span> <span class="n">decoding</span> <span class="ow">in</span> <span class="p">[</span><span class="n">greedy_decoding</span><span class="p">,</span> <span class="n">beam_search_decoding</span><span class="p">,</span> <span class="n">pure_sampling_decoding</span><span class="p">,</span> <span class="n">softmax_sampling_decoding</span><span class="p">,</span> <span class="n">top_k_sampling_decoding</span><span class="p">,</span> <span class="n">top_p_sampling_decoding</span><span class="p">,</span> <span class="n">contrastive_decoding</span><span class="p">]:</span>
+    <span class="n">experiment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples_v2</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+
+<span class="c1">## GT:  neutral entailment entailment contradiction neutral contradiction</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gc</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">majority_vote</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">few_shot_examples_v1</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+<span class="c1">## GT:  neutral entailment entailment contradiction neutral contradiction</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">self_consistency</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">few_shot</span> <span class="o">=</span> <span class="n">few_shot_examples</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">few_shot</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;Please classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”.</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">task</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span>  <span class="n">test</span>
+
+
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">) &quot;</span> <span class="o">+</span> <span class="n">test</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+      <span class="n">output</span> <span class="o">=</span> <span class="n">decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+      <span class="n">decoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">self_consistency</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="n">softmax_sampling_decoding</span><span class="p">,</span> <span class="n">few_shot_examples_v1</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+<span class="c1">## GT:  neutral entailment entailment contradiction neutral contradiction</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="multiple-choice-qa">
+<h2>Multiple-choice QA<a class="headerlink" href="#multiple-choice-qa" title="Permalink to this heading">#</a></h2>
+<p>Multiple-choice QA: the task is to predict the correct answer option for the question, given the question and the options.</p>
+</section>
+<section id="id2">
+<h2>Experiment Scheme<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
+<p>In our experiments we worked on the following configurations:</p>
+<ul class="simple">
+<li><p>Two models, <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code> and <code class="docutils literal notranslate"><span class="pre">pythia-1.4b</span></code> are used to generate the output.</p></li>
+<li><p>Few-shot examples are collected from two different datasets: <a class="reference external" href="https://huggingface.co/datasets/tau/commonsense_qa">CommonSenseQA</a> and <a class="reference external" href="https://inklab.usc.edu/NumerSense/">NumerSense</a> dataset. CommonsenseQA is a multiple-choice question answering dataset that requires different types of commonsense knowledge to predict the correct answers . It contains 12,102 questions with one correct answer and four distractor answers. NumerSense is a numerical commonsense reasoning probing task, with a diagnostic dataset consisting of 3,145 masked-word-prediction probes.</p></li>
+<li><p>We primarily explored two prompting techniques: Generated Knowledge Prompting (with few-shot examples) and Few-shot Prompting. In Generated Knowledge Prompting, the approach involves generating knowledge statements pertaining to the given question. Subsequently, we evaluate the log probability of each answer option being generated given these knowledge statements. This methodology enables the model to either support or oppose its own answer. We also employ two output extraction techniques: scoring the answers based on log-probabilities and classical generation. Classical generation utilizes the log-probabilities to generate new tokens. Hence, these approaches initially appear similar. However, the former allows us to constrain the model’s output to only one of the options, thereby limiting its output possibilities. We worked on the following combinations:</p>
+<ul>
+<li><p>Generated Knowledge Prompting with NumerSense dataset + scoring</p></li>
+<li><p>Generated Knowledge Prompting with CommonSenseQA dataset + scoring</p></li>
+<li><p>Few Shot Learning with CommonSenseQA dataset + scoring</p></li>
+<li><p>Few Shot Learning with CommonSenseQA dataset + classical generation (softmax sampling)</p></li>
+</ul>
+</li>
+</ul>
+<p>For the generated knowledge prompting, we generated five knowledge statements for each question. For each answer choice 𝑎, we identified the knowledge statement that best supports it by calculating the log probability of generating that answer for each augmented prompt (with the knowledge statement). This process allows us to determine the maximum probability for each answer. Ultimately, we select the answer with the highest maximum probability.</p>
+<p>All the few-shot prompts can be found below.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Model</p></th>
+<th class="head text-center"><p>Prompt Engineering</p></th>
+<th class="head text-center"><p>Dataset</p></th>
+<th class="head text-center"><p>Generation Technique</p></th>
+<th class="head text-center"><p>Accuracy</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Generated Knowledge Prompting</p></td>
+<td class="text-center"><p>NumerSense</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p>3/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Generated Knowledge Prompting</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p><strong>4/6</strong></p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few Shot learning</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p>0/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-410m</p></td>
+<td class="text-center"><p>Few Shot learning</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Generation with Softmax Sampling</p></td>
+<td class="text-center"><p>1/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Generated Knowledge Prompting</p></td>
+<td class="text-center"><p>NumerSense</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Generated Knowledge Prompting</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few Shot learning</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Log-Probability scoring</p></td>
+<td class="text-center"><p>1/6</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>pythia-1.4b</p></td>
+<td class="text-center"><p>Few Shot learning</p></td>
+<td class="text-center"><p>CommonSenseQA</p></td>
+<td class="text-center"><p>Generation with Softmax Sampling</p></td>
+<td class="text-center"><p>2/6</p></td>
+</tr>
+</tbody>
+</table>
+<p>Observations:</p>
+<ul class="simple">
+<li><p>Overall, generated knowledge prompting seems to outperform vanilla few shot learning (no knowledge statement is generated).</p></li>
+<li><p>Maximum accuracy is achieved using generated knowledge prompting on CommonSenseQA with <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code>.</p></li>
+</ul>
+<section id="generated-knowledge-prompting-with-numersense-dataset">
+<h3>Generated Knowledge Prompting with NumerSense Dataset<a class="headerlink" href="#generated-knowledge-prompting-with-numersense-dataset" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qa</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;The only baggage the woman checked was a drawstring bag, where was she heading with it?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;garbage can&quot;</span><span class="p">,</span> <span class="s2">&quot;military&quot;</span><span class="p">,</span> <span class="s2">&quot;jewelry store&quot;</span><span class="p">,</span> <span class="s2">&quot;safe&quot;</span><span class="p">,</span> <span class="s2">&quot;airport&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;To prevent any glare during the big football game he made sure to clean the dust of his what?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;television&quot;</span><span class="p">,</span> <span class="s2">&quot;attic&quot;</span><span class="p">,</span> <span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;they cannot clean corner and library during football match they cannot need that&quot;</span><span class="p">,</span> <span class="s2">&quot;ground&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;The president is the leader of what institution?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;walmart&quot;</span><span class="p">,</span> <span class="s2">&quot;white house&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;corporation&quot;</span><span class="p">,</span> <span class="s2">&quot;government&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;What kind of driving leads to accidents?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;stressful&quot;</span><span class="p">,</span> <span class="s2">&quot;dangerous&quot;</span><span class="p">,</span> <span class="s2">&quot;fun&quot;</span><span class="p">,</span> <span class="s2">&quot;illegal&quot;</span><span class="p">,</span> <span class="s2">&quot;deadly&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Can you name a good reason for attending school?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get smart&quot;</span><span class="p">,</span> <span class="s2">&quot;boredom&quot;</span><span class="p">,</span> <span class="s2">&quot;colds and flu&quot;</span><span class="p">,</span> <span class="s2">&quot;taking tests&quot;</span><span class="p">,</span> <span class="s2">&quot;spend time&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Stanley had a dream that was very vivid and scary. He had trouble telling it from what?&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;imagination&quot;</span><span class="p">,</span> <span class="s2">&quot;reality&quot;</span><span class="p">,</span> <span class="s2">&quot;dreamworker&quot;</span><span class="p">,</span> <span class="s2">&quot;nightmare&quot;</span><span class="p">,</span> <span class="s2">&quot;awake&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="c1"># GT: airport - television - country - dangerous - get smart - reality</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run this to get NumerSense dataset few shot prompts</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;How many wings do penguins have?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;How many sides does a parallelogram have?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;What is the number of limbs a typical human being has?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;How many feet are there in a yard?&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">knowledges</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Birds have two wings. Penguin is a kind of bird.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A rectangular is a parallelogram. A square is a parallelogram.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Human beings have four limbs.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A yard is three feet.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Creating the dataframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
+    <span class="s1">&#39;knowledge&#39;</span><span class="p">:</span> <span class="n">knowledges</span>
+<span class="p">})</span>
+<span class="n">df</span>
+
+
+<span class="n">few_shot_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{q}</span><span class="s2"> We know that </span><span class="si">{k}</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="n">few_shot_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;knowledge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructed few shot prompt</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constructed few shot prompt
+How many wings do penguins have? We know that birds have two wings. penguin is a kind of bird.
+How many sides does a parallelogram have? We know that a rectangular is a parallelogram. a square is a parallelogram.
+What is the number of limbs a typical human being has? We know that human beings have four limbs.
+How many feet are there in a yard? We know that a yard is three feet.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run this to get CommonSenseQA dataset few shot prompts</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Google Maps and other highway and street GPS services have replaced what?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The fox walked from the city into the forest, what was it looking for?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;You can share files with someone if you have a connection to a what?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Too many people want exotic snakes. The demand is driving what to carry them?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The bodyguard was good at his duties, he made the person who hired him what?&quot;</span>
+<span class="p">]</span>
+
+<span class="n">knowledges</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Electronic maps are the modern version of paper atlas.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Natural habitats are usually away from cities.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Files can be shared over the Internet.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Some people raise snakes as pets.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The job of bodyguards is to ensure the safety and security of the employer.&quot;</span>
+<span class="p">]</span>
+<span class="c1"># Creating the dataframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
+    <span class="s1">&#39;knowledge&#39;</span><span class="p">:</span> <span class="n">knowledges</span>
+<span class="p">})</span>
+<span class="n">df</span>
+
+
+<span class="n">few_shot_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="si">{q}</span><span class="s2"> We know that </span><span class="si">{k}</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+    <span class="n">few_shot_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">],</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;knowledge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constructed few shot prompt</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Constructed few shot prompt
+Google Maps and other highway and street GPS services have replaced what? We know that electronic maps are the modern version of paper atlas.
+The fox walked from the city into the forest, what was it looking for? We know that natural habitats are usually away from cities.
+You can share files with someone if you have a connection to a what? We know that files can be shared over the internet.
+Too many people want exotic snakes. The demand is driving what to carry them? We know that some people raise snakes as pets.
+The bodyguard was good at his duties, he made the person who hired him what? We know that the job of bodyguards is to ensure the safety and security of the employer.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Only for visualizing a generated knowledge:</span>
+<span class="n">question</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">choices</span> <span class="o">=</span> <span class="n">qa</span><span class="p">[</span><span class="n">question</span><span class="p">]</span>
+<span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">knowledge_statements</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt_input_ids</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+<span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">knowledge_statements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span>
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge: &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+bags are usually carried by the person carrying them.
+
+So,
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
+<span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">no_knowledge_statements</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">):</span>
+  <span class="n">answers</span> <span class="o">=</span> <span class="n">qa</span><span class="p">[</span><span class="n">question</span><span class="p">]</span>
+  <span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">prompt_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot; We know that &quot;</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+  <span class="n">knowledge_statements</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_knowledge_statements</span><span class="p">):</span>
+    <span class="n">knowledge</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">prompt_input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span>
+    <span class="p">)</span>
+
+    <span class="c1"># access the knowledge statements (i.e., only text that comes after prompt)</span>
+    <span class="n">knowledge</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+        <span class="n">knowledge</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">prompt_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span>
+        <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">knowledge_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledge</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated knowledge: &quot;</span><span class="p">,</span> <span class="n">knowledge</span><span class="p">)</span>
+
+  <span class="c1"># now we have knowledge statements in hand</span>
+  <span class="n">maximizing_answer</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="n">maximizing_log_prob</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+    <span class="n">log_probs_for_a</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">knowledge</span> <span class="ow">in</span> <span class="n">knowledge_statements</span><span class="p">:</span>
+        <span class="c1"># construct the full prompt</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># construct the prompt without the answer to create a mask which will</span>
+        <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+        <span class="n">context_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">knowledge</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">question</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># tokenize the prompt</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                            <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># tokenize the context prompt</span>
+        <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+        <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+        <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+        <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+        <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+        <span class="c1"># generate the answer</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+        <span class="p">)</span>
+        <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+        <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">log_probs_for_a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+    <span class="n">max_prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">log_probs_for_a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_prob</span> <span class="o">&gt;</span> <span class="n">maximizing_log_prob</span><span class="p">:</span>
+        <span class="n">maximizing_log_prob</span> <span class="o">=</span> <span class="n">max_prob</span>
+        <span class="n">maximizing_answer</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s2">&quot;Answer probabilities for each knowledge statement: &quot;</span><span class="p">,</span> <span class="n">log_probs_for_a</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">maximizing_answer</span><span class="p">,</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">maximizing_log_prob</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+the woman checked her luggage, but she didn&#39;t take any of her
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+baggage is usually checked in checked baggage.
+The man was not
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+women carry small bags, especially when they&#39;re on the go.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+the woman checked her bag before she left.
+What was the reason
+Generated knowledge:  
+bags are usually carried in a carrier bag or a briefcase.
+
+Answer  garbage can Answer probabilities for each knowledge statement:  [-8.651183128356934, -8.358133316040039, -9.2638578414917, -8.854644775390625, -8.918338775634766]
+Answer  military Answer probabilities for each knowledge statement:  [-13.746541976928711, -13.27782917022705, -14.510452270507812, -14.339978218078613, -14.297685623168945]
+Answer  jewelry store Answer probabilities for each knowledge statement:  [-9.776968002319336, -10.095916748046875, -10.659232139587402, -9.95555591583252, -10.486684799194336]
+Answer  safe Answer probabilities for each knowledge statement:  [-11.570777893066406, -11.832415580749512, -13.639629364013672, -12.748946189880371, -13.790425300598145]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Answer  airport Answer probabilities for each knowledge statement:  [-11.538839340209961, -9.888652801513672, -12.38808536529541, -11.434816360473633, -11.631083488464355]
+Selected answer  garbage can with log P  -8.358133316040039
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  umpires are also responsible for cleaning the field.
+The police officer was
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  icing is used to stop glare on the ice.
+The computer software was
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  icing is a technique used to prevent glare in the game of football.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  umpires are responsible for preventing any glare.
+The person who wanted to
+Generated knowledge:  umpires are the workers who make sure the game goes well.
+You
+Answer  television Answer probabilities for each knowledge statement:  [-10.235928535461426, -9.407893180847168, -8.890667915344238, -9.370429039001465, -11.198206901550293]
+Answer  attic Answer probabilities for each knowledge statement:  [-13.596774101257324, -12.11440658569336, -11.61604118347168, -11.67751693725586, -13.281587600708008]
+Answer  corner Answer probabilities for each knowledge statement:  [-11.031961441040039, -10.703117370605469, -10.687712669372559, -11.021014213562012, -11.909016609191895]
+Answer  they cannot clean corner and library during football match they cannot need that Answer probabilities for each knowledge statement:  [-6.271496772766113, -6.655148983001709, -6.51792049407959, -6.4584479331970215, -6.452688217163086]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Answer  ground Answer probabilities for each knowledge statement:  [-8.554006576538086, -9.23339557647705, -8.114116668701172, -8.754240989685059, -9.520474433898926]
+Selected answer  they cannot clean corner and library during football match they cannot need that with log P  -6.271496772766113
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  umpires are the people who make the decisions about what to call an 
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+presidents can be elected by the people.
+
+The president is
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+the president is the leader of what institution? We know that the president
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+the president has a lot of power, but the president is also the
+Generated knowledge:  umpires are the people who officiate at baseball games.
+The cat
+Answer  walmart Answer probabilities for each knowledge statement:  [-8.142420768737793, -8.972271919250488, -8.90455436706543, -8.03041934967041, -7.8204474449157715]
+Answer  white house Answer probabilities for each knowledge statement:  [-8.612419128417969, -7.63491153717041, -7.091569900512695, -6.645547866821289, -8.576825141906738]
+Answer  country Answer probabilities for each knowledge statement:  [-10.13504695892334, -12.369648933410645, -13.64605712890625, -11.518067359924316, -11.83149242401123]
+Answer  corporation Answer probabilities for each knowledge statement:  [-12.276028633117676, -14.06977367401123, -16.650859832763672, -13.893194198608398, -13.85256576538086]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Answer  government Answer probabilities for each knowledge statement:  [-10.173294067382812, -9.73061466217041, -11.749650001525879, -9.258166313171387, -10.929475784301758]
+Selected answer  white house with log P  -6.645547866821289
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+driving is a very dangerous job.
+What kind of car was the
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  ####### has a very high accident rate.
+What do you mean by
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+There are many types of accidents:
+
+Faulty brakes
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+- the driver is under the influence of drugs
+- the driver is
+Generated knowledge:  
+accidents happen because of what? We know that we can’t
+Answer  stressful Answer probabilities for each knowledge statement:  [-14.708761215209961, -15.258934020996094, -15.46780014038086, -14.419212341308594, -14.7927885055542]
+Answer  dangerous Answer probabilities for each knowledge statement:  [-10.114299774169922, -11.092577934265137, -11.165120124816895, -9.094646453857422, -10.583547592163086]
+Answer  fun Answer probabilities for each knowledge statement:  [-14.501969337463379, -14.986560821533203, -16.233652114868164, -14.622293472290039, -13.889074325561523]
+Answer  illegal Answer probabilities for each knowledge statement:  [-11.216497421264648, -13.336479187011719, -12.792975425720215, -9.515718460083008, -11.635777473449707]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Answer  deadly Answer probabilities for each knowledge statement:  [-12.690098762512207, -14.63901424407959, -15.035849571228027, -12.710489273071289, -13.199512481689453]
+Selected answer  dangerous with log P  -9.094646453857422
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+school is expensive.
+
+A:
+
+There are several reasons
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+schools are meant to prepare students for the future.
+
+The
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+schools are for learning and education, they do not teach people how
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+schools will be the place for you to learn what? We know
+Generated knowledge:  ith the education system.
+
+A:
+
+I&#39;m not sure
+Answer  get smart Answer probabilities for each knowledge statement:  [-8.589640617370605, -8.743338584899902, -8.013982772827148, -8.673873901367188, -9.343545913696289]
+Answer  boredom Answer probabilities for each knowledge statement:  [-7.858763694763184, -7.82045841217041, -7.263005256652832, -7.9718918800354, -7.668207168579102]
+Answer  colds and flu Answer probabilities for each knowledge statement:  [-5.3271989822387695, -5.516082286834717, -5.24860143661499, -5.370843410491943, -5.465941429138184]
+Answer  taking tests Answer probabilities for each knowledge statement:  [-8.29901123046875, -7.830539703369141, -7.338224411010742, -8.12620735168457, -7.884116172790527]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Answer  spend time Answer probabilities for each knowledge statement:  [-7.690305233001709, -7.893522262573242, -7.179699897766113, -7.780394554138184, -8.239646911621094]
+Selected answer  colds and flu with log P  -5.24860143661499
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+Stanley had trouble telling it from what? We know that Stanley had
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  umpires are often called to decide games.
+A person who is very
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+Stanley had a dream that was very vivid and scary. He had
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input&#39;s `attention_mask` to obtain reliable results.
+Setting `pad_token_id` to `eos_token_id`:0 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated knowledge:  
+Stanley had an aversion to heights.
+The man was a
+Generated knowledge:  icing is used in medicine to treat pain.
+The computer was a big
+Answer  imagination Answer probabilities for each knowledge statement:  [-14.361309051513672, -11.466972351074219, -12.520139694213867, -9.94018840789795, -11.04466724395752]
+Answer  reality Answer probabilities for each knowledge statement:  [-12.76948356628418, -9.612512588500977, -9.671875, -7.55483865737915, -8.412652015686035]
+Answer  dreamworker Answer probabilities for each knowledge statement:  [-14.165630340576172, -10.419055938720703, -12.055522918701172, -12.118217468261719, -11.015838623046875]
+Answer  nightmare Answer probabilities for each knowledge statement:  [-15.019416809082031, -11.555357933044434, -11.577406883239746, -10.60135555267334, -11.841059684753418]
+Answer  awake Answer probabilities for each knowledge statement:  [-15.815916061401367, -12.528425216674805, -13.598419189453125, -13.201595306396484, -13.424176216125488]
+Selected answer  reality with log P  -7.55483865737915
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="few-shot-prompting-with-commonsenseqa">
+<h3>Few-Shot Prompting with CommonSenseQA<a class="headerlink" href="#few-shot-prompting-with-commonsenseqa" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;A revolving door is convenient for two direction travel, but it also serves as a security measure at a what?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. bank&#39;</span><span class="p">,</span> <span class="s1">&#39;B. library&#39;</span><span class="p">,</span> <span class="s1">&#39;C. department store&#39;</span><span class="p">,</span> <span class="s1">&#39;D. mall&#39;</span><span class="p">,</span> <span class="s1">&#39;E. new york&#39;</span><span class="p">],</span> <span class="s1">&#39;A&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;What do people aim to do at work?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. complete job&#39;</span><span class="p">,</span> <span class="s1">&#39;B. learn from each other&#39;</span><span class="p">,</span> <span class="s1">&#39;C. kill animals&#39;</span><span class="p">,</span> <span class="s1">&#39;D. wear hats&#39;</span><span class="p">,</span> <span class="s1">&#39;E. talk to each other&#39;</span><span class="p">],</span> <span class="s1">&#39;A&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Where would you find magazines alongside many other printed works?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. doctor&#39;</span><span class="p">,</span> <span class="s1">&#39;B. bookstore&#39;</span><span class="p">,</span> <span class="s1">&#39;C. market&#39;</span><span class="p">,</span> <span class="s1">&#39;D. train station&#39;</span><span class="p">,</span> <span class="s1">&#39;E. mortuary&#39;</span><span class="p">],</span> <span class="s1">&#39;B&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Where are you likely to find a hamburger?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. fast food restaurant&#39;</span><span class="p">,</span> <span class="s1">&#39;B. pizza&#39;</span><span class="p">,</span> <span class="s1">&#39;C. ground up dead cows&#39;</span><span class="p">,</span> <span class="s1">&#39;D. mouth&#39;</span><span class="p">,</span> <span class="s1">&#39;E. cow carcass&#39;</span><span class="p">],</span> <span class="s1">&#39;A&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;James was looking for a good place to buy farmland. Where might he look?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. midwest&#39;</span><span class="p">,</span> <span class="s1">&#39;B. countryside&#39;</span><span class="p">,</span> <span class="s1">&#39;C. estate&#39;</span><span class="p">,</span> <span class="s1">&#39;D. farming areas&#39;</span><span class="p">,</span> <span class="s1">&#39;E. illinois&#39;</span><span class="p">],</span> <span class="s1">&#39;A&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;What island country is ferret popular?&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;A. own home&#39;</span><span class="p">,</span> <span class="s1">&#39;B. north carolina&#39;</span><span class="p">,</span> <span class="s1">&#39;C. great britain&#39;</span><span class="p">,</span> <span class="s1">&#39;D. hutch&#39;</span><span class="p">,</span> <span class="s1">&#39;E. outdoors&#39;</span><span class="p">],</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Question&#39;</span><span class="p">,</span> <span class="s1">&#39;Answer_Options&#39;</span><span class="p">,</span> <span class="s1">&#39;Correct_Answer&#39;</span><span class="p">])</span>
+
+<span class="c1"># Define task and instructions prompts</span>
+<span class="n">task_prompt</span> <span class="o">=</span> <span class="s2">&quot;Task: Predict the correct answer option for the question provided, considering the available options.&quot;</span>
+<span class="n">instructions_prompt</span> <span class="o">=</span> <span class="s2">&quot;Instructions: Review the question and choices provided, then select the option you believe is the correct answer.&quot;</span>
+
+<span class="c1"># Generate prompt with multiple examples</span>
+<span class="n">few_shot_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task_prompt</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">instructions_prompt</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Question: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Question&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">Options:</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Answer_Options&#39;</span><span class="p">]:</span>
+        <span class="n">few_shot_prompt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">few_shot_prompt</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Selected Choice: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Correct_Answer&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+<span class="c1"># Display prompt</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">few_shot_prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Task: Predict the correct answer option for the question provided, considering the available options.
+Instructions: Review the question and choices provided, then select the option you believe is the correct answer.
+
+Question: A revolving door is convenient for two direction travel, but it also serves as a security measure at a what?
+Options:
+A. bank
+B. library
+C. department store
+D. mall
+E. new york
+Selected Choice: A
+
+Question: What do people aim to do at work?
+Options:
+A. complete job
+B. learn from each other
+C. kill animals
+D. wear hats
+E. talk to each other
+Selected Choice: A
+
+Question: Where would you find magazines alongside many other printed works?
+Options:
+A. doctor
+B. bookstore
+C. market
+D. train station
+E. mortuary
+Selected Choice: B
+
+Question: Where are you likely to find a hamburger?
+Options:
+A. fast food restaurant
+B. pizza
+C. ground up dead cows
+D. mouth
+E. cow carcass
+Selected Choice: A
+
+Question: James was looking for a good place to buy farmland. Where might he look?
+Options:
+A. midwest
+B. countryside
+C. estate
+D. farming areas
+E. illinois
+Selected Choice: A
+
+Question: What island country is ferret popular?
+Options:
+A. own home
+B. north carolina
+C. great britain
+D. hutch
+E. outdoors
+Selected Choice: C
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">question</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">choices</span> <span class="o">=</span> <span class="n">qa</span><span class="p">[</span><span class="n">question</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Question: &quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Options:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">choices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">choices</span><span class="p">))])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Selected Choice:&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Task: Predict the correct answer option for the question provided, considering the available options.
+Instructions: Review the question and choices provided, then select the option you believe is the correct answer.
+
+Question: A revolving door is convenient for two direction travel, but it also serves as a security measure at a what?
+Options:
+A. bank
+B. library
+C. department store
+D. mall
+E. new york
+Selected Choice: A
+
+Question: What do people aim to do at work?
+Options:
+A. complete job
+B. learn from each other
+C. kill animals
+D. wear hats
+E. talk to each other
+Selected Choice: A
+
+Question: Where would you find magazines alongside many other printed works?
+Options:
+A. doctor
+B. bookstore
+C. market
+D. train station
+E. mortuary
+Selected Choice: B
+
+Question: Where are you likely to find a hamburger?
+Options:
+A. fast food restaurant
+B. pizza
+C. ground up dead cows
+D. mouth
+E. cow carcass
+Selected Choice: A
+
+Question: James was looking for a good place to buy farmland. Where might he look?
+Options:
+A. midwest
+B. countryside
+C. estate
+D. farming areas
+E. illinois
+Selected Choice: A
+
+Question: What island country is ferret popular?
+Options:
+A. own home
+B. north carolina
+C. great britain
+D. hutch
+E. outdoors
+Selected Choice: C
+
+Question: The only baggage the woman checked was a drawstring bag, where was she heading with it?
+Options:
+A. garbage can
+B. military
+C. jewelry store
+D. safe
+E. airport
+Selected Choice:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iterate over the answer options</span>
+<span class="c1"># NOTE: This can take a moment</span>
+
+<span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">):</span>
+  <span class="n">answers</span> <span class="o">=</span> <span class="n">qa</span><span class="p">[</span><span class="n">question</span><span class="p">]</span>
+  <span class="n">answer_log_probs</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">,</span><span class="s1">&#39;C&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">]:</span>
+    <span class="c1"># construct the full prompt</span>
+    <span class="n">context_prompt</span> <span class="o">=</span> <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Question: &quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Options:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">answers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">))])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Selected Choice:&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">context_prompt</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">choice</span>
+
+    <span class="c1"># construct the prompt without the answer to create a mask which will</span>
+    <span class="c1"># allow to retrieve the token probabilities for tokens in the answer only</span>
+    <span class="c1"># tokenize the prompt</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span>
+                          <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># tokenize the context prompt</span>
+    <span class="n">context_input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">context_prompt</span><span class="p">,</span>
+                                  <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span>
+    <span class="c1"># create a mask with -100 for all tokens in the context prompt</span>
+    <span class="c1"># the -100 indicates that the token should be ignored in the loss computation</span>
+    <span class="n">masked_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">100</span>
+    <span class="n">masked_labels</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">[:,</span> <span class="n">context_input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span>
+    <span class="c1"># generate the answer</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">masked_labels</span>
+    <span class="p">)</span>
+    <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
+    <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
+  <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
+  <span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected answer &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">],</span> <span class="s2">&quot;with log P &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">[</span><span class="n">max_prob_idx</span><span class="p">])</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>All answers  [&#39;garbage can&#39;, &#39;military&#39;, &#39;jewelry store&#39;, &#39;safe&#39;, &#39;airport&#39;]
+Answer probabilities  [-1.149327039718628, -0.8839691281318665, -1.7674624919891357, -2.4614875316619873, -5.297186851501465]
+Selected answer  military with log P  -0.8839691281318665
+----------------------------------------------------------------------------------------------------
+All answers  [&#39;television&#39;, &#39;attic&#39;, &#39;corner&#39;, &#39;they cannot clean corner and library during football match they cannot need that&#39;, &#39;ground&#39;]
+Answer probabilities  [-1.6051456928253174, -1.3155701160430908, -1.452256441116333, -1.5575783252716064, -2.7076313495635986]
+Selected answer  attic with log P  -1.3155701160430908
+----------------------------------------------------------------------------------------------------
+All answers  [&#39;walmart&#39;, &#39;white house&#39;, &#39;country&#39;, &#39;corporation&#39;, &#39;government&#39;]
+Answer probabilities  [-1.0540814399719238, -0.9338192343711853, -1.921186923980713, -2.363598346710205, -4.736490726470947]
+Selected answer  white house with log P  -0.9338192343711853
+----------------------------------------------------------------------------------------------------
+All answers  [&#39;stressful&#39;, &#39;dangerous&#39;, &#39;fun&#39;, &#39;illegal&#39;, &#39;deadly&#39;]
+Answer probabilities  [-0.7589095234870911, -1.0533545017242432, -2.1971399784088135, -2.8056986331939697, -6.040278911590576]
+Selected answer  stressful with log P  -0.7589095234870911
+----------------------------------------------------------------------------------------------------
+All answers  [&#39;get smart&#39;, &#39;boredom&#39;, &#39;colds and flu&#39;, &#39;taking tests&#39;, &#39;spend time&#39;]
+Answer probabilities  [-1.03721284866333, -0.8900933861732483, -1.955305576324463, -2.6002087593078613, -4.708530902862549]
+Selected answer  boredom with log P  -0.8900933861732483
+----------------------------------------------------------------------------------------------------
+All answers  [&#39;imagination&#39;, &#39;reality&#39;, &#39;dreamworker&#39;, &#39;nightmare&#39;, &#39;awake&#39;]
+Answer probabilities  [-0.9054934978485107, -1.1341121196746826, -1.681248426437378, -2.6236846446990967, -5.031479835510254]
+Selected answer  imagination with log P  -0.9054934978485107
+----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">):</span>
+  <span class="n">answers</span> <span class="o">=</span> <span class="n">qa</span><span class="p">[</span><span class="n">question</span><span class="p">]</span>
+  <span class="n">prompt</span> <span class="o">=</span> <span class="n">few_shot_prompt</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Question: &quot;</span> <span class="o">+</span> <span class="n">question</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Options:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">answers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">))])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Selected Choice:&quot;</span>
+
+  <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+  <span class="n">output</span> <span class="o">=</span> <span class="n">softmax_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+  <span class="n">decoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The only baggage the woman checked was a drawstring bag, where was she heading with it?
+ B
+To prevent any glare during the big football game he made sure to clean the dust of his what?
+ B
+The president is the leader of what institution?
+ A
+What kind of driving leads to accidents?
+ B
+Can you name a good reason for attending school?
+ B
+Stanley had a dream that was very vivid and scary. He had trouble telling it from what?
+ D
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="exercise-3-first-neural-lm-20-points">
 <h2>Exercise 3: First neural LM (20 points)<a class="headerlink" href="#exercise-3-first-neural-lm-20-points" title="Permalink to this heading">#</a></h2>
@@ -778,17 +2025,17 @@ document.write(`
 <section id="how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">
 <h4>How were words / tokens represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
 <p>A continuous real-vector for each word was used to represent similarity between words (instead of using discrete random or deterministic variables). That way, each word is associated with a specific point in the vector space, while the number of features is smaller than the size of the vocabulary.
-That idea reminds of the feature vectors used in information retrieval. However, in this model we are not looking in the co-occurring of words but in the probability distribution of word sequences from natural language text.
-Like the Bengio et al. paper, LLMs using a vector representation. However, LLMs are not working with continuous real-vector but with context-sensitive embeddings. Also, they divide the word into sub words.</p>
+That idea reminds of the feature vectors used in information retrieval. However, here we are looking at the probability distribution of word sequences from natural language text.
+Like the Bengio et al. paper, LLMs using a vector representation. However, modern LLMs work with context-sensitive embeddings. Also, they divide the word into sub words.</p>
 </section>
 <section id="how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">
 <h4>How was the context represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
-<p>The context vector is formed for a given sequence of words. Here, the word vectors of the preceding words in the sequence are getting combined through a neural network architecture.
-In contrast Modern LLM work with self-attention and Transformers. Furthermore, the context size is fixed in the neural network model, but not with the LLMs.</p>
+<p>The vector, that is learnt to represent a word, is based on the preceding context. This follows the intuition that words, which occur in similar contexts, have similar meaning.
+In contrast Modern LLMs work with self-attention and Transformers. They also use much wider context-windows, than the model decribed here.</p>
 </section>
 <section id="what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">
 <h4>What is the curse of dimensionality? Give a concrete example in the context of language modelling.<a class="headerlink" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling" title="Permalink to this heading">#</a></h4>
-<p>The curse of dimensionality occurs while analysing data in high-dimensional spaces. When the dimensionality rises, the volume of the space increases exponentially.
+<p>The curse of dimensionality occurs while analysing data in high-dimensional spaces. When the dimensionality rises, the volume of the space increases exponentially. The Problem is that words, which are similar, will still be different in high dimensial space. This is because even though they appear relatively often in simialar contexts, most of the contexts will still be different, if we consider every possible context.
 One example is a joint distribution of 10 consecutive words with a vocabulary size of 100,000. Here we have 100,000^10-1 = 10^50-1 free parameters.
 This model is using a joint probability function of word feature vector sequences which is a smooth function of this feature values with a neural network.
 Doing so, the method is crucially different to modern LLMs.</p>
@@ -798,7 +2045,7 @@ Doing so, the method is crucially different to modern LLMs.</p>
 <p>The training set is a sequence of words, the vocabulary large but finite.
 Comparative experiments were performed on the Brown corpus, where the first 800,000 words were used for the training data set.
 Furthermore, a experiment was run on the Associated Press News texts, where the training set consist of a stream of about 14 million words.
-The training data of Modern LLMs is much larger and consist a lot more data than that.</p>
+The training data of Modern LLMs is much larger and much more diverse.</p>
 </section>
 <section id="which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">
 <h4>Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?<a class="headerlink" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms" title="Permalink to this heading">#</a></h4>
@@ -810,7 +2057,7 @@ The training data of Modern LLMs is much larger and consist a lot more data than
 <p>LLMs:</p>
 <ul class="simple">
 <li><p>Self-Attention</p></li>
-<li><p>embeddings</p></li>
+<li><p>contextualised embeddings</p></li>
 <li><p>Masking</p></li>
 <li><p>Special Tokens</p></li>
 <li><p>Fine-Tuning</p></li>
@@ -828,13 +2075,13 @@ The training data of Modern LLMs is much larger and consist a lot more data than
 <h4>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h4>
 <p>Bengio et al. describes the challenges of statistical modelling and offers a neural network solution. A special focus is here the curse of dimensionality.
 Devlin et al. explains the limitation of existing pre-trained techniques and introduced BERT.
-Therefore, Bengio et al. introduces a new theoretical framework whereas Denvio et. al introduces an entire alternative model.
-Bengio et al. looks into earlier neural networks and statistical models whereas Devlin et al. focusses on feature based models like ELMo.</p>
+Therefore, Bengio et al. introduce a new theoretical framework whereas Denvio et. al introduces an entire alternative model.
+Bengio et al. looks into earlier neural networks and statistical models whereas Devlin et al. focus on feature based models like ELMo.</p>
 </section>
 <section id="a-neural-model">
 <h4>A neural model<a class="headerlink" href="#a-neural-model" title="Permalink to this heading">#</a></h4>
 <p>Bengio et al. describes a neural network architecture. Devlin et al. explains a pre-trained transformer with a giant corpus, masked language modelling and finetuning.
-Both papers are explaining there architecture detailed and with pictures.</p>
+Both papers are explaining there architecture detailed and with pictures. But Bengio et al. give a much more detailed description of the theoretical background, while Devlin et al. presuppose knowledge about general transformer architecture and emphasize the diffenrencs and improvements of BERT.</p>
 </section>
 <section id="parallel-implementation">
 <h4>Parallel Implementation<a class="headerlink" href="#parallel-implementation" title="Permalink to this heading">#</a></h4>
@@ -904,6 +2151,18 @@ Both papers are explaining there architecture detailed and with pictures.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-advanced-prompting-strategies-16-points">Exercise 1: Advanced prompting strategies (16 points)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points">Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2">Exercise 2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment-scheme">Experiment Scheme</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-language-inference">Natural Language Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Natural Language Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-choice-qa">Multiple-choice QA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Experiment Scheme</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generated-knowledge-prompting-with-numersense-dataset">Generated Knowledge Prompting with NumerSense Dataset</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting-with-commonsenseqa">Few-Shot Prompting with CommonSenseQA</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
