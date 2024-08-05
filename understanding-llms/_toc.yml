@@ -47,6 +47,7 @@ parts:
   - file: lectures/10-mechanistic-interpretability
   - file: tutorials/08a-mechanistic-interpretability
 - caption: 10 Understanding LLMs
+  chapters:
   - file: lectures/09-philosophy
 - caption: Homework
   chapters:
