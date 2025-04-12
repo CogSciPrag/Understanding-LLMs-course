@@ -49,4 +49,3 @@ parts:
 - caption: 10 Understanding LLMs
   chapters:
   - file: lectures/09-philosophy
-- caption: Homework
