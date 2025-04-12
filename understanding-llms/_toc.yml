@@ -50,8 +50,3 @@ parts:
   chapters:
   - file: lectures/09-philosophy
 - caption: Homework
-  chapters:
-  - file: homework/01-language-modeling
-  - file: homework/02-prompting
-  - file: homework/03-agents-RL
-  - file: homework/04-evaluation

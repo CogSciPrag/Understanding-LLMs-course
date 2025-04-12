@@ -1,6 +1,6 @@
 # PyTorch, ANNs & LMs
 
-Slides from the second lecture introducing PyTorch, artificial neural networks (ANNs), formally introducing language models (LMs) and introducing recurrent neural networks can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/02-PyTorch-ANNs-RNNs.pdf).
+Stay tuned for slides from the second lecture!
 
 ## Additional materials
 

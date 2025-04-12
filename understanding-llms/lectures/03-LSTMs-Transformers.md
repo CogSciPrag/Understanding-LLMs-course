@@ -1,6 +1,6 @@
 # LSTMs & Transformers
 
-Slides from the third lecture introducing a more advanced RNN architecture - LSTMs - and transformers - the architecture behind modern LLMs - can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/03-LSTMs-Transformers.pdf).
+Stay tuned for slides from the third lecture!
 
 ## Additional materials
 

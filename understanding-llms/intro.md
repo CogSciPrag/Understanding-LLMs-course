@@ -35,3 +35,7 @@ There are various courses on deep learning, NLP and LLMs out there. To name a fe
 Andrej Karpathy has an excellent [1h overview video](https://www.youtube.com/watch?v=zjkBMFhNj_g).
 
 We also highly recommend Brian Christian's book [The Alignment Problem](https://brianchristian.org/the-alignment-problem/) for a more general perspective on AI and computational CogSci.
+
+## Previous iterations of the course
+
+Slides from the 2024 iteration of the course can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/archive_2024/).
