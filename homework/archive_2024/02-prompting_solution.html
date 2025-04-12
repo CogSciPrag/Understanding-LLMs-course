@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Homework 2: Prompting &amp; Generation with LMs (50 points) &#8212; Understanding LLMs</title>
   
@@ -15,58 +14,54 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/02-prompting_solution';</script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/archive_2024/02-prompting_solution';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -76,34 +71,29 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="../search.html"
+      action="../../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -119,12 +109,22 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -141,8 +141,10 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="sidebar-primary-item">
 
   
+    
+  
 
-<a class="navbar-brand logo" href="../intro.html">
+<a class="navbar-brand logo" href="../../intro.html">
   
   
   
@@ -153,82 +155,86 @@ const thebe_selector_output = ".output, .cell_output"
       
     
     
-    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
-    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+    <img src="../../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
-                <a class="reference internal" href="../intro.html">
+                <a class="reference internal" href="../../intro.html">
                     Course overview: Understanding LLMs
                 </a>
             </li>
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Prompting</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">05 Fine-tuning &amp; RLHF</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">06 Agents &amp; applications</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">07 Attribution</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">08 Behavioral evaluation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/07b-biases-assessment.html">Sheet 7.2: Advanced evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/07b-biases-assessment.html">Sheet 7.2: Advanced evaluation</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">09 Mechanistic interpretation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/10-mechanistic-interpretability.html">Mechanistic Interpretability</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/08a-mechanistic-interpretability.html">Sheet 8.1: Mechanistic interpretability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/10-mechanistic-interpretability.html">Mechanistic Interpretability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/08a-mechanistic-interpretability.html">Sheet 8.1: Mechanistic interpretability</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">10 Understanding LLMs</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="04-evaluation.html">Homework 4: LLM evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
 
     </div>
@@ -244,7 +250,7 @@ const thebe_selector_output = ".output, .cell_output"
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -253,14 +259,14 @@ const thebe_selector_output = ".output, .cell_output"
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -283,16 +289,16 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/02-prompting_solution.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/archive_2024/02-prompting_solution.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onBinder"
+   title="Launch on Binder"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_binder.svg">
+    <img alt="Binder logo" src="../../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
 </a>
@@ -301,16 +307,16 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/02-prompting_solution.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/archive_2024/02-prompting_solution.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onColab"
+   title="Launch on Colab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_colab.png">
+    <img alt="Colab logo" src="../../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
@@ -367,7 +373,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/02-prompting_solution.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/archive_2024/02-prompting_solution.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -397,7 +403,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/homework/02-prompting_solution.ipynb" target="_blank"
+      <li><a href="../../_sources/homework/archive_2024/02-prompting_solution.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -452,10 +458,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -463,14 +469,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -506,27 +512,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting-with-commonsenseqa">Few-Shot Prompting with CommonSenseQA</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">How was the context represented? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">What is the curse of dimensionality? Give a concrete example in the context of language modelling.</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">Which training data was used? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#differences-per-section">differences per section</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#a-neural-model">A neural model</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-implementation">Parallel Implementation</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-results">Experimental Results</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-future-work">Extensions and Future Work</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a></li>
 </ul>
             </nav>
         </div>
@@ -536,13 +522,13 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="homework-2-prompting-generation-with-lms-50-points">
-<h1>Homework 2: Prompting &amp; Generation with LMs (50 points)<a class="headerlink" href="#homework-2-prompting-generation-with-lms-50-points" title="Permalink to this heading">#</a></h1>
+<h1>Homework 2: Prompting &amp; Generation with LMs (50 points)<a class="headerlink" href="#homework-2-prompting-generation-with-lms-50-points" title="Link to this heading">#</a></h1>
 <p>The second homework zooms in on the following skills: on gaining a deeper understanding of different state-of-the-art prompting techniques and training your critical conceptual thinking regarding research on LMs.</p>
 <section id="logistics">
-<h2>Logistics<a class="headerlink" href="#logistics" title="Permalink to this heading">#</a></h2>
+<h2>Logistics<a class="headerlink" href="#logistics" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>submission deadline: June 2nd th 23:59 German time via Moodle</p>
 <ul>
@@ -554,7 +540,7 @@ document.write(`
 </ul>
 </section>
 <section id="exercise-1-advanced-prompting-strategies-16-points">
-<h2>Exercise 1: Advanced prompting strategies (16 points)<a class="headerlink" href="#exercise-1-advanced-prompting-strategies-16-points" title="Permalink to this heading">#</a></h2>
+<h2>Exercise 1: Advanced prompting strategies (16 points)<a class="headerlink" href="#exercise-1-advanced-prompting-strategies-16-points" title="Link to this heading">#</a></h2>
 <p>The lecture discussed various sophisticated ways of prompting language models for generating texts. Please answer the following questions about prompting techniques in context of different models, and write down your answers, briefly explaining them (max. 3 sentences). Feel free to actually implement some of the prompting strategies to play around with them and build your intuitions.</p>
 <blockquote>
 <div><p>Consider the following language models:</p>
@@ -595,7 +581,7 @@ document.write(`
 </ul>
 </section>
 <section id="exercise-2-prompting-for-nli-multiple-choice-qa-14-points">
-<h2>Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)<a class="headerlink" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points" title="Permalink to this heading">#</a></h2>
+<h2>Exercise 2: Prompting for NLI &amp; Multiple-choice QA (14 points)<a class="headerlink" href="#exercise-2-prompting-for-nli-multiple-choice-qa-14-points" title="Link to this heading">#</a></h2>
 <p>In this exercise, you can let your creativity flow – your task is to come up with prompts for language models such that they achieve maximal accuracy on the following example tasks. Feel free to take inspiration from the in-class examples of the sentiment classification task. Also feel free to play around with the decoding scheme and see how it interacts with the different prompts.</p>
 <p><strong>TASK:</strong></p>
 <blockquote>
@@ -635,7 +621,7 @@ document.write(`
 </ul>
 </section>
 <section id="exercise-2">
-<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this heading">#</a></h2>
+<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Link to this heading">#</a></h2>
 <p><strong>Partial solution suggestion</strong></p>
 <ul class="simple">
 <li><p>6 pts / model, 2 pts for code</p>
@@ -651,10 +637,10 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># define computational device</span>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
@@ -687,7 +673,7 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">set_seed</span>  <span class="c1"># reproducibility</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_seed</span>  <span class="c1"># reproducibility</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">set_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
@@ -710,7 +696,7 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pretty_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">decoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">decoded</span> <span class="o">=</span> <span class="n">decoded</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -723,11 +709,11 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># greedy decoding</span>
-<span class="k">def</span> <span class="nf">greedy_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">greedy_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span> <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">beam_search_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_beams</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">beam_search_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_beams</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
         <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
@@ -737,7 +723,7 @@ document.write(`
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">pure_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pure_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
@@ -748,7 +734,7 @@ document.write(`
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">softmax_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">softmax_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">):</span>
     <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
@@ -760,7 +746,7 @@ document.write(`
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">top_k_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">top_k_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
     <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
@@ -772,7 +758,7 @@ document.write(`
     <span class="k">return</span> <span class="n">output</span>
 
 <span class="c1"># the set of most likely words the summed probability of which exceeds threshold p  (also called nucleus sampling)</span>
-<span class="k">def</span> <span class="nf">top_p_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">top_p_sampling_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
     <span class="c1"># # activate sampling and deactivate top_k by setting top_k sampling to 0</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
@@ -783,7 +769,7 @@ document.write(`
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">contrastive_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">penalty_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">contrastive_decoding</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">penalty_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
         <span class="n">input_ids</span><span class="p">,</span>
         <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_new_tokens</span><span class="p">,</span>
@@ -798,13 +784,13 @@ document.write(`
 </div>
 </section>
 <section id="experiment-scheme">
-<h2>Experiment Scheme<a class="headerlink" href="#experiment-scheme" title="Permalink to this heading">#</a></h2>
+<h2>Experiment Scheme<a class="headerlink" href="#experiment-scheme" title="Link to this heading">#</a></h2>
 <p>In our experiments we worked on the following configurations:</p>
 <ul class="simple">
 <li><p>Two models, <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code> and <code class="docutils literal notranslate"><span class="pre">pythia-1.4b</span></code> are used to generate the output.</p></li>
 </ul>
 <section id="natural-language-inference">
-<h3>Natural Language Inference<a class="headerlink" href="#natural-language-inference" title="Permalink to this heading">#</a></h3>
+<h3>Natural Language Inference<a class="headerlink" href="#natural-language-inference" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>We use “Instruction Prompting” to make LM better understand user intention and follow the instruction.</p></li>
 <li><p>Prefix of the input is given as follows:<br />
@@ -839,7 +825,7 @@ document.write(`
 </section>
 </section>
 <section id="id1">
-<h2>Natural Language Inference<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<h2>Natural Language Inference<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>Natural language inference: the task is to classify whether two sentences form a “contradiction” or an “entailment”, or the relation is “neutral”.</p>
 <ul class="simple">
 <li><p>A person on a horse jumps over a broken down airplane. A person is training his horse for a competition. <strong>neutral</strong></p></li>
@@ -852,7 +838,7 @@ document.write(`
 <p>Few-shot examples are collected from the Stanford Natural Language Inference (SNLI) Corpus. <br />
 Paper: https://arxiv.org/pdf/1508.05326</p>
 <p>We used two sets of few-shot examples to experiment on. First set consists of entirely independent sentences, while the second set consists of sentences that are related to each other. In the second set, three different “hypothesis” sentences are created for each “premise” sentence. The idea is to prevent the model from relying solely on the first sentence for the relation prediction.</p>
-<table class="table">
+<div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head text-center"><p>Model</p></th>
 <th class="head text-center"><p>Prompt Engineering</p></th>
@@ -960,6 +946,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </tr>
 </tbody>
 </table>
+</div>
 <ul class="simple">
 <li><p>Best Accuracy: For optimal accuracy, we generate outputs for each decoding scheme and select the one with the highest accuracy, disregarding the others.</p></li>
 <li><p>Majority Vote Accuracy (few-shot learning): Accuracy is determined by considering all outputs from different decoding schemes for a given input, with the final output decided by majority vote.</p></li>
@@ -1010,7 +997,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">experiment</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">experiment</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decoding scheme: </span><span class="si">{</span><span class="n">decoding</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
         <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -1030,7 +1017,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">majority_vote</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">majority_vote</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
@@ -1063,7 +1050,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gc</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 </pre></div>
@@ -1080,7 +1067,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">self_consistency</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">self_consistency</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">few_shot_examples</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_set</span><span class="p">):</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
@@ -1112,11 +1099,11 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </div>
 </section>
 <section id="multiple-choice-qa">
-<h2>Multiple-choice QA<a class="headerlink" href="#multiple-choice-qa" title="Permalink to this heading">#</a></h2>
+<h2>Multiple-choice QA<a class="headerlink" href="#multiple-choice-qa" title="Link to this heading">#</a></h2>
 <p>Multiple-choice QA: the task is to predict the correct answer option for the question, given the question and the options.</p>
 </section>
 <section id="id2">
-<h2>Experiment Scheme<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
+<h2>Experiment Scheme<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
 <p>In our experiments we worked on the following configurations:</p>
 <ul class="simple">
 <li><p>Two models, <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code> and <code class="docutils literal notranslate"><span class="pre">pythia-1.4b</span></code> are used to generate the output.</p></li>
@@ -1132,7 +1119,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </ul>
 <p>For the generated knowledge prompting, we generated five knowledge statements for each question. For each answer choice 𝑎, we identified the knowledge statement that best supports it by calculating the log probability of generating that answer for each augmented prompt (with the knowledge statement). This process allows us to determine the maximum probability for each answer. Ultimately, we select the answer with the highest maximum probability.</p>
 <p>All the few-shot prompts can be found below.</p>
-<table class="table">
+<div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head text-center"><p>Model</p></th>
 <th class="head text-center"><p>Prompt Engineering</p></th>
@@ -1192,13 +1179,14 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Observations:</p>
 <ul class="simple">
 <li><p>Overall, generated knowledge prompting seems to outperform vanilla few shot learning (no knowledge statement is generated).</p></li>
 <li><p>Maximum accuracy is achieved using generated knowledge prompting on CommonSenseQA with <code class="docutils literal notranslate"><span class="pre">pythia-410m</span></code>.</p></li>
 </ul>
 <section id="generated-knowledge-prompting-with-numersense-dataset">
-<h3>Generated Knowledge Prompting with NumerSense Dataset<a class="headerlink" href="#generated-knowledge-prompting-with-numersense-dataset" title="Permalink to this heading">#</a></h3>
+<h3>Generated Knowledge Prompting with NumerSense Dataset<a class="headerlink" href="#generated-knowledge-prompting-with-numersense-dataset" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qa</span> <span class="o">=</span> <span class="p">{</span>
@@ -1218,7 +1206,7 @@ Paper: https://arxiv.org/pdf/1508.05326</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run this to get NumerSense dataset few shot prompts</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;How many wings do penguins have?&quot;</span><span class="p">,</span>
@@ -1359,7 +1347,7 @@ So,
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. Score each answer to the question based on the knowledge statements</span>
 <span class="c1"># as the score, we take the average log probability of the tokens in the answer</span>
 <span class="c1"># iterate over the answer options</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="n">no_knowledge_statements</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">qa</span><span class="p">):</span>
@@ -1726,7 +1714,7 @@ Selected answer  reality with log P  -7.55483865737915
 </div>
 </section>
 <section id="few-shot-prompting-with-commonsenseqa">
-<h3>Few-Shot Prompting with CommonSenseQA<a class="headerlink" href="#few-shot-prompting-with-commonsenseqa" title="Permalink to this heading">#</a></h3>
+<h3>Few-Shot Prompting with CommonSenseQA<a class="headerlink" href="#few-shot-prompting-with-commonsenseqa" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
@@ -1932,7 +1920,7 @@ Selected Choice:
     <span class="c1"># retrieve the average log probability of the tokens in the answer</span>
     <span class="n">log_p</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="n">answer_log_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">log_p</span><span class="p">)</span>
-  <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All answers &quot;</span><span class="p">,</span> <span class="n">answers</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer probabilities &quot;</span><span class="p">,</span> <span class="n">answer_log_probs</span><span class="p">)</span>
   <span class="n">max_prob_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">answer_log_probs</span><span class="p">)</span>
@@ -2006,7 +1994,7 @@ Stanley had a dream that was very vivid and scary. He had trouble telling it fro
 </section>
 </section>
 <section id="exercise-3-first-neural-lm-20-points">
-<h2>Exercise 3: First neural LM (20 points)<a class="headerlink" href="#exercise-3-first-neural-lm-20-points" title="Permalink to this heading">#</a></h2>
+<h2>Exercise 3: First neural LM (20 points)<a class="headerlink" href="#exercise-3-first-neural-lm-20-points" title="Link to this heading">#</a></h2>
 <p>Next to reading and understanding package documentations, a key skill for NLP researchers and practitioners is reading and critically assessing NLP literature. The density, but also the style of NLP literature has undergone a significant shift in the recent years with increasing acceleration of progress. Your task in this exercise is to read a paper about one of the first successful neural langauge models, understand its key architectural components and compare how these key components have evolved in modern systems that were discussed in the lecture.</p>
 <blockquote>
 <div><p>Specifically, please read this paper and answer the following questions: <a class="reference external" href="https://www.jmlr.org/papers/volume3/bengio03a/bengio03a.pdf">Bengio et al. (2003)</a></p>
@@ -2024,35 +2012,26 @@ Stanley had a dream that was very vivid and scary. He had trouble telling it fro
 <blockquote>
 <div><p>For each section of the Bengio et al. (2003) paper, what are key differences between the way it is written, the included contents, to the BERT paper (Devlin et al., 2019)? What are key similarities? Write max. 2 sentences per section.</p>
 </div></blockquote>
-<section id="answers">
-<h3>Answers<a class="headerlink" href="#answers" title="Permalink to this heading">#</a></h3>
-<section id="how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">
-<h4>How were words / tokens represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><h3 class="rubric" id="answers">Answers</h3>
+<h4 class="rubric" id="how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</h4>
 <p>A continuous real-vector for each word was used to represent similarity between words (instead of using discrete random or deterministic variables). That way, each word is associated with a specific point in the vector space, while the number of features is smaller than the size of the vocabulary.
 That idea reminds of the feature vectors used in information retrieval. However, here we are looking at the probability distribution of word sequences from natural language text.
 Like the Bengio et al. paper, LLMs using a vector representation. However, modern LLMs work with context-sensitive embeddings. Also, they divide the word into sub words.</p>
-</section>
-<section id="how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">
-<h4>How was the context represented? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">How was the context represented? What is the difference / similarity to modern LLMs?</h4>
 <p>The vector, that is learnt to represent a word, is based on the preceding context. This follows the intuition that words, which occur in similar contexts, have similar meaning.
 In contrast Modern LLMs work with self-attention and Transformers. They also use much wider context-windows, than the model decribed here.</p>
-</section>
-<section id="what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">
-<h4>What is the curse of dimensionality? Give a concrete example in the context of language modelling.<a class="headerlink" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">What is the curse of dimensionality? Give a concrete example in the context of language modelling.</h4>
 <p>The curse of dimensionality occurs while analysing data in high-dimensional spaces. When the dimensionality rises, the volume of the space increases exponentially. The Problem is that words, which are similar, will still be different in high dimensial space. This is because even though they appear relatively often in simialar contexts, most of the contexts will still be different, if we consider every possible context.
 One example is a joint distribution of 10 consecutive words with a vocabulary size of 100,000. Here we have 100,000^10-1 = 10^50-1 free parameters.
 This model is using a joint probability function of word feature vector sequences which is a smooth function of this feature values with a neural network.
 Doing so, the method is crucially different to modern LLMs.</p>
-</section>
-<section id="which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">
-<h4>Which training data was used? What is the difference / similarity to modern LLMs?<a class="headerlink" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">Which training data was used? What is the difference / similarity to modern LLMs?</h4>
 <p>The training set is a sequence of words, the vocabulary large but finite.
 Comparative experiments were performed on the Brown corpus, where the first 800,000 words were used for the training data set.
 Furthermore, a experiment was run on the Associated Press News texts, where the training set consist of a stream of about 14 million words.
 The training data of Modern LLMs is much larger and much more diverse.</p>
-</section>
-<section id="which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">
-<h4>Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?<a class="headerlink" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</h4>
 <p>Bengio et al.:</p>
 <ul class="simple">
 <li><p>Using neural networks with softmax</p></li>
@@ -2066,44 +2045,29 @@ The training data of Modern LLMs is much larger and much more diverse.</p>
 <li><p>Special Tokens</p></li>
 <li><p>Fine-Tuning</p></li>
 </ul>
-</section>
-</section>
-<section id="differences-per-section">
-<h3>differences per section<a class="headerlink" href="#differences-per-section" title="Permalink to this heading">#</a></h3>
+</div></blockquote>
+<blockquote>
+<div><h3 class="rubric" id="differences-per-section">differences per section</h3>
 <p>The section are selected as the main section of the Bengio et al. paper</p>
-<section id="abstract">
-<h4>Abstract<a class="headerlink" href="#abstract" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="abstract">Abstract</h4>
 <p>Similar in both papers: introducing problem and solution.</p>
-</section>
-<section id="introduction">
-<h4>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="introduction">Introduction</h4>
 <p>Bengio et al. describes the challenges of statistical modelling and offers a neural network solution. A special focus is here the curse of dimensionality.
 Devlin et al. explains the limitation of existing pre-trained techniques and introduced BERT.
 Therefore, Bengio et al. introduce a new theoretical framework whereas Denvio et. al introduces an entire alternative model.
 Bengio et al. looks into earlier neural networks and statistical models whereas Devlin et al. focus on feature based models like ELMo.</p>
-</section>
-<section id="a-neural-model">
-<h4>A neural model<a class="headerlink" href="#a-neural-model" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="a-neural-model">A neural model</h4>
 <p>Bengio et al. describes a neural network architecture. Devlin et al. explains a pre-trained transformer with a giant corpus, masked language modelling and finetuning.
 Both papers are explaining there architecture detailed and with pictures. But Bengio et al. give a much more detailed description of the theoretical background, while Devlin et al. presuppose knowledge about general transformer architecture and emphasize the diffenrencs and improvements of BERT.</p>
-</section>
-<section id="parallel-implementation">
-<h4>Parallel Implementation<a class="headerlink" href="#parallel-implementation" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="parallel-implementation">Parallel Implementation</h4>
 <p>Bengio et al. emphasizes parallel computation where the hardware no longer exists. There is no comaprable section in the paper of Devlin et al.</p>
-</section>
-<section id="experimental-results">
-<h4>Experimental Results<a class="headerlink" href="#experimental-results" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="experimental-results">Experimental Results</h4>
 <p>Bengio et al. uses only perplexity reduction on the Brown dataset and the AP News Corpora. The paper also compares to SOTA.  Devlin et al. uses different NLP benchmarks.</p>
-</section>
-<section id="extensions-and-future-work">
-<h4>Extensions and Future Work<a class="headerlink" href="#extensions-and-future-work" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="extensions-and-future-work">Extensions and Future Work</h4>
 <p>Bengio et al. describes different possible improvements that can be tried out in the future. Devlin et al.is keeping this part very short.</p>
-</section>
-<section id="conclusion">
-<h4>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h4>
+<h4 class="rubric" id="conclusion">Conclusion</h4>
 <p>Both papers summarize their break throughs. Nonetheless, the conclusion in the BERT paper is shorter than in the paper introducing the neural network solution.</p>
-</section>
-</section>
+</div></blockquote>
 </section>
 </section>
 
@@ -2120,7 +2084,7 @@ Both papers are explaining there architecture detailed and with pictures. But Be
         },
         kernelOptions: {
             name: "python3",
-            path: "./homework"
+            path: "./homework/archive_2024"
         },
         predefinedOutput: true
     }
@@ -2134,7 +2098,7 @@ Both papers are explaining there architecture detailed and with pictures. But Be
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -2145,6 +2109,7 @@ Both papers are explaining there architecture detailed and with pictures. But Be
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -2167,27 +2132,7 @@ Both papers are explaining there architecture detailed and with pictures. But Be
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#few-shot-prompting-with-commonsenseqa">Few-Shot Prompting with CommonSenseQA</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#answers">Answers</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-were-words-tokens-represented-what-is-the-difference-similarity-to-modern-llms">How were words / tokens represented? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#how-was-the-context-represented-what-is-the-difference-similarity-to-modern-llms">How was the context represented? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-curse-of-dimensionality-give-a-concrete-example-in-the-context-of-language-modelling">What is the curse of dimensionality? Give a concrete example in the context of language modelling.</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-training-data-was-used-what-is-the-difference-similarity-to-modern-llms">Which training data was used? What is the difference / similarity to modern LLMs?</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#which-components-of-the-bengio-et-al-2003-model-if-any-can-be-found-in-modern-lms">Which components of the Bengio et al. (2003) model (if any) can be found in modern LMs?</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#differences-per-section">differences per section</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#a-neural-model">A neural model</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-implementation">Parallel Implementation</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-results">Experimental Results</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#extensions-and-future-work">Extensions and Future Work</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-first-neural-lm-20-points">Exercise 3: First neural LM (20 points)</a></li>
 </ul>
   </nav></div>
 
@@ -2236,8 +2181,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

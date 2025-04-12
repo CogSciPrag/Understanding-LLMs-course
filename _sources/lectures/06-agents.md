@@ -1,6 +1,6 @@
 # LLM systems & agents
 
-Slides of the session which looks at LLMs as part of larger systems / as agents (which can use various tools including, e.g., additional database tools etc), can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/06-agents-applications-neuroSymbolic.pdf).
+Stay tuned for slides from the sixth lecture!
 
 ## Additional materials
 

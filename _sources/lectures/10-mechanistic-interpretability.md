@@ -1,7 +1,6 @@
 # Mechanistic Interpretability
 
-This session covers a cutting-edge topic -- mechanistic interpretability -- which works towatds identifying computational mechanisms within the transformer architecture which support performance on various tasks. 
-Slides of the session can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/10-Mechanistic-Interpretability.pdf).
+Stay tuned for slides from the tenth lecture!
 
 ## Additional materials
 

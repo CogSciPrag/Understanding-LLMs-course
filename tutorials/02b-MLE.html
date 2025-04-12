@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sheet 2.2: ML-estimation &#8212; Understanding LLMs</title>
   
@@ -15,53 +14,49 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/02b-MLE';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -76,28 +71,23 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -119,12 +109,20 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -140,6 +138,8 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../intro.html">
@@ -158,7 +158,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -223,13 +234,6 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/04-evaluation.html">Homework 4: LLM evaluation</a></li>
-</ul>
 
     </div>
 </nav></div>
@@ -244,7 +248,7 @@ const thebe_selector_output = ".output, .cell_output"
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -253,14 +257,14 @@ const thebe_selector_output = ".output, .cell_output"
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -285,14 +289,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/02b-MLE.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onBinder"
+   title="Launch on Binder"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_binder.svg">
+    <img alt="Binder logo" src="../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
 </a>
@@ -303,14 +307,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/02b-MLE.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onColab"
+   title="Launch on Colab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_colab.png">
+    <img alt="Colab logo" src="../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
@@ -452,10 +456,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -463,14 +467,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -511,10 +515,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-2-2-ml-estimation">
-<h1>Sheet 2.2: ML-estimation<a class="headerlink" href="#sheet-2-2-ml-estimation" title="Permalink to this heading">#</a></h1>
+<h1>Sheet 2.2: ML-estimation<a class="headerlink" href="#sheet-2-2-ml-estimation" title="Link to this heading">#</a></h1>
 <p><strong>Author:</strong> Michael Franke</p>
 <p>This tutorial is meant to introduce some basics of PyTorch by looking at a simple case study: how to find the best-fitting parameter for the mean of a normal (Gaussian) distribution.
 The training data is a set of samples from a “true” distribution.
@@ -522,16 +526,16 @@ The loss function is the negative likelihood that a candidate parameter value fo
 By using stochastic gradient descent to minimize the loss, we seek the parameter value that maximizes the likelihood of the training data.
 This is, therefore, a <strong>maximum likelihood estimation</strong>.</p>
 <section id="packages">
-<h2>Packages<a class="headerlink" href="#packages" title="Permalink to this heading">#</a></h2>
+<h2>Packages<a class="headerlink" href="#packages" title="Link to this heading">#</a></h2>
 <p>We will need to import the <code class="docutils literal notranslate"><span class="pre">torch</span></code> package for the main functionality.
 We also will use <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> for plotting, and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> for showing the plots.
 Finally, we use the <code class="docutils literal notranslate"><span class="pre">warnings</span></code> package to suppress all warning messages in the notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 </pre></div>
@@ -540,7 +544,7 @@ Finally, we use the <code class="docutils literal notranslate"><span class="pre"
 </div>
 </section>
 <section id="true-distribution-training-data">
-<h2>True distribution &amp; training data<a class="headerlink" href="#true-distribution-training-data" title="Permalink to this heading">#</a></h2>
+<h2>True distribution &amp; training data<a class="headerlink" href="#true-distribution-training-data" title="Link to this heading">#</a></h2>
 <p>The “true distribution” that generates the data is a normal distribution with a mean (location) stored in the variable <code class="docutils literal notranslate"><span class="pre">true_location</span></code>.
 (We keep the scale parameter (standard deviation) fixed at a known value of 1.)
 The <code class="docutils literal notranslate"><span class="pre">torch.distributions</span></code> package contains ready-made probability distributions for sampling.
@@ -584,7 +588,7 @@ The empirical mean need not be identical to the true mean!</p>
 </div>
 </section>
 <section id="optimizing-a-parameter-gradients-optimizers-loss-backprop">
-<h2>Optimizing a parameter: gradients, optimizers, loss &amp; backprop<a class="headerlink" href="#optimizing-a-parameter-gradients-optimizers-loss-backprop" title="Permalink to this heading">#</a></h2>
+<h2>Optimizing a parameter: gradients, optimizers, loss &amp; backprop<a class="headerlink" href="#optimizing-a-parameter-gradients-optimizers-loss-backprop" title="Link to this heading">#</a></h2>
 <p>We want an estimate of the true mean of the training data.
 For that, we define a “trainable” parameter in PyTorch, which we set to some initial value.
 Subsequently, we will update the value of this parameter in a series of training steps, so that it will become “better” over time.
@@ -651,7 +655,7 @@ A training step consists of the following parts:</p>
 </li>
 </ol>
 <section id="part-1-compute-the-predictions-for-current-parameter-value">
-<h3>Part 1: Compute the predictions for current parameter value<a class="headerlink" href="#part-1-compute-the-predictions-for-current-parameter-value" title="Permalink to this heading">#</a></h3>
+<h3>Part 1: Compute the predictions for current parameter value<a class="headerlink" href="#part-1-compute-the-predictions-for-current-parameter-value" title="Link to this heading">#</a></h3>
 <p>The prediction for the current parameter value is a Gaussian with the location parameter set to our current parameter value.
 We obtain our “current best model” by instantiating a distribution like so:</p>
 <div class="cell docutils container">
@@ -663,7 +667,7 @@ We obtain our “current best model” by instantiating a distribution like so:<
 </div>
 </section>
 <section id="part-2-computing-the-loss-for-the-current-prediction">
-<h3>Part 2: Computing the loss for the current prediction<a class="headerlink" href="#part-2-computing-the-loss-for-the-current-prediction" title="Permalink to this heading">#</a></h3>
+<h3>Part 2: Computing the loss for the current prediction<a class="headerlink" href="#part-2-computing-the-loss-for-the-current-prediction" title="Link to this heading">#</a></h3>
 <p>How good is our current model?
 Goodness can be measured in many ways.
 Here we consider the likelihood: how likely is the training data under the current model?</p>
@@ -684,7 +688,7 @@ Here we consider the likelihood: how likely is the training data under the curre
 Notice that PyTorch has also added information on how to compute gradients, i.e., it keeps track of way in which values for the variable <code class="docutils literal notranslate"><span class="pre">location</span></code> influence the values for the variable <code class="docutils literal notranslate"><span class="pre">loss</span></code>.</p>
 </section>
 <section id="part-3-backpropagate-the-error-signal">
-<h3>Part 3: Backpropagate the error signal<a class="headerlink" href="#part-3-backpropagate-the-error-signal" title="Permalink to this heading">#</a></h3>
+<h3>Part 3: Backpropagate the error signal<a class="headerlink" href="#part-3-backpropagate-the-error-signal" title="Link to this heading">#</a></h3>
 <p>In the next step, we will use the information stored about the functional relation between <code class="docutils literal notranslate"><span class="pre">location</span></code> and <code class="docutils literal notranslate"><span class="pre">loss</span></code> to infer how the <code class="docutils literal notranslate"><span class="pre">location</span></code> parameter would need to be changed to make <code class="docutils literal notranslate"><span class="pre">loss</span></code> higher or lower.
 This is the so-called backpropagation step.</p>
 <p>Concretely, at the outset, the gradient information for <code class="docutils literal notranslate"><span class="pre">location</span></code> is “NONE”.</p>
@@ -720,7 +724,7 @@ Gradient information (after backprop) = 10015.0458984375
 </div>
 </section>
 <section id="part-4-update-the-parameter-values">
-<h3>Part 4: Update the parameter values<a class="headerlink" href="#part-4-update-the-parameter-values" title="Permalink to this heading">#</a></h3>
+<h3>Part 4: Update the parameter values<a class="headerlink" href="#part-4-update-the-parameter-values" title="Link to this heading">#</a></h3>
 <p>Next, we use the information in the gradient to actually update the trainable parameter values.
 This is what the optimizer does.
 It knows which parameters to update (we told it), so the relevant update function is one associated with the optimizer itself.</p>
@@ -741,7 +745,7 @@ Gradient information (after step) = 10015.0458984375
 </div>
 </section>
 <section id="part-5-reset-the-gradient-information">
-<h3>Part 5: Reset the gradient information<a class="headerlink" href="#part-5-reset-the-gradient-information" title="Permalink to this heading">#</a></h3>
+<h3>Part 5: Reset the gradient information<a class="headerlink" href="#part-5-reset-the-gradient-information" title="Link to this heading">#</a></h3>
 <p>If we want to repeat the updating process, we need to erase information about gradients for the last prediction.
 This is because otherwise information would just accumulate in the gradients.
 This zero-ing of the gradients is again something we do holistically (for all parameters to train) through the optimizer object:</p>
@@ -763,7 +767,7 @@ Gradient information (after zero-ing) = None
 </section>
 </section>
 <section id="training-loop">
-<h2>Training loop<a class="headerlink" href="#training-loop" title="Permalink to this heading">#</a></h2>
+<h2>Training loop<a class="headerlink" href="#training-loop" title="Link to this heading">#</a></h2>
 <p>After having gone through our cycle of parameter updating step-by-step, let’s iterate this in a training loop consisting of <code class="docutils literal notranslate"><span class="pre">n_training_steps</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -865,7 +869,7 @@ Gradient information (after zero-ing) = None
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -894,6 +898,7 @@ Gradient information (after zero-ing) = None
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -960,8 +965,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

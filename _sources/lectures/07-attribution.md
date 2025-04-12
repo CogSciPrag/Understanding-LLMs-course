@@ -1,6 +1,6 @@
 # Attribution methods
 
-Slides of the session which looks at the internal workings of LLMs and different techniques for trying to understand them (e.g., transformer attention visualization, feature attribution methods, probing), can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/07-Probing-Attribution.pdf).
+Stay tuned for slides from the seventh lecture!
 
 ## Additional materials
 

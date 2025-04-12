@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sheet 7.2: Advanced evaluation &#8212; Understanding LLMs</title>
   
@@ -15,53 +14,49 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/07b-biases-assessment';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -76,28 +71,23 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -119,12 +109,20 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -140,6 +138,8 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../intro.html">
@@ -158,7 +158,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -223,13 +234,6 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/04-evaluation.html">Homework 4: LLM evaluation</a></li>
-</ul>
 
     </div>
 </nav></div>
@@ -244,7 +248,7 @@ const thebe_selector_output = ".output, .cell_output"
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -253,14 +257,14 @@ const thebe_selector_output = ".output, .cell_output"
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -285,14 +289,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/07b-biases-assessment.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onBinder"
+   title="Launch on Binder"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_binder.svg">
+    <img alt="Binder logo" src="../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
 </a>
@@ -303,14 +307,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/07b-biases-assessment.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onColab"
+   title="Launch on Colab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_colab.png">
+    <img alt="Colab logo" src="../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
@@ -452,10 +456,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -463,14 +467,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -508,17 +512,17 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-7-2-advanced-evaluation">
-<h1>Sheet 7.2: Advanced evaluation<a class="headerlink" href="#sheet-7-2-advanced-evaluation" title="Permalink to this heading">#</a></h1>
+<h1>Sheet 7.2: Advanced evaluation<a class="headerlink" href="#sheet-7-2-advanced-evaluation" title="Link to this heading">#</a></h1>
 <p><strong>Author:</strong> Polina Tsvilodub</p>
 <p>The main learning goal of this sheet is diving deeper into SOTA evaluations of LLMs; specifically, it is the familiarization with benchmarks which evaluate more intricate aspects of LLM I/O behavior.
 Since recent LLMs exhibit in-context learning behavior and have shown good performance on various tasks going beyond simple text completion, this sheet will zoom in on the more recent benchmarks like <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a>, and evaluations of aspects connected to safety and fairness of LLMs. As mentioned in the previous sheet, the latter aspect became especially relevant as LLMs are embedded in user facing applications. Furthermore, awareness of questions of algorithmic fairness and biases in ML is increasingly rising in the community.</p>
 <p>The methods used for evaluating such aspects are already familiar to you from the previous sheet. Therefore, this sheet is more conceptual and aims rather at sharpening your critical thinking and result interpretation skills.</p>
 <p><strong>Disclaimer:</strong> this sheet does NOT provide exhaustive information or perspectives on these topics. It is intended as a starting resource for thinking and researching more on these topics, if you are interested.</p>
 <section id="knowledge-problem-solving-benchmarks">
-<h2>Knowledge &amp; Problem solving benchmarks<a class="headerlink" href="#knowledge-problem-solving-benchmarks" title="Permalink to this heading">#</a></h2>
+<h2>Knowledge &amp; Problem solving benchmarks<a class="headerlink" href="#knowledge-problem-solving-benchmarks" title="Link to this heading">#</a></h2>
 <p>Two of the most popular recent benchmarks for LLMs are the <a class="reference external" href="https://arxiv.org/abs/2009.03300">MMLU</a> and the <a class="reference external" href="https://arxiv.org/abs/2206.04615">BIG-Bench</a> datasets.
 The authors of MMLU describe it as a multi-task dataset for text models; according to the paper, in order to obtain high accuracy on it, models must possess world knowledge and problem solving capabilities. It contains tasks like elementary mathematics, US history, computer science, law etc.
 The BIG Bench also contains various tasks drawing problems from linguistics, childhood development, math, common-sense reasoning, biology, physics, social bias, software development etc. Interestingly, its composition is driven by what is / was believed to be beyond the capabilities of SOTA LMs of 2022.</p>
@@ -551,7 +555,7 @@ Most recent evaluations, e.g., of <a class="reference external" href="https://ar
 <p><img alt="img" src="../_images/inverse-scaling.png" /></p>
 </div></blockquote>
 <section id="hallucinations">
-<h3>Hallucinations<a class="headerlink" href="#hallucinations" title="Permalink to this heading">#</a></h3>
+<h3>Hallucinations<a class="headerlink" href="#hallucinations" title="Link to this heading">#</a></h3>
 <p>One core problem of LLMs are so-called <em>hallucinations</em> – outputs generated by LLMs which sound <em>plausible</em> but are actually <em>wrong</em> with respect to real-world facts. This is a problematic phenomenon when we think about LLMs as part of user-facing applications where the developers would want the users to be able to rely on the system’s outputs. Additionally, this issue might provide an interesting perspective on the questions regarding human-likeness of LLM performance.</p>
 <p>Hallucinations have been distinguished into factual hallucinations, i.e., those where LLMs output factually wrong information, and faithfulness hallucinations, where the LLM is inconsistent with user inputs or prior generations. Identifying, minimizing hallucinations and scalably evaluating LLMs’ hallucination propensity remains a core challenge for the field. One commonly used benchmark for detecting hallucinations is the <a class="reference external" href="https://arxiv.org/abs/2109.07958">TruthfulQA dataset</a>.
 <a class="reference external" href="https://arxiv.org/pdf/2311.05232">This</a> paper provides more details and an overview of recent advances in the field.</p>
@@ -565,7 +569,7 @@ Most recent evaluations, e.g., of <a class="reference external" href="https://ar
 </div></blockquote>
 </section>
 <section id="process-consistency">
-<h3>Process consistency<a class="headerlink" href="#process-consistency" title="Permalink to this heading">#</a></h3>
+<h3>Process consistency<a class="headerlink" href="#process-consistency" title="Link to this heading">#</a></h3>
 <p>One aspect of LLM evaluation that is missing for the approaches discussed so far is closer (behvaioral) inspection of <em>how a model got to its answer</em>. That is, although it has been shown that explicit solution steps elicited via chain-of-thought prompting and similar techniques are beneficial for model performance, the actual consistency and correctness of these steps is rarely evaluated! In fact, it has been shown that models can be “right for the wrong reasons”, i.e., their performance might not be sensitive to wrong intermediate steps <a class="reference external" href="https://aclanthology.org/2022.naacl-main.167/">(Webson &amp; Pavlick, 2022)</a>.</p>
 <p>One interesting approach that attempts to target this problem is <a class="reference external" href="https://openai.com/index/improving-mathematical-reasoning-with-process-supervision/"><em>process supervision</em></a>. This approach is related to RLHF, where a reward model is trained to assign higher rewards to more desirable outcomes. Under process supervision, however, the reward model is trained to also check intermediate solution steps. This is tested on math tasks.</p>
 <blockquote>
@@ -577,7 +581,7 @@ Most recent evaluations, e.g., of <a class="reference external" href="https://ar
 </section>
 </section>
 <section id="reasoning-benchmarks">
-<h2>Reasoning benchmarks<a class="headerlink" href="#reasoning-benchmarks" title="Permalink to this heading">#</a></h2>
+<h2>Reasoning benchmarks<a class="headerlink" href="#reasoning-benchmarks" title="Link to this heading">#</a></h2>
 <p>Another capability that has been recently tested distinctly from knowledge tasks and respective problems is <em>abstract reasoning</em>. Specifically, the Abstraction and Reasoning Corpus (ARC) (<a class="reference external" href="https://arxiv.org/pdf/1911.01547">Chollet, 2019</a>) tests different models (primarily, vision models, but more recently also LLMs) on reasoning about abstract visual shapes and their relations. This remains one of the most challenging tests for machines. <a class="reference external" href="https://lab42.global/arc/">This</a> blogpost provides a short overview of the benchmark.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 7.2.4: ARC</span></strong></p>
@@ -587,7 +591,7 @@ Most recent evaluations, e.g., of <a class="reference external" href="https://ar
 </div></blockquote>
 </section>
 <section id="social-aspects">
-<h2>Social aspects<a class="headerlink" href="#social-aspects" title="Permalink to this heading">#</a></h2>
+<h2>Social aspects<a class="headerlink" href="#social-aspects" title="Link to this heading">#</a></h2>
 <p>There are many important social aspects of LLM performance. Some of these have been outlined in the hallmark paper about whether LLMs are stochastic parrots <a class="reference external" href="https://dl.acm.org/doi/10.1145/3442188.3445922">(Bender et al., 2021)</a>, i.e., whether they perpetuate (parrot) patterns in their training data, and in particular, undesirable patterns.</p>
 <p>Some examples and discussions in the lecture and previous sheets already highlighted some of these undesirable aspects. These include stereotypes (e.g., gender stereotypes), toxicity (i.e., use of harmful language) and other social biases.
 Below are some examples for datasets commonly used to evaluate whether an LLM exhibits those biases.</p>
@@ -605,7 +609,7 @@ Below are some examples for datasets commonly used to evaluate whether an LLM ex
 </div></blockquote>
 </section>
 <section id="assistant-evaluation">
-<h2>Assistant evaluation<a class="headerlink" href="#assistant-evaluation" title="Permalink to this heading">#</a></h2>
+<h2>Assistant evaluation<a class="headerlink" href="#assistant-evaluation" title="Link to this heading">#</a></h2>
 <p>Finally, as recent LLMs have been trained to be <em>helpful, honest and harmless assitants</em>, there are respective evaluations assessing whether trained assistant indeed meet these criteria. Evaluations of harmlessness often assess the toxicity of LM outputs, with methods / datasets mentioned above.
 The process of identifying topics or inputs for which LLMs exhibit unsafe or undesired behavior is also sometimes called <em>red teaming</em>. Here, teams of experts come up with prompts or topics which might elicit undesirable behavior by the LLMs. The results are often used to construct targeted fine-tuning datasets which aim to adjust the LLM behavior, and for evaluation of the models throughout the fine-tuning.</p>
 <p>Evaluations of honesty are often largely evaluations related to factuality and hallucinations.</p>
@@ -646,7 +650,7 @@ The process of identifying topics or inputs for which LLMs exhibit unsafe or und
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -675,6 +679,7 @@ The process of identifying topics or inputs for which LLMs exhibit unsafe or und
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -738,8 +743,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

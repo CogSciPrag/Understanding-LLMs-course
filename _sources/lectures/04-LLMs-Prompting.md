@@ -1,6 +1,6 @@
 # Prompting & Current LMs
 
-Slides from the fourth lecture introducing prompting strategies in the context of base (or, foundational) language models, as well as some of the current large language models can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/04-LLMs-prompting.pdf).
+Stay tuned for slides from the fourth lecture!
 
 ## Additional materials
 

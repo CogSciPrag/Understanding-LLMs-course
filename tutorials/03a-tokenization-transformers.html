@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sheet 3.1: Tokenization &amp; Transformers &#8212; Understanding LLMs</title>
   
@@ -15,53 +14,49 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/03a-tokenization-transformers';</script>
@@ -78,28 +73,23 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -121,12 +111,20 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -142,6 +140,8 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../intro.html">
@@ -160,7 +160,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -225,13 +236,6 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/04-evaluation.html">Homework 4: LLM evaluation</a></li>
-</ul>
 
     </div>
 </nav></div>
@@ -246,7 +250,7 @@ const thebe_selector_output = ".output, .cell_output"
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -255,14 +259,14 @@ const thebe_selector_output = ".output, .cell_output"
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -287,14 +291,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/03a-tokenization-transformers.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onBinder"
+   title="Launch on Binder"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_binder.svg">
+    <img alt="Binder logo" src="../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
 </a>
@@ -305,14 +309,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/03a-tokenization-transformers.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onColab"
+   title="Launch on Colab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_colab.png">
+    <img alt="Colab logo" src="../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
@@ -454,10 +458,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -465,14 +469,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -520,10 +524,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-3-1-tokenization-transformers">
-<h1>Sheet 3.1: Tokenization &amp; Transformers<a class="headerlink" href="#sheet-3-1-tokenization-transformers" title="Permalink to this heading">#</a></h1>
+<h1>Sheet 3.1: Tokenization &amp; Transformers<a class="headerlink" href="#sheet-3-1-tokenization-transformers" title="Link to this heading">#</a></h1>
 <p><strong>Author:</strong> Polina Tsvilodub</p>
 <p>In this sheet, we will focus on two topics: <em>tokenization</em>, the process of converting raw text into single tokens which are mapped onto neural-network friendly numerical representations; and <em>transformers</em>, the architecture behind state-of-the-art language models. The learning goals for this sheet are:</p>
 <ul class="simple">
@@ -533,7 +537,7 @@ document.write(`
 <li><p>understand pretrained transformers like GPT-2 which can be loaded from HuggingFace.</p></li>
 </ul>
 <section id="tokenization">
-<h2>Tokenization<a class="headerlink" href="#tokenization" title="Permalink to this heading">#</a></h2>
+<h2>Tokenization<a class="headerlink" href="#tokenization" title="Link to this heading">#</a></h2>
 <p>Under the hood, neural networks are complicated functions; therefore, they cannot deal with raw text represented as strings, but uses numerical representations of the text. This conversion is done by a <em>tokenizer</em>, and the process is called <em>tokenization</em>. Tokenization commonly consists of the following steps:</p>
 <ol class="arabic simple">
 <li><p>splitting the input text into words, subwords, or symbols (like punctuation) that are called <em>tokens</em></p></li>
@@ -560,7 +564,7 @@ document.write(`
 <p>However, this simple approach has several limitations. Specifically, the vocabulary is very limited and is manually defined a priori. While such an approach may work for simple tasks or very specific domains like predicting names, it is not very useful for dealing with more general texts which may include numbers, emojis, or different languages with different alphabets. Under this simple approach, we wouldn’t be able to represent any of these things.</p>
 <p>To allow for more flexibility but avoid having to manually specify all possible tokens, special tokenization approaches have been developed. The most prominent tokenization algorithm used, e.g., for the GPT models, is the so-called <em>byte-pair-encoding</em> (BPE) tokenization. BPE tokenizers are trained, i.e., the can be adjusted on specific texts so as to optimally represent the data.</p>
 <section id="bpe-tokenization">
-<h3>BPE tokenization<a class="headerlink" href="#bpe-tokenization" title="Permalink to this heading">#</a></h3>
+<h3>BPE tokenization<a class="headerlink" href="#bpe-tokenization" title="Link to this heading">#</a></h3>
 <p>Here are the core steps behind BPE tokenization:</p>
 <ul class="simple">
 <li><p>Text from the training corpus is normalized. That is, text undergoes general preprocessing like removing unnecessary whitespaces, lower-casing, possibly doing unicode normalization.</p></li>
@@ -577,7 +581,7 @@ document.write(`
 <p>If you want to dive deeper into the algorithm, take a look at <a class="reference external" href="https://huggingface.co/learn/nlp-course/en/chapter6/5#byte-pair-encoding-tokenization">this</a> tutorial. Another common approach is WordPiece tokenization; you can learn more <a class="reference external" href="https://huggingface.co/learn/nlp-course/en/chapter6/6">here</a>.</p>
 </section>
 <section id="special-tokens">
-<h3>Special tokens<a class="headerlink" href="#special-tokens" title="Permalink to this heading">#</a></h3>
+<h3>Special tokens<a class="headerlink" href="#special-tokens" title="Link to this heading">#</a></h3>
 <p>An important aspect of tokenizers are special tokens. They are called “special” because they carry special meaning rather than simply representing parts of a text. Common SOTA tokenizers have the following special tokens:</p>
 <ul class="simple">
 <li><p><strong>beginning-of-sequence (BOS)</strong> (or, start-of-sequence, SOS) token: it is prepended to the start of every training sequence, and at inference time, it is used to signal to the LM that text should be predicted. In a sense, it represents a “signal to act”.</p>
@@ -603,17 +607,17 @@ document.write(`
 <p>These special tokens are added to the vocabulary of a tokenizer, i.e., represented by their own token indices.</p>
 <p>The important take-away is that, in order to get optimal performance of a trained LM, one must use tokenization in the same way as what was used when the model was trained!</p>
 <section id="outlook-optional-eos-tokens">
-<h4>Outlook (optional): EOS tokens<a class="headerlink" href="#outlook-optional-eos-tokens" title="Permalink to this heading">#</a></h4>
+<h4>Outlook (optional): EOS tokens<a class="headerlink" href="#outlook-optional-eos-tokens" title="Link to this heading">#</a></h4>
 <p>Next to the intuitive role of signaling to the LM that a sequence ended, EOS tokens play an important conceptual role. Specifically, it is necessary to define a set of finite strings so as to ensure that the LM represents a valid probability measure over the vocabulary (or, alphabet) (<a class="reference external" href="https://arxiv.org/pdf/2212.10502">Du et al., 2022</a>). See <a class="reference external" href="https://drive.google.com/file/d/1IYgjs0Vf8TPmVW6w4S125j3G5Asatn4f/view">these</a> lecture notes for more information.</p>
 </section>
 </section>
 <section id="pretrained-tokenizers">
-<h3>Pretrained tokenizers<a class="headerlink" href="#pretrained-tokenizers" title="Permalink to this heading">#</a></h3>
+<h3>Pretrained tokenizers<a class="headerlink" href="#pretrained-tokenizers" title="Link to this heading">#</a></h3>
 <p>In practice, as with language models, we don’t have to create tokenizers ourselves – we can download pretrained tokenizers that were created for specific LMs and are shipped with them on HF. We have already used a pretrained tokenizer in the previous sheets under the hood. Below, we take a closer look at the pretrained GPT-2 tokenizer.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load tokenizer</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
 
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
 </pre></div>
@@ -693,7 +697,7 @@ Third tokenization: Unigram Tokenization. Starts with large vocabulary and remov
 <p>After tokenization, each token is mapped onto an <em>embedding</em>. As discussed in the lecture, there are different types of embeddings: type-based and contextualized embeddings. In both cases, the token IDs are mapped to vector representations as the first processing step in an LM. For type-based representations, these vectors are already pretrained static embeddings. For contextualized cases, these vectores are passed through the net and only the processed vectors are considered embeddings.</p>
 <p>The initial mapping is done by creating <em>one-hot vector</em> as a representation of each index. These are then multipled with the embedding matrix, which results in embedding representations of each token. These are then further processed.</p>
 <section id="attention-masks">
-<h4>Attention masks<a class="headerlink" href="#attention-masks" title="Permalink to this heading">#</a></h4>
+<h4>Attention masks<a class="headerlink" href="#attention-masks" title="Link to this heading">#</a></h4>
 <p>Note that, next to input IDs (i.e., token IDs), the tokenizer encoding returns an attention mask <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code>. The attention mask has the same shape as the input IDs. It is used for training in order to allow the transformer to base its predictions only on certain parts of the input text. Specifically, for causal LMs, attention masks are needed because we can nicely parallelise the training of transformers and process an entire sequence at once (in contrast to RNN training); but we still want to base the predictions only on the preceding part of a sentence.</p>
 <p>In the widespread HF implementation, the attention mask has a 1 to indicate that the transformer should <em>attend</em> to tokens at the particular positions, while a 0 indicates that the transformer should not attend to the given token. The attention mask provided by the tokenizer (or created manually by the user) is further transformed and added to the attention computations. This operation results in “zero-ing out” contributions of tokens we don’t want to attend to when computing a given token representation, essentially as if they weren’t there.</p>
 <p><strong>Causal mask</strong>:
@@ -706,20 +710,19 @@ The attention mask is used to enable <em>causal</em> language modeling, i.e., to
 <ol class="arabic simple">
 <li><p>Consider the sentence “The quick fox jumped.”. Write down the causal attention mask that we would use for i=2, i.e,. when training the model to predict the word that comes after “fox”. Assume word / punctuation-sign level tokenization.</p></li>
 <li><p>Consider a vocabulary that consists of five tokens. Consider the following embedding matrix with 3-dimensional embeddings:
-$$
-E =</p></li>
+$<span class="math notranslate nohighlight">\(
+E =
+\begin{bmatrix}
+0.11 &amp; 0.02 &amp; 0.37\\
+0.56 &amp; 0.89 &amp; 0.41 \\
+0.60 &amp; 0.89 &amp; 0 \\
+0.20 &amp; 1 &amp; 0.62 \\
+0.12 &amp; 0.03 &amp; 0.29 \\ 
+\end{bmatrix}
+\)</span>$
+Extract the embedding for the token with the ID 2 (assume 0-indexing). Write down the respective calculation step.</p></li>
+<li><p>What is a very well known masked LM architecture?</p></li>
 </ol>
-<div class="amsmath math notranslate nohighlight" id="equation-ff2e340c-b8ab-4448-9661-8d7e841fc39e">
-<span class="eqno">(1)<a class="headerlink" href="#equation-ff2e340c-b8ab-4448-9661-8d7e841fc39e" title="Permalink to this equation">#</a></span>\[\begin{bmatrix}
-&gt;0.11 &amp; 0.02 &amp; 0.37\\
-&gt;0.56 &amp; 0.89 &amp; 0.41 \\
-&gt;0.60 &amp; 0.89 &amp; 0 \\
-&gt; 0.20 &amp; 1 &amp; 0.62 \\
-&gt; 0.12 &amp; 0.03 &amp; 0.29 \\ 
-&gt;\end{bmatrix}\]</div>
-<p>$$
-Extract the embedding for the token with the ID 2 (assume 0-indexing). Write down the respective calculation step.
-3. What is a very well known masked LM architecture?</p>
 </div></blockquote>
 <div class="toggle docutils container">
 <blockquote>
@@ -735,10 +738,10 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 </section>
 </section>
 <section id="transformers">
-<h2>Transformers<a class="headerlink" href="#transformers" title="Permalink to this heading">#</a></h2>
+<h2>Transformers<a class="headerlink" href="#transformers" title="Link to this heading">#</a></h2>
 <p>In the lecture we have now considered what the transformer architecture actually is under the hood. In this part of the sheet, the formal concepts of the architecture are mapped on their implementation, as provided by the PyTorch library and by HuggingFace within the pre-build and pre-trained models.</p>
 <section id="pytorch">
-<h3>PyTorch<a class="headerlink" href="#pytorch" title="Permalink to this heading">#</a></h3>
+<h3>PyTorch<a class="headerlink" href="#pytorch" title="Link to this heading">#</a></h3>
 <p>PyTorch provides a pre-build <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html">transformer</a> architecture which allows to specify your desired model via different parameters.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 3.1.4: Simple transformers in PyTorch</span></strong></p>
@@ -749,9 +752,9 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 </pre></div>
 </div>
 </div>
@@ -763,7 +766,7 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 <span class="expanded">Hide code cell content</span>
 </summary>
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inject some information about the relative or absolute position of the tokens in the sequence.</span>
 <span class="sd">    The positional encodings have the same dimension as the embeddings, so that the two can be summed.</span>
@@ -781,7 +784,7 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 <span class="sd">        &gt;&gt;&gt; pos_encoder = PositionalEncoding(d_model)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PositionalEncoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
 
@@ -793,12 +796,12 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
         <span class="n">pe</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;pe&#39;</span><span class="p">,</span> <span class="n">pe</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">TransformerModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Transformer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransformerModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Transformer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Container module with an encoder-decoder transformer model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntoken</span><span class="p">,</span> <span class="n">ninp</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">nhid</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntoken</span><span class="p">,</span> <span class="n">ninp</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">nhid</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        #### YOUR DOCSTRING HERE #####</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1011,11 +1014,11 @@ Value matrix shape  torch.Size([32, 32])
 <p>Feel free to play around with these retrievals to better understand the architecture.</p>
 </section>
 <section id="pretrained-transformers">
-<h3>Pretrained transformers<a class="headerlink" href="#pretrained-transformers" title="Permalink to this heading">#</a></h3>
+<h3>Pretrained transformers<a class="headerlink" href="#pretrained-transformers" title="Link to this heading">#</a></h3>
 <p>Below, we consider in more detail what is under the hood when we load a pretrained transformer from HF. We will look at GPT-2. GPT-2 is a <em>decoder-only</em> model. That is, it only uses self-attention and only has a <em>decoder</em> block. Under the hood, it also uses the same building blocks as the transformer above, but provides higher-level wrappers around the core functionality and already implements the required configurations that were developed as the GPT-2 architecture.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
 </pre></div>
 </div>
 </div>
@@ -1126,7 +1129,7 @@ Value matrix shape  torch.Size([32, 32])
 </section>
 </section>
 <section id="outlook-optional">
-<h2>Outlook (optional)<a class="headerlink" href="#outlook-optional" title="Permalink to this heading">#</a></h2>
+<h2>Outlook (optional)<a class="headerlink" href="#outlook-optional" title="Link to this heading">#</a></h2>
 <p>For those who want to know more about topics that go beyond the contents of the sheet and the lecture, here are some pointers:</p>
 <ul class="simple">
 <li><p>A different task that relies on text generation is image captioning. We have briefly seen it in the context of attention visualization. <a class="reference external" href="https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Vinyals_Show_and_Tell_2015_CVPR_paper.pdf">This</a> paper introduces one of the first successful architectures in this domain.</p>
@@ -1171,7 +1174,7 @@ Value matrix shape  torch.Size([32, 32])
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1200,6 +1203,7 @@ Value matrix shape  torch.Size([32, 32])
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -1273,8 +1277,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

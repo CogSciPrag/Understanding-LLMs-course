@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sheet 2.4: Character-level sequence modeling w/ RNNs &#8212; Understanding LLMs</title>
   
@@ -15,53 +14,49 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/02d-char-level-RNN';</script>
@@ -78,28 +73,23 @@ const thebe_selector_output = ".output, .cell_output"
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -121,12 +111,20 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -142,6 +140,8 @@ const thebe_selector_output = ".output, .cell_output"
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../intro.html">
@@ -160,7 +160,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -225,13 +236,6 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../homework/01-language-modeling.html">Homework 1: Language models (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/02-prompting.html">Homework 2: Prompting &amp; Generation with LMs (50 points)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/03-agents-RL.html">Homework 3: LLM agents &amp; RL fine-tuning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../homework/04-evaluation.html">Homework 4: LLM evaluation</a></li>
-</ul>
 
     </div>
 </nav></div>
@@ -246,7 +250,7 @@ const thebe_selector_output = ".output, .cell_output"
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -255,14 +259,14 @@ const thebe_selector_output = ".output, .cell_output"
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -287,14 +291,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/tutorials/02d-char-level-RNN.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onBinder"
+   title="Launch on Binder"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_binder.svg">
+    <img alt="Binder logo" src="../_static/images/logo_binder.svg">
   </span>
 <span class="btn__text-container">Binder</span>
 </a>
@@ -305,14 +309,14 @@ const thebe_selector_output = ".output, .cell_output"
       
       <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/tutorials/02d-char-level-RNN.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
-   title="Launch onColab"
+   title="Launch on Colab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
 <span class="btn__icon-container">
   
-    <img src="../_static/images/logo_colab.png">
+    <img alt="Colab logo" src="../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
@@ -454,10 +458,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -465,14 +469,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -511,16 +515,16 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-2-4-character-level-sequence-modeling-w-rnns">
-<h1>Sheet 2.4: Character-level sequence modeling w/ RNNs<a class="headerlink" href="#sheet-2-4-character-level-sequence-modeling-w-rnns" title="Permalink to this heading">#</a></h1>
+<h1>Sheet 2.4: Character-level sequence modeling w/ RNNs<a class="headerlink" href="#sheet-2-4-character-level-sequence-modeling-w-rnns" title="Link to this heading">#</a></h1>
 <p><strong>Author:</strong> Michael Franke</p>
 <p>The goal of this tutorial is to get familiar with simple language models.
 To be able to have a manageable (quick to train, evaluate, inspect) case study, we look at character-level predictions of surnames from different languages.
 (The inspiration and source of this notebook is <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html">this tutorial</a> from PyTorch’s documentation.)</p>
 <section id="packages-global-parameters">
-<h2>Packages &amp; global parameters<a class="headerlink" href="#packages-global-parameters" title="Permalink to this heading">#</a></h2>
+<h2>Packages &amp; global parameters<a class="headerlink" href="#packages-global-parameters" title="Link to this heading">#</a></h2>
 <p>In addition to the usual packages for neural network modeling, we will also require packages for I/O and string handling.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -528,19 +532,19 @@ To be able to have a manageable (quick to train, evaluate, inspect) case study, 
 <span class="c1">## import packages</span>
 <span class="c1">##################################################</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">pandas</span>
-<span class="kn">import</span> <span class="nn">string</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 </pre></div>
@@ -549,7 +553,7 @@ To be able to have a manageable (quick to train, evaluate, inspect) case study, 
 </div>
 </section>
 <section id="loading-inspecting-the-data">
-<h2>Loading &amp; inspecting the data<a class="headerlink" href="#loading-inspecting-the-data" title="Permalink to this heading">#</a></h2>
+<h2>Loading &amp; inspecting the data<a class="headerlink" href="#loading-inspecting-the-data" title="Link to this heading">#</a></h2>
 <p>Our training data are lists of surnames from different countries.
 We will use this data set to train a model that predicts a name, given the country as a prompt.</p>
 <p>The (pre-processed) data is stored in a JSON file.
@@ -665,7 +669,7 @@ False
 </div>
 </section>
 <section id="train-test-split">
-<h2>Train-test split<a class="headerlink" href="#train-test-split" title="Permalink to this heading">#</a></h2>
+<h2>Train-test split<a class="headerlink" href="#train-test-split" title="Link to this heading">#</a></h2>
 <p>We will split the data into a training and a test set.
 Look at the code and try to answer the exercise question of how this split is realized.</p>
 <div class="cell docutils container">
@@ -726,7 +730,7 @@ Polish 139 125 14
 </div>
 </section>
 <section id="defining-the-model">
-<h2>Defining the model<a class="headerlink" href="#defining-the-model" title="Permalink to this heading">#</a></h2>
+<h2>Defining the model<a class="headerlink" href="#defining-the-model" title="Link to this heading">#</a></h2>
 <p>The model we use is a (hand-crafted) recurrent neural network.
 The architecture follows <a class="reference external" href="https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html">this tutorial</a>, from where we also borrow the following picture:</p>
 <p><img alt="img" src="../_images/05-RNN-diagram.png" />{width=550px}</p>
@@ -750,8 +754,8 @@ The inclusion of dropout introduces a random element in the model during trainin
 <span class="c1">##################################################</span>
 
 
-<span class="k">class</span> <span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
@@ -761,7 +765,7 @@ The inclusion of dropout introduces a random element in the model during trainin
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">dropout</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">dropout</span><span class="p">):</span>
         <span class="n">input_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
@@ -773,7 +777,7 @@ The inclusion of dropout introduces a random element in the model during trainin
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
 
-    <span class="k">def</span> <span class="nf">init_hidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_hidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -792,7 +796,7 @@ The inclusion of dropout introduces a random element in the model during trainin
 </div>
 </section>
 <section id="helper-functions-for-training">
-<h2>Helper functions for training<a class="headerlink" href="#helper-functions-for-training" title="Permalink to this heading">#</a></h2>
+<h2>Helper functions for training<a class="headerlink" href="#helper-functions-for-training" title="Link to this heading">#</a></h2>
 <p>For training, we will present the model with randomly sampled single items.
 This is why we define a ’random_training_pair’ function which returns, well, a random training pair (category and name).</p>
 <div class="cell docutils container">
@@ -803,12 +807,12 @@ This is why we define a ’random_training_pair’ function which returns, well,
 
 
 <span class="c1"># Random item from a list</span>
-<span class="k">def</span> <span class="nf">random_choice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_choice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
 
 
 <span class="c1"># Get a random category and random line from that category</span>
-<span class="k">def</span> <span class="nf">random_training_pair</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_training_pair</span><span class="p">():</span>
     <span class="n">category</span> <span class="o">=</span> <span class="n">random_choice</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
     <span class="n">line</span> <span class="o">=</span> <span class="n">random_choice</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">category</span><span class="p">,</span> <span class="n">line</span>
@@ -822,7 +826,7 @@ For sequences of characters we distinguish those used as input to the model (’
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># One-hot vector for category</span>
-<span class="k">def</span> <span class="nf">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
     <span class="n">li</span> <span class="o">=</span> <span class="n">categories</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_categories</span><span class="p">)</span>
     <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -831,7 +835,7 @@ For sequences of characters we distinguish those used as input to the model (’
 
 <span class="c1"># One-hot matrix of first to last letters (not including [EOS]) for input</span>
 <span class="c1"># The first input is always [SOS]</span>
-<span class="k">def</span> <span class="nf">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
     <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">SOSIndex</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
@@ -840,7 +844,7 @@ For sequences of characters we distinguish those used as input to the model (’
     <span class="k">return</span> <span class="n">tensor</span>
 
 
-<span class="k">def</span> <span class="nf">target_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">target_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
     <span class="n">letter_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">])</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))]</span>
     <span class="n">letter_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOSIndex</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">letter_indexes</span><span class="p">)</span>
@@ -852,7 +856,7 @@ For sequences of characters we distinguish those used as input to the model (’
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make category, input, and target tensors from a random category, line pair</span>
-<span class="k">def</span> <span class="nf">random_training_example</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_training_example</span><span class="p">():</span>
     <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">random_training_pair</span><span class="p">()</span>
     <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
     <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
@@ -877,7 +881,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make category, input, and target tensors from a random category, line pair</span>
-<span class="k">def</span> <span class="nf">random_training_example</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">random_training_example</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    create a random training example from dataset.</span>
 <span class="sd">    :return:</span>
@@ -900,7 +904,7 @@ For sequences of characters we distinguish those used as input to the model (’
 <p>We use this timing function to keep track of training time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">time_since</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">time_since</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">since</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
@@ -912,7 +916,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </section>
 <section id="training-the-network">
-<h2>Training the network<a class="headerlink" href="#training-the-network" title="Permalink to this heading">#</a></h2>
+<h2>Training the network<a class="headerlink" href="#training-the-network" title="Link to this heading">#</a></h2>
 <p>This function captures a single training step for one training triplet (category, input representation of the name, output representation of the string).</p>
 <p>What is important to note here is that at the start of each “name”, so to speak, we need to supply a fresh ’hidden layer’, but that subsequent calls to the RNN’s forward pass function will use the hidden layer that is returned from the previous forward pass.</p>
 <div class="cell docutils container">
@@ -922,7 +926,7 @@ For sequences of characters we distinguish those used as input to the model (’
 <span class="c1">##################################################</span>
 
 
-<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">):</span>
     <span class="c1"># reshape target tensor</span>
     <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># get a fresh hidden layer</span>
@@ -1042,7 +1046,7 @@ For sequences of characters we distinguish those used as input to the model (’
 </div>
 </section>
 <section id="evaluation-inference">
-<h2>Evaluation &amp; inference<a class="headerlink" href="#evaluation-inference" title="Permalink to this heading">#</a></h2>
+<h2>Evaluation &amp; inference<a class="headerlink" href="#evaluation-inference" title="Link to this heading">#</a></h2>
 <p>Let’s see what the model has learned and how well it does in producing new names.</p>
 <p>Here are some auxiliary functions to obtain surprisal values and related notions for sequences of characters.
 We can use them to compare the model’s performance on the training and test data set.</p>
@@ -1053,7 +1057,7 @@ We can use them to compare the model’s performance on the training and test da
 <span class="c1">##################################################</span>
 
 
-<span class="k">def</span> <span class="nf">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_surprisal_item</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
     <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1067,7 +1071,7 @@ We can use them to compare the model’s performance on the training and test da
     <span class="k">return</span> <span class="n">surprisal</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">get_surprisal_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_surprisal_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="n">surprisl_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">surp_avg_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">perplxty_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -1090,7 +1094,7 @@ We can use them to compare the model’s performance on the training and test da
     <span class="k">return</span> <span class="p">(</span><span class="n">surprisl_dict</span><span class="p">,</span> <span class="n">surp_avg_dict</span><span class="p">,</span> <span class="n">perplxty_dict</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">make_df</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_df</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">):</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">surp_dict</span><span class="p">)</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
     <span class="n">p</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;surprisal&quot;</span><span class="p">,</span> <span class="s2">&quot;surp_scaled&quot;</span><span class="p">,</span> <span class="s2">&quot;perplexity&quot;</span><span class="p">]</span>
@@ -1125,7 +1129,7 @@ mean surprisal (train): 11.90373899401307
 </div>
 </section>
 <section id="inference">
-<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this heading">#</a></h2>
+<h2>Inference<a class="headerlink" href="#inference" title="Link to this heading">#</a></h2>
 <p>Let’s also explore the trained model’s predictions to compare them against our own intuitions of what might be typical names in a given country.</p>
 <p>Here’s a function that takes a country and an initial string, and it outputs a model prediction for how to continue that string.</p>
 <p>Note that for each prediction step with the model, the model is embedded under <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code>. This setting means that gradients are not computed during the forward passes through the model. This setting is recommended for <em>inference</em> (for any neural net), i.e., when you don’t want to train the model anymore (only use it for generating predictions). This allows to increase computational effiency and save memory.</p>
@@ -1139,7 +1143,7 @@ mean surprisal (train): 11.90373899401307
 
 
 <span class="c1"># make a prediction based on given sequence</span>
-<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">initial_sequence</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">initial_sequence</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_length</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">initial_sequence</span>
@@ -1214,7 +1218,7 @@ Shima
 </div>
 </section>
 <section id="inverting-the-generation-model">
-<h2>Inverting the generation model<a class="headerlink" href="#inverting-the-generation-model" title="Permalink to this heading">#</a></h2>
+<h2>Inverting the generation model<a class="headerlink" href="#inverting-the-generation-model" title="Link to this heading">#</a></h2>
 <p>The model we have trained here could be consider a <strong>speaker model</strong>: the model generates language (very limited in scope but still).
 Additionally, the model can be used to probe how likely a particular name would be (as a generated string) for a particular category/country.
 So, essentially we get something like <span class="math notranslate nohighlight">\(P_{S}(name \mid category)\)</span> as a speaker likelihood function.
@@ -1265,7 +1269,7 @@ For instance, we can do this:</p>
 </summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># function to retrieve conditional probability for (name|country)</span>
-<span class="k">def</span> <span class="nf">get_prob</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_prob</span><span class="p">(</span><span class="n">country</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
     <span class="n">category_tensor_</span> <span class="o">=</span> <span class="n">category_tensor</span><span class="p">(</span><span class="n">country</span><span class="p">)</span>
     <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -1417,7 +1421,7 @@ Logspace: P(Polish | Satoshi) = -3.033587316144933
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1446,6 +1450,7 @@ Logspace: P(Polish | Satoshi) = -3.033587316144933
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -1510,8 +1515,8 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>
