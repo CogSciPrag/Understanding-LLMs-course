@@ -1,0 +1,1131 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Homework 1: Language models (50 points) &#8212; Understanding LLMs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'homework/01-language-modeling';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Course overview: Understanding LLMs
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/01-introduction.html">Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/01-introduction.html">Sheet 1.1: Practical set-up &amp; Training data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 ANNs &amp; RNNs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/02-torch-ANNs-RNNs.html">PyTorch, ANNs &amp; LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02a-pytorch-intro.html">Sheet 2.1: PyTorch essentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02b-MLE.html">Sheet 2.2: ML-estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02c-MLP-pytorch.html">Sheet 2.3: Non-linear regression (MLP w/ PyTorch modules)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02d-char-level-RNN.html">Sheet 2.4: Character-level sequence modeling w/ RNNs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/02e-intro-to-hf.html">Sheet 2.5: Introduction to HuggingFace &amp; LMs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03a-tokenization-transformers.html">Sheet 3.1: Tokenization &amp; Transformers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 Prompting</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/04-LLMs-Prompting.html">Prompting &amp; Current LMs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/03c-decoding-prompting.html">Sheet 3.3: Prompting &amp; Decoding</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">05 Fine-tuning &amp; RLHF</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/05-finetuning-RLHF.html">Fine-tuning and RLHF</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/04a-finetuning-RL.html">Sheet 4.1 Supervised fine-tuning and RL fine-tuning</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 Agents &amp; applications</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/06-agents.html">LLM systems &amp; agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/05a-agents.html">Sheet 5.1 LLM agents</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">07 Attribution</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/07-attribution.html">Attribution methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/06a-attribution.html">Sheet 6.1 LLM probing &amp; attribution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">08 Behavioral evaluation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/08-evaluation.html">Evaluation &amp; behavioral assessment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07a-behavioral-assessment.html">Sheet 7.1: Behavioral assessment &amp; Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/07b-biases-assessment.html">Sheet 7.2: Advanced evaluation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">09 Mechanistic interpretation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/10-mechanistic-interpretability.html">Mechanistic Interpretability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/08a-mechanistic-interpretability.html">Sheet 8.1: Mechanistic interpretability</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">10 Understanding LLMs</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/CogSciPrag/Understanding-LLMs-course/main?urlpath=tree/understanding-llms/homework/01-language-modeling.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/CogSciPrag/Understanding-LLMs-course/blob/main/understanding-llms/homework/01-language-modeling.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/CogSciPrag/Understanding-LLMs-course/issues/new?title=Issue%20on%20page%20%2Fhomework/01-language-modeling.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/homework/01-language-modeling.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Homework 1: Language models (50 points)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-language-modeling-12-points">Exercise 1: Understanding language modeling (12 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-13-points">Exercise 2: Understanding LLM configuration (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-15-points">Exercise 3 (15 points):</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points">Exercise 3: Fine-tuning GPT-2 for QA (23 points)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="homework-1-language-models-50-points">
+<h1>Homework 1: Language models (50 points)<a class="headerlink" href="#homework-1-language-models-50-points" title="Link to this heading">#</a></h1>
+<p>The first homework focuses on the following skills: being able to work with concpetual &amp; formal exercises on language modeling and neural networks, understanding configurations of state-of-the-art language models and, finally, fine-tuning a language model yourself!</p>
+<section id="logistics">
+<h2>Logistics<a class="headerlink" href="#logistics" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>submission deadline: May 13th 23:59 German time via Moodle</p>
+<ul>
+<li><p>please upload a <strong>SINGLE ZIP FILE named Surname_FirstName_HW1.zip</strong> containing the .ipynb file of the notebook (if you solve it on Colab, you can go to File &gt; download).</p></li>
+</ul>
+</li>
+<li><p>please make sure to <strong>KEEP</strong> the outputs of your notebook cells where needed, so that we can inspect them.</p></li>
+<li><p>please solve and submit the homework <strong>individually</strong>!</p></li>
+<li><p>if you use Colab, to speed up the execution of the code on Colab (especially Exercise 3), you can use the available GPU (if Colab resources allow). For that, before executing your code, navigate to Runtime &gt; Change runtime type &gt; GPU &gt; Save.</p></li>
+</ul>
+</section>
+<section id="exercise-1-understanding-language-modeling-12-points">
+<h2>Exercise 1: Understanding language modeling (12 points)<a class="headerlink" href="#exercise-1-understanding-language-modeling-12-points" title="Link to this heading">#</a></h2>
+<p>Please answer the following exercises. Importantly, please reason step by step; i.e., where calculations are required, please provide intermediate steps of how you arrived at your solution. You do not need to write any code, just mathematical solutions.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>[6pts] Consider the corpus <span class="math notranslate nohighlight">\(C\)</span> with the following sentences: <span class="math notranslate nohighlight">\(C=\)</span>{“The cat sneezes”, “The bird sings”, “The cat sneezes”, “A dog sings”}.
+(a) Define the vocabulary <span class="math notranslate nohighlight">\(V\)</span> of this corpus (assuming by-word tokenization).
+(b) Pick one of the four sentences in <span class="math notranslate nohighlight">\(C\)</span>. Formulate the probability of that sentence in the form of the chain rule. Calculate the probability of each termn in the chain rule, given the corpus (assuming that there is, additionally, a start-of-sequence and an end-of-sequence token).</p></li>
+<li><p>[4pts] We want to train a neural network that takes as input two numbers <span class="math notranslate nohighlight">\(x_1, x_2\)</span>, passes them through three hidden linear layers, each with 13 neurons, each followed by the ReLU activation function, and outputs three numbers <span class="math notranslate nohighlight">\(y_1, y_2, y_3\)</span>. Write down all weight matrices of this network with their dimensions. (Example: if one weight matrix has the dimensions 3x5, write <span class="math notranslate nohighlight">\(M_1\in R^{3\times5}\)</span>)</p></li>
+<li><p>[2pts] Consider the sequence: “Input: Some students trained each language model”. Assuming that each word+space/punctuation corresponds to one token, consider the following token probabilities of this sequence under some trained language model: <span class="math notranslate nohighlight">\(p = [0.67, 0.91, 0.83, 0.40, 0.29, 0.58, 0.75]\)</span>. Compute the average surprisal of this sequence under that language model. [Note: in this class we always assume the base <span class="math notranslate nohighlight">\(e\)</span> for <span class="math notranslate nohighlight">\(log\)</span>, unless indicated otherwise. This is also usually the case throughout NLP.]</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="exercise-2-understanding-llm-configuration-13-points">
+<h2>Exercise 2: Understanding LLM configuration (13 points)<a class="headerlink" href="#exercise-2-understanding-llm-configuration-13-points" title="Link to this heading">#</a></h2>
+<p>For this task, your job is to understand the configrations of a state-of-the-art transformer, provided in a <code class="docutils literal notranslate"><span class="pre">config.json</span></code> file for allowing to initialize a transformer through the function <code class="docutils literal notranslate"><span class="pre">AutoModelForCausalLM.from_pretrained()</span></code> witin the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library. This file contains meta-information about the parameter configurations of the transformer.</p>
+<p>Your task is to:</p>
+<ol class="arabic simple">
+<li><p>explain what each line of the following config provides. Please write a commend above the line explaining what the following parameter is.</p></li>
+<li><p>modify the config so that the transformer would use a context window size of 1024, 12 attention heads, and a ReLU activation function.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;attention_bias&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;attention_dropout&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+  <span class="s2">&quot;bos_token_id&quot;</span><span class="p">:</span> <span class="mi">100257</span><span class="p">,</span>
+  <span class="s2">&quot;eos_token_id&quot;</span><span class="p">:</span> <span class="mi">100257</span><span class="p">,</span>
+  <span class="s2">&quot;hidden_act&quot;</span><span class="p">:</span> <span class="s2">&quot;silu&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;hidden_size&quot;</span><span class="p">:</span> <span class="mi">5120</span><span class="p">,</span>
+  <span class="s2">&quot;initializer_range&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span>
+  <span class="s2">&quot;intermediate_size&quot;</span><span class="p">:</span> <span class="mi">27648</span><span class="p">,</span>
+  <span class="s2">&quot;max_position_embeddings&quot;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
+  <span class="s2">&quot;num_attention_heads&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+  <span class="s2">&quot;num_hidden_layers&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+  <span class="s2">&quot;num_key_value_heads&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+  <span class="s2">&quot;pad_token_id&quot;</span><span class="p">:</span> <span class="mi">100277</span><span class="p">,</span>
+  <span class="s2">&quot;rms_norm_eps&quot;</span><span class="p">:</span> <span class="mf">1e-06</span><span class="p">,</span>
+  <span class="s2">&quot;rope_scaling&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+  <span class="s2">&quot;rope_theta&quot;</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span>
+  <span class="s2">&quot;tie_word_embeddings&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+  <span class="s2">&quot;torch_dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;use_cache&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="s2">&quot;vocab_size&quot;</span><span class="p">:</span> <span class="mi">100352</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3-15-points">
+<h2>Exercise 3 (15 points):<a class="headerlink" href="#exercise-3-15-points" title="Link to this heading">#</a></h2>
+<p>In the lecture, we have extensively covered a core component of the transformer – the self-attention block.
+In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up to, excluding, the forward step) from the exercise sheet assuming that the transformer has <em>two</em> attention heads, where the second attention head has the following weight matrices:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q_2</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="n">K_2</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="n">V_2</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can submit a picture / scan of a hand-written solution, or type – up to you. Please make sure to include all the intermediate calculation steps and answer the following question:</p>
+<ul class="simple">
+<li><p>How does the memory load of running inference with the transformer scale with the number of attention heads?</p></li>
+</ul>
+</section>
+<section id="exercise-3-fine-tuning-gpt-2-for-qa-23-points">
+<h2>Exercise 3: Fine-tuning GPT-2 for QA (23 points)<a class="headerlink" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points" title="Link to this heading">#</a></h2>
+<p>The learning goal of this exercise is to practice fine-tuning a pretrained LM, Pythia-160M, for a particular task, namely commonsense question answering (QA). We will use a task-specific dataset, <a class="reference external" href="https://huggingface.co/datasets/tau/commonsense_qa">CommonsenseQA</a>, that was introduced by <a class="reference external" href="https://arxiv.org/abs/1811.00937">Talmor et al. (2018)</a>. We will evaluate the performance of the model on our test split of the dataset over training to monitor whether the model’s performance is improving and compare the performance of the base pretrained GPT-2 and the fine-tuned model. We will need to perform the following steps:</p>
+<ol class="arabic simple">
+<li><p>Prepare data according to steps described in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/01-introduction.html#main-training-data-processing-steps">sheet 1.1</a></p>
+<ol class="arabic simple">
+<li><p>additionally to these steps, prepare a custom Dataset (like in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/02c-MLP-pytorch.html#preparing-the-training-data">sheet 2.3</a>) that massages the dataset from the format that it is shipped in on HuggingFace into strings that can be used for training. Some of the procesing steps will happen in the Dataset.</p></li>
+</ol>
+</li>
+<li><p>Load the pretrained GPT-2 model</p></li>
+<li><p>Set up training pipeline according to steps described in <a class="reference internal" href="#"><span class="xref myst">sheet 2.5</span></a></p></li>
+<li><p>Run the training for <strong>50 steps</strong>, while tracking the losses. This number of steps should be sufficient for being able to tell that your training is working <em>in principle</em>.</p></li>
+<li><p>Save plot of losses for submission</p></li>
+</ol>
+<p>Your tasks:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>[19pts] Complete the code in the spots where there is a comment “#### YOUR CODE HERE ####”. There are instructions in the comments as to what the code should implement. With you completed code, you should be able to let the training run without errors. Note that the point of the exercise is the implementation; we should not necessarily expect great performance of the fine-tuned model (and the actual performance will <em>not</em> be graded). Often there are several correct ways of implementing something. Anything that is correct will be accepted.</p></li>
+<li><p>[4pts] Answer questions at the end of the execise.</p></li>
+</ol>
+</div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note: if you are on Colab, you might need to install some requirements</span>
+<span class="c1"># as we did in Sheet 1.1. Otherwise, don&#39;t forget to activate your local environment</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2LMHeadModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/understanding_llms/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># additioanlly, we need to install accelerate</span>
+<span class="c1"># uncomment and run the following line on Colab or in your environment</span>
+<span class="c1"># !pip install accelerate</span>
+<span class="c1"># NOTE: in a notebook, reloading of the kernel might be required after installation if you get dependency errors with the transformers package</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### 1. Prepare data with data prepping steps from sheet 1.1</span>
+
+<span class="c1"># a. Acquiring data</span>
+<span class="c1"># b. (minimally) exploring dataset</span>
+<span class="c1"># c. cleaning / wrangling data (combines step 4 from sheet 1.1 and step 1.1 above)</span>
+<span class="c1"># d. splitting data into training and test set (we will not do any hyperparam tuning) </span>
+<span class="c1"># (we don&#39;t need further training set wrangling)</span>
+<span class="c1"># e. tokenizing data and making sure it can be batched (i.e., conversted into 2d tensors)</span>
+<span class="c1"># this will also happen in our custom Dataset class (common practice when working with text data)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># downaload dataset from HF</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;tau/commonsense_qa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect dataset</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="c1"># print a sample from the dataset</span>
+<span class="c1">### YOUR CODE HERE ####</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;train&#39;, &#39;validation&#39;, &#39;test&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that the test split does not have ground truth answer labels. Therefore, we will use the validation split as our test split.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load tokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;EleutherAI/pythia-160m&quot;</span><span class="p">)</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
+<span class="c1"># set padding side to be left because we are doing causal LM</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">massage_input_text</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper for converting input examples which have </span>
+<span class="sd">    a separate qquestion, labels, answer options</span>
+<span class="sd">    into a single string.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    example: dict</span>
+<span class="sd">        Sample input from the dataset which contains the </span>
+<span class="sd">        question, answer labels (e.g. A, B, C, D),</span>
+<span class="sd">        the answer options for the question, and which </span>
+<span class="sd">        of the answers is correct.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    input_text: str</span>
+<span class="sd">        Formatted training text which contains the question,</span>
+<span class="sd">        the forwatted answer options (e.g., &#39;A. &lt;option 1&gt; B. &lt;option 2&gt;&#39; etc)</span>
+<span class="sd">        and the ground truth answer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># combine each label with its corresponding text</span>
+    <span class="n">answer_options_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
+        <span class="n">example</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">],</span>
+        <span class="n">example</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+    <span class="p">))</span>
+    <span class="c1"># join each label and text with . and space</span>
+    <span class="n">answer_options</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+    <span class="c1"># join the list of options with spaces into single string</span>
+    <span class="n">answer_options_string</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+    <span class="c1"># combine question and answer options</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">answer_options_string</span>
+    <span class="c1"># append the true answer with a new line, &quot;Answer: &quot; and the label</span>
+    <span class="n">input_text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Answer: &quot;</span> <span class="o">+</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;answerKey&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">input_text</span>
+
+<span class="c1"># process input texts of train and test sets</span>
+<span class="n">massaged_datasets</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">massage_input_text</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect a sample from our preprocessed data</span>
+<span class="n">massaged_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper for pre-tokenizing all examples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tokenized</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
+        <span class="n">example</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> 
+        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;longest&quot;</span><span class="p">,</span> 
+        <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">tokenized</span>
+
+<span class="n">tokenized_dataset</span> <span class="o">=</span> <span class="n">massaged_datasets</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="c1">### YOUR CODE HERE #### </span>
+    <span class="n">batched</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+    <span class="n">example</span><span class="p">[],</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: invalid syntax. Perhaps you forgot a comma?
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># move to accelerated device </span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;mps&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. init model</span>
+
+<span class="c1"># load pretrained Pythia-160M for HF</span>
+<span class="n">model</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+<span class="c1"># print num of trainable parameters</span>
+<span class="n">model_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPT-2 size: </span><span class="si">{</span><span class="n">model_size</span><span class="o">/</span><span class="mi">1000</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">M parameters&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Hint: If you run out of memory while trying to run the training, try decreasing the batch size.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 3. set up configurations required for the training loop</span>
+
+<span class="c1"># instantiate tokenized train dataset </span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+
+<span class="c1"># instantiate tokenizes test dataset</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####,</span>
+    
+<span class="c1"># create a DataLoader for the dataset</span>
+<span class="c1"># the data loader will automatically batch the data</span>
+<span class="c1"># and iteratively return training examples (question answer pairs) in batches</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">train_dataset</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="c1"># create a DataLoader for the test dataset</span>
+<span class="c1"># reason for separate data loader is that we want to</span>
+<span class="c1"># be able to use a different index for retreiving the test batches</span>
+<span class="c1"># we might also want to use a different batch size etc.</span>
+<span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">test_dataset</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 4. run the training of the model</span>
+<span class="c1"># Hint: for implementing the forward pass and loss computation, carefully look at the exercise sheets </span>
+<span class="c1"># and the links to examples in HF tutorials.</span>
+
+<span class="c1"># put the model in training mode</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="c1"># move the model to the device (e.g. GPU)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># trianing configutations </span>
+<span class="c1"># feel free to play around with these</span>
+<span class="n">epochs</span>  <span class="o">=</span> <span class="mi">1</span>
+<span class="n">train_steps</span> <span class="o">=</span>  <span class="c1">### YOUR CODE HERE ###</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of training steps: &quot;</span><span class="p">,</span> <span class="n">train_steps</span><span class="p">)</span>
+<span class="c1"># number of test steps to perform every 10 training steps</span>
+<span class="c1"># (smaller that the entore test split for reasons of comp. time)</span>
+<span class="n">num_test_steps</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># define optimizer and learning rate</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span> 
+<span class="c1"># define some variables to accumulate the losses</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_losses</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># iterate over epochs</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="c1"># iterate over training steps</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">train_steps</span><span class="p">)):</span>
+        <span class="c1"># get a batch of data</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))</span>
+        <span class="c1"># move the data to the device (GPU)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+
+        <span class="c1"># forward pass through the model</span>
+        <span class="c1">### YOUR CODE HERE ###</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+            <span class="c1">### YOUR CODE HERE ####</span>
+        <span class="p">)</span>
+        <span class="c1"># get the loss</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+        <span class="c1"># backward pass</span>
+        <span class="c1">### YOUR CODE HERE ####</span>
+        <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="c1"># update the parameters of the model</span>
+        <span class="c1">### YOUR CODE HERE ###</span>
+
+        <span class="c1"># zero out gradient for next step</span>
+        <span class="c1">### YOUR CODE HERE ####</span>
+
+        <span class="c1"># evaluate on test set every 10 steps</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, loss </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># track test loss for the evaluation iteration</span>
+            <span class="n">test_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_test_steps</span><span class="p">):</span>
+                <span class="c1"># get test batch</span>
+                <span class="n">x_test</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">))</span>
+                <span class="n">x_test</span> <span class="o">=</span> <span class="n">x_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">test_outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
+                        <span class="c1">### YOUR CODE HERE ####</span>
+                    <span class="p">)</span>
+                <span class="n">test_loss</span> <span class="o">+=</span> <span class="c1">### YOUR CODE HERE ####</span>
+                
+            <span class="n">test_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_loss</span> <span class="o">/</span> <span class="n">num_test_steps</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test loss: &quot;</span><span class="p">,</span> <span class="n">test_loss</span><span class="o">/</span><span class="n">num_test_steps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 5. Plot the fine-tuning loss and MAKE SURE TO SAVE IT AND SUBMIT IT</span>
+
+<span class="c1"># plot training losses on x axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="c1">### YOUR CODE HERE ####)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Training steps&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># print a few predictions on the eval dataset to see what the model predicts</span>
+
+<span class="c1"># construct a list of questions without the ground truth label</span>
+<span class="c1"># and compare prediction of the model with the ground truth</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_test_samples</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper for converting input examples which have </span>
+<span class="sd">    a separate qquestion, labels, answer options</span>
+<span class="sd">    into a single string for testing the model.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    example: dict</span>
+<span class="sd">        Sample input from the dataset which contains the </span>
+<span class="sd">        question, answer labels (e.g. A, B, C, D),</span>
+<span class="sd">        the answer options for the question, and which </span>
+<span class="sd">        of the answers is correct.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    input_text: str, str</span>
+<span class="sd">        Tuple: Formatted test text which contains the question,</span>
+<span class="sd">        the forwatted answer options (e.g., &#39;A. &lt;option 1&gt; B. &lt;option 2&gt;&#39; etc); </span>
+<span class="sd">        the ground truth answer label only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">answer_options_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
+        <span class="n">example</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">],</span>
+        <span class="n">example</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+    <span class="p">))</span>
+    <span class="c1"># join each label and text with . and space</span>
+    <span class="n">answer_options</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+    <span class="c1"># join the list of options with spaces into single string</span>
+    <span class="n">answer_options_string</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
+    <span class="c1"># combine question and answer options</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">answer_options_string</span>
+    <span class="c1"># create the test input text which should be:</span>
+    <span class="c1"># the input text, followed by the string &quot;Answer: &quot;</span>
+    <span class="c1"># we don&#39;t need to append the ground truth answer since we are creating test inputs</span>
+    <span class="c1"># and the answer should be predicted.</span>
+    <span class="n">input_text</span> <span class="o">+=</span> <span class="c1">### YOUR CODE HERE ####</span>
+
+    <span class="k">return</span> <span class="n">input_text</span><span class="p">,</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;answerKey&quot;</span><span class="p">]</span>
+
+<span class="n">test_samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">construct_test_samples</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="n">test_samples</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test the model </span>
+
+<span class="c1"># set it to evaluation mode</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">test_samples</span><span class="p">:</span>
+    <span class="n">input_text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="o">.</span><span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">input_ids</span><span class="o">.</span><span class="n">attention_mask</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">input_text</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">sample</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predictions of trained model &quot;</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Questions:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Provide a brief description of the CommonsenseQA dataset. What kind of task was it developed for, what do the single columns contain?</p></li>
+<li><p>What loss function is computed for this training? Provide the name of the function (conceptual, not necessarily the name of a function in the code).</p></li>
+<li><p>Given your loss curve, do you think your model will perform well on answering common sense questions? (Note: there is no single right answer; you need to interpret your specific plot)</p></li>
+<li><p>Inspect the predictions above. On how many test questions did the model predict the right answer? Compute the accuracy.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "CogSciPrag/Understanding-LLMs-course",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./homework"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-language-modeling-12-points">Exercise 1: Understanding language modeling (12 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-13-points">Exercise 2: Understanding LLM configuration (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-15-points">Exercise 3 (15 points):</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points">Exercise 3: Fine-tuning GPT-2 for QA (23 points)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
