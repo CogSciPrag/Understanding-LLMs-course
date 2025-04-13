@@ -8,9 +8,9 @@ The course is intended for master students or advanced bachelor students (of, e.
 
 ## Course formalia
 
-In SS 2024, the course consists of a weekly lecture (Tue) and a weekly practical seminar (Fri) which will systematically introduce and cover concepts from the lecture hands-on, in practical worksheets, where participants will work with (small) LMs themselves. This webbbook will host both lecture materials and practical materials.
+In SS 2025, the course consists of a weekly lecture (Tue, 9-12) and a weekly practical seminar (Thu, 14-16) which will systematically introduce and cover concepts from the lecture hands-on, in practical worksheets, where participants will work with (small) LMs themselves. This webbbook will host both lecture materials and practical materials.
 
-The course is intended for 6 ECTS. There will be compulsory homework assignments and a final exam. Optionally, for 9ECTS, students will conduct group projects.
+The course is intended for 6 ECTS. There will be compulsory homework assignments and a final exam. Optionally, for 9 ECTS, students will conduct group projects.
 
 ## Schedule
 
