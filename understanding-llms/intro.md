@@ -1,10 +1,10 @@
-# Course overview: Understanding LLMs
+# Course overview: Understanding LMs
 
-The course "Understanding LLMs", taught at Uni Tübingen, focuses on Large Language Models (LLMs) like GPT-x or LLama. It covers topics that will equip participants with a better conceptual and practical understanding of what LLMs are, how they work, and how to understand them. In the course, we will look (among others) at LLM architecture, training & fine-tuning, prompting, mechanistic interpretability of LLMs, LLM agents and different evaluation methods. Participants will be offered both a technical perspective and encouraged to critically think about important topics relevant to cognitive science and society in the context of LLMs.
+This course deals with language models (LMs), in particular (but not exclusively so) on transformer-based language models like GPT-x or LLama. It covers topics that will equip participants with a better conceptual and practical understanding of what LMs are, how they work, and how to understand them. In the course, we will look (among others) at LM architectures, training & fine-tuning, prompting, mechanistic interpretability of LMs, LM agents and different evaluation methods. Participants will be offered both a technical perspective and encouraged to critically think about important topics relevant to cognitive science and society in the context of LMs.
 
 ## Intended audience
 
-The course is intended for master students or advanced bachelor students (of, e.g., (computational) linguistics, cognitive science, or computer science) who are interested in language models / NLP / linguistics / AI / interdisciplinary approaches to state-of-the-art technical advances. Prior knowledge of LLMs is not required; prior experience with programming in Python is highly encouraged.
+The course is intended for master students or advanced bachelor students (of, e.g., (computational) linguistics, cognitive science, or computer science) who are interested in language models / NLP / linguistics / AI / interdisciplinary approaches to state-of-the-art technical advances. Prior knowledge of LMs is not required; prior experience with programming in Python is highly encouraged.
 
 ## Course formalia
 
@@ -26,7 +26,7 @@ The lecture overview below is **preliminary** and subject to changes.
 
 ## Further materials
 
-There are various courses on deep learning, NLP and LLMs out there. To name a few, these are excellent sources for further related materials:
+There are various courses on deep learning, NLP and LMs out there. To name a few, these are excellent sources for further related materials:
 
 * [Large Language Models](https://rycolab.io/classes/llm-s24/) by Ryan Cotterell's lab
 * [Large Language Models](https://stanford-cs324.github.io/winter2022/) by Percy Liang's lab
