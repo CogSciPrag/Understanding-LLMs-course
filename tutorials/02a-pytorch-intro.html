@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Sheet 2.1: PyTorch essentials &#8212; Understanding LLMs</title>
+    <title>Sheet 2.1: PyTorch essentials &#8212; Understanding LMs</title>
   
   
   
@@ -155,8 +155,8 @@
       
     
     
-    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LLMs - Home"/>
-    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LLMs - Home"/>`);</script>
+    <img src="../_static/logo-ULM-2024.png" class="logo__image only-light" alt="Understanding LMs - Home"/>
+    <script>document.write(`<img src="../_static/logo-ULM-2024.png" class="logo__image only-dark" alt="Understanding LMs - Home"/>`);</script>
   
   
 </a></div>
@@ -967,7 +967,7 @@ type support.</p>
 </div>
 </div>
 </div>
-<p><strong>NOTE</strong>: weights of a language model are, at the end, also represented as tensors. The data type of a tensor determines how much memory the tensor occupies. In the context of a language model, this means that, depending on the data type of the weights, more or less memory (e.g., on the GPU) is required in order to be able to use the model. Note that often weights of pretrained available models (i.e., weights of an already trained model that can be used to predict text) are available in <code class="docutils literal notranslate"><span class="pre">torch.float16</span></code>. We will see where to see this and how to change the dtype when loading a pretrained model in the next sheets.</p>
+<p><strong>NOTE</strong>: weights of a language model are, at the end, also represented as tensors. The data type of a tensor determines how much memory the tensor occupies. In the context of a language model, this means that, depending on the data type of the weights, more or less memory (e.g., on the GPU) is required in order to be able to use the model. Note that often weights of pretrained available models (i.e., weights of an already trained model that can be used to predict text) are available in <code class="docutils literal notranslate"><span class="pre">torch.float16</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.bfloat16</span></code>. We will see where to see this and how to change the dtype when loading a pretrained model in the next sheets.</p>
 </section>
 <section id="attributes-of-a-tensor">
 <h2>Attributes of a tensor<a class="headerlink" href="#attributes-of-a-tensor" title="Link to this heading">#</a></h2>
@@ -994,7 +994,7 @@ The property <code class="docutils literal notranslate"><span class="pre">shape<
 The property assessed with <code class="docutils literal notranslate"><span class="pre">.device</span></code> tells us where the tensor is stored and manipulated.
 The default is the CPU.
 If your machine allows you can also shift all your tensors to a GPU.
-The syntax for doing this is slightly different on different machines.</p>
+The syntax for doing this is slightly different on different machines. <strong>NOTE:</strong> the tensors have to be on the same machine in order to perform joint operations on them.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 2.1.3: Tensor attributes &amp; types </span></strong></p>
 <ol class="arabic simple">
@@ -1616,7 +1616,7 @@ By Michael Franke, Carsten Eickhoff, Polina Tsvilodub
 
   <p class="copyright">
     
-      © Copyright 2024.
+      © Copyright 2025.
       <br/>
     
   </p>
