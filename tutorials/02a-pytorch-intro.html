@@ -527,7 +527,7 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-2-1-pytorch-essentials">
 <h1>Sheet 2.1: PyTorch essentials<a class="headerlink" href="#sheet-2-1-pytorch-essentials" title="Link to this heading">#</a></h1>
 <p><strong>Author:</strong> Michael Franke</p>
-<p>This work sheet introduces the very basics of PyTorch.
+<p>This work sheet introduces the basics of PyTorch.
 If you want to install PyTorch locally on your machine, follow <a class="reference external" href="https://pytorch.org/get-started/locally/">these instructions</a>.
 If installed, import the library to make it usable:</p>
 <div class="cell docutils container">
@@ -758,8 +758,8 @@ The function <code class="docutils literal notranslate"><span class="pre">torch.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.6004, 0.1671, 0.2114],
-        [0.4924, 0.5919, 0.0054]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[0.2205, 0.1811, 0.7672],
+        [0.5473, 0.5995, 0.3073]])
 </pre></div>
 </div>
 </div>
@@ -819,7 +819,7 @@ tensor([[[3, 3, 3, 3],
 
         [[3, 3, 3, 3],
          [3, 3, 3, 3]]])
-tensor([1.9025e-01, 4.4543e-01, 7.3338e-04, 8.5581e-01, 3.8884e-01, 2.4922e-02])
+tensor([0.9068, 0.5336, 0.5489, 0.9443, 0.3523, 0.0721])
 </pre></div>
 </div>
 </div>
@@ -828,12 +828,15 @@ tensor([1.9025e-01, 4.4543e-01, 7.3338e-04, 8.5581e-01, 3.8884e-01, 2.4922e-02])
 </section>
 <section id="row-column-vectors">
 <h2>Row &amp; column vectors<a class="headerlink" href="#row-column-vectors" title="Link to this heading">#</a></h2>
-<p>A one-dimensional tensor is a row-vector:</p>
+<p>A one-dimensional tensor can be thought of as a vector in linear algebra.
+But there is an important different.
+There are two types of vectors in linear algebra: row and column vectors.
+In PyTorch, a one-dimensional tensor are vector for which it is, in a manner of speaking, flexibly determined in context whether it is a row or a column vector.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">row_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">row_vector</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">row_vector</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -844,8 +847,8 @@ torch.Size([3])
 </div>
 </div>
 </div>
-<p>Strictly speaking, there are no column vectors in PyTorch.
-A column vector would be a matrix with one column:</p>
+<p>So, strictly speaking, there are no row or column vectors in PyTorch.
+If we need a column vector, we would define a matrix with one column:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">col_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">]])</span>
@@ -1178,7 +1181,7 @@ tensor([[1],
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>  <span class="c1"># to (row) vector</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>  <span class="c1"># to vector</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># to one col matrix (~ col vector)</span>
 <span class="n">d</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># to one row matrix</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1335,12 +1338,12 @@ The result is that each element in the vector is multiplied by that scalar.</p>
 </div>
 </div>
 <p>Similarly, for higher dimensions.
-With the usual arithmetic operations, a row vector will be recycled in the obvious way.</p>
+With the usual arithmetic operations, a vector will be recycled, e.g., to apply to each row of a matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">row_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 <span class="n">matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;multiplication:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">*</span> <span class="n">row_vector</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;multiplication:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">*</span> <span class="n">vector</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1354,7 +1357,7 @@ With the usual arithmetic operations, a row vector will be recycled in the obvio
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;division:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">/</span> <span class="n">row_vector</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;division:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">/</span> <span class="n">vector</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1368,8 +1371,8 @@ With the usual arithmetic operations, a row vector will be recycled in the obvio
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;addition:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">+</span> <span class="n">row_vector</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;subtraction:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">-</span> <span class="n">row_vector</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;addition:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">+</span> <span class="n">vector</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;subtraction:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">-</span> <span class="n">vector</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1412,25 +1415,26 @@ tensor([[ 12, 200],
 </div>
 </div>
 </div>
-<p>Notice that the function <code class="docutils literal notranslate"><span class="pre">torch.matmul()</span></code> implicitly converts and broadcasts and so also flexibly yields a matrix-vector product or a dot product.</p>
+<p>Notice that the function <code class="docutils literal notranslate"><span class="pre">torch.matmul()</span></code> implicitly converts and broadcasts and so also flexibly yields a dot-product, a matrix-vector product or a vector-matrix product.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
 <span class="n">vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">matrix</span> <span class="o">@</span> <span class="n">vector</span><span class="p">)</span>  <span class="c1"># matrix-vector product</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">vector</span> <span class="o">@</span> <span class="n">vector</span><span class="p">)</span>  <span class="c1"># dot prodcut</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">matrix</span> <span class="o">@</span> <span class="n">vector</span><span class="p">)</span>  <span class="c1"># matrix-vector product (vector is treated as a column vector)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vector</span> <span class="o">@</span> <span class="n">matrix</span><span class="p">)</span>  <span class="c1"># vector-matrix product (vector is treated as a row vector)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[1, 2],
-        [3, 4],
-        [5, 6]])
+        [3, 4]])
 tensor([ 1, 10])
-tensor([21, 43, 65])
 tensor(101)
+tensor([21, 43])
+tensor([31, 42])
 </pre></div>
 </div>
 </div>
@@ -1448,24 +1452,12 @@ tensor(101)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor(4)
-4
-</pre></div>
-</div>
-</div>
 </div>
 <p>To convert a larger tensor back to numpy (e.g., for plotting) you can do this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">another_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
 <span class="n">another_tensor</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1, 2, 3],
-       [4, 5, 6]])
 </pre></div>
 </div>
 </div>
@@ -1511,25 +1503,6 @@ tensor(101)
 <span class="n">matrix2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">]])</span>
 <span class="n">matrixProd</span> <span class="o">=</span> <span class="n">matrix1</span> <span class="nd">@matrix2</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">matrixProd</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[1, 2],
-         [3, 4],
-         [5, 6]]])
-tensor([1, 2, 3, 4, 5, 6])
-tensor([[1],
-        [2],
-        [3],
-        [4],
-        [5],
-        [6]])
-tensor([[1, 2, 3, 4, 5, 6]])
-tensor(531)
-[[  1  10 100]
- [  2  20 200]
- [  3  30 300]]
 </pre></div>
 </div>
 </div>
