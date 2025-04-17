@@ -498,6 +498,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-requirements">Installing requirements</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#colab">Colab</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-installation">Local installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bwjupyter">bwJupyter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nvidia-api">NVIDIA API</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
@@ -522,7 +524,7 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="sheet-1-1-practical-set-up-training-data">
 <h1>Sheet 1.1: Practical set-up &amp; Training data<a class="headerlink" href="#sheet-1-1-practical-set-up-training-data" title="Link to this heading">#</a></h1>
 <p><strong>Author</strong>: Polina Tsvilodub</p>
-<p>This page contains materials for the first tutorial session (April 19th).</p>
+<p>This page contains materials for the first tutorial session.</p>
 <p>The learning goals for the first tutorial are:</p>
 <ul class="simple">
 <li><p>preparing the Python requirements for practical exercises in the upcoming tutorials,</p></li>
@@ -536,6 +538,7 @@ document.write(`
 <p>Throughout the semester, we will use Python, PyTorch and various packages for practical work. Both the in-tutorial exercise sheets and homework will require you to execute Python code yourself.
 Please follow the steps below to set up the requirements (i.e., most packages required for completing exercises) that we will use in the course. We will most likely install more packages as we go during the semester, though.</p>
 <p>You can do so either on your own machine, or by using <a class="reference external" href="https://colab.research.google.com/">Google Colab</a>. You can easily access the latter option by pressing the Colab icon at the top of the webook’s page. Depending on your choice, please follow the respective requirement installation steps below.</p>
+<p>Please note that working with language models is quite compute-intensive. That is, their weight require a lot of disk space, and most importantly, a relatively performant GPU, both for inference and for training. For most purposes of this course, using Colab is the recommended option, unless you have a performant GPU on your laptop. However, there are two additional resources we will take advantage of: <a class="reference external" href="https://www.bwjupyter.de/">bwJupyter</a>, a server provided by the state of Baden-Württemberg, and the API provided by NVIDIA. More on both services below.</p>
 <section id="colab">
 <h3>Colab<a class="headerlink" href="#colab" title="Link to this heading">#</a></h3>
 <p>The advantage of using Colab is that you don’t need to install software on your own machine; i.e., it is a safer option if you are not very comfortable with using Python on your own machine. Colab is a  platform provided by Google for free, and it also provides limited access to GPU computation (which will be useful for working with language models). Using it only requires a Google account.</p>
@@ -543,18 +546,19 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 <p>Colab already provides Python as well as a number of basic packages. If you choose to use it, you will only need to install the more specific packages. Note that you will have to so <em>every time</em> you open a new Colab runtime. To test that you can access requirements for the class, please open this notebook in Colab (see above), uncomment and run the following line:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install datasets langchain torchrl llama-index bertviz wikipedia</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install transformers datasets langchain_nvidia_ai_endpoints==0.3.9 python-dotenv==1.1.0 torchrl llama-index bertviz wikipedia</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>Alternatively, if you want, you can also download the requirements file <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/tutorials/files/requirements.txt">here</a> and install from it by running <code class="docutils literal notranslate"><span class="pre">!pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code>.</p>
 </section>
 <section id="local-installation">
 <h3>Local installation<a class="headerlink" href="#local-installation" title="Link to this heading">#</a></h3>
 <p>Using your computer for local execution of all practical exercises might be a more advanced option. If you do so, we strongly encourage you to create an environment (e.g., with Conda) before installing any packages. Furthermore, ideally, check if you have a GPU suitable for deep learning because using a GPU will significantly speed up the work with language models. You can do so by checking your computer specs and finding out whether your GPU works with CUDA, MPS or ROCm. If you don’t have a suitable GPU, you can use Colab for tasks that require GPU access. Finally, please note that we will download some pretrained models and some datasets which will occupy some of your local storage.</p>
 <p>If you choose to use your own machine, please do the following steps:</p>
 <ul class="simple">
-<li><p>install Python &gt;= 3.9</p></li>
+<li><p>install Python &gt;= 3.10</p></li>
 <li><p>create an environment (optional but recommended)</p></li>
 <li><p>download the requirements file <a class="reference external" href="https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/tutorials/files/requirements.txt">here</a></p></li>
 <li><p>if you have a deep learning supporting GPU:</p>
@@ -570,6 +574,16 @@ Please follow the steps below to set up the requirements (i.e., most packages re
 </ul>
 </li>
 </ul>
+</section>
+<section id="bwjupyter">
+<h3>bwJupyter<a class="headerlink" href="#bwjupyter" title="Link to this heading">#</a></h3>
+<p>This is a compute service provided by the state of Baden-Württemberg, specifically for educational purposes. It hosts a Jupyter Notebook server and also provides access to GPUs, as documented <a class="reference external" href="https://www.bwjupyter.de/english/65.php">here</a>. However, the available resources are very limited: only 2GB drive space and 8GB RAM per user. Although the available GPUs are large, there seems to be a cap of 6GB vRAM (GPU memory) per user. Therefore, we might only make use of this service for selected purposes.</p>
+<p>Nevertheless, please try accessing the server with your <strong>uni email</strong> <a class="reference external" href="https://hub.bwjupyter.de/hub/login?next=%2Fhub%2F">here</a>. We will need it later in the course.</p>
+</section>
+<section id="nvidia-api">
+<h3>NVIDIA API<a class="headerlink" href="#nvidia-api" title="Link to this heading">#</a></h3>
+<p>NVIDIA hosts an API that provides to many state-of-the-art LLMs. This means, NVIDIA servers host these LLMs, and we can retrieve predictions from these models (i.e., <em>run inference</em> on them) by submitting an input to the API, without having to download the weights and run the entire LLM ourselves. The API can be accessed by signing up for an account. However, there are also limitations when using an API; for instance, we cannot access the internal model representations or conditional probabilities, or train the models. Therefore, we will make use of the API in later sessions which rather rely on prompting.
+Detailed instructions on how to sign up and use the API can be found <a class="reference external" href="https://maxschmaltz.github.io//Course-LLM-based-Assistants/infos/llm_inference_guide/README.html">here</a>.</p>
 </section>
 </section>
 <section id="verifying-requirement-installation">
@@ -1275,6 +1289,8 @@ The following exercises are meant to foster understanding and critical thinking 
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-requirements">Installing requirements</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#colab">Colab</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-installation">Local installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bwjupyter">bwJupyter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nvidia-api">NVIDIA API</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-requirement-installation">Verifying requirement installation</a></li>
