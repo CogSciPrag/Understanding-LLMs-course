@@ -1,6 +1,6 @@
 # Background
 
-Stay tuned for slides from the first lecture!
+Slides from the first lecture providing an introduction to the course and a brief history of language model development can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/01-UnderLLMs-2025-introduction.pdf).
 
 A cheat sheet on mathematical notation and a few basics for the class can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/cheat-sheet-notation-algebra.pdf).
 
