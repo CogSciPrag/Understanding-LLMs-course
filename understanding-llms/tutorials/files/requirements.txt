@@ -11,3 +11,5 @@ llama-index
 bertviz
 ipykernel
 wikipedia
+langchain_nvidia_ai_endpoints==0.3.9
+python-dotenv==1.1.0
