@@ -1,9 +1,9 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: Understanding LLMs
+title: Understanding LMs
 author: Michael Franke, Carsten Eickhoff, Polina Tsvilodub
-copyright: "2024"
+copyright: "2025"
 logo: logo-ULM-2024.png
 
 # Force re-execution of notebooks on each build.
