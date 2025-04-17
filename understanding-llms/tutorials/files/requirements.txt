@@ -6,6 +6,7 @@ transformers
 sentencepiece
 datasets
 langchain
+langchain-community
 torchrl
 llama-index
 bertviz
