@@ -602,7 +602,7 @@ document.write(`
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install torch transformers==4.51.3 datasets langchain-community langchain_nvidia_ai_endpoints==0.3.9 python-dotenv==1.1.0 torchrl llama-index bertviz wikipedia</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install torch transformers==4.51.3 datasets</span>
 </pre></div>
 </div>
 </div>
@@ -610,7 +610,7 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
-<span class="c1"># note: if you are on Colab, you might need to install some requirements</span>
+<span class="c1"># note: if you are on Colab, you might need to install some requirements (by running the line above)</span>
 <span class="c1"># as we did in Sheet 1.1. Otherwise, don&#39;t forget to activate your local environment</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
@@ -766,7 +766,6 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load IMDB dataset</span>
-<span class="c1"># dataset = load_dataset(&quot;truthful_qa&quot;, &quot;generation&quot;)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;stanfordnlp/imdb&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -792,7 +791,7 @@ document.write(`
         <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span>
     <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">   YOUR TEXT HERE.</span>
+<span class="sd">    YOUR TEXT HERE.</span>
 
 <span class="sd">    Arguments</span>
 <span class="sd">    ---------</span>
@@ -877,6 +876,12 @@ document.write(`
 <span class="n">tokenized_datasets</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
     <span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_columns</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span>
 <span class="p">)</span>
+
+<span class="c1"># if we want, we can explicitly set the format of the dataset columns </span>
+<span class="n">tokenized_datasets</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;torch&quot;</span><span class="p">,</span> 
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -938,13 +943,13 @@ document.write(`
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
     <span class="n">eval_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="c1"># logging_steps=10, # the Trainer also allows to automatically track metrics like the loss; here, the loss would be captured every 10 steps</span>
-    <span class="c1"># logging = &quot;wandb&quot;, # the logs can be captured in different ways, for instance through Weights &amp; Biases</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">report_to</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
     <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-5</span><span class="p">,</span>
     <span class="n">save_steps</span><span class="o">=</span><span class="mi">5_000</span><span class="p">,</span>
     <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -978,12 +983,14 @@ document.write(`
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="c1"># batch size per GPU/CPU in evaluation</span>
     <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="c1"># evaluation at every 5 steps</span>
     <span class="n">eval_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># the Trainer also allows to automatically track metrics like the loss; here, the loss would be captured every 10 steps</span>
+    <span class="c1"># report_to = &quot;wandb&quot;, # the logs can be captured in different ways, for instance through Weights &amp; Biases</span>
+    <span class="n">report_to</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
     <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># number of steps before performing backward pass</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># number of training epochs (runs through training set)</span>
     <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># weight decay is used to prevent overfitting</span>
     <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="c1"># learning rate scheduler</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">,</span> <span class="c1"># learning rate</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-5</span><span class="p">,</span> <span class="c1"># learning rate</span>
     <span class="n">save_steps</span><span class="o">=</span><span class="mi">5_000</span><span class="p">,</span> <span class="c1"># number of steps before checkpoint</span>
     <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1016,7 +1023,7 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">IMDBTrainer</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_items_in_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">loss</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_outputs</span> <span class="k">else</span> <span class="n">loss</span>
