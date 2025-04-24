@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Homework 1: Language models (50 points) &#8212; Understanding LMs</title>
+    <title>Homework 1: Language models (58 points) &#8212; Understanding LMs</title>
   
   
   
@@ -487,7 +487,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Homework 1: Language models (50 points)</h1>
+    <h1>Homework 1: Language models (58 points)</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -499,9 +499,9 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-language-modeling-12-points">Exercise 1: Understanding language modeling (12 points)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-13-points">Exercise 2: Understanding LLM configuration (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-8-points">Exercise 2: Understanding LLM configuration (8 points)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-15-points">Exercise 3 (15 points):</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points">Exercise 3: Fine-tuning GPT-2 for QA (23 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-fine-tuning-pythia-for-question-answering-23-points">Exercise 4: Fine-tuning Pythia for Question Answering (23 points)</a></li>
 </ul>
             </nav>
         </div>
@@ -513,8 +513,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="homework-1-language-models-50-points">
-<h1>Homework 1: Language models (50 points)<a class="headerlink" href="#homework-1-language-models-50-points" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="homework-1-language-models-58-points">
+<h1>Homework 1: Language models (58 points)<a class="headerlink" href="#homework-1-language-models-58-points" title="Link to this heading">#</a></h1>
 <p>The first homework focuses on the following skills: being able to work with concpetual &amp; formal exercises on language modeling and neural networks, understanding configurations of state-of-the-art language models and, finally, fine-tuning a language model yourself!</p>
 <section id="logistics">
 <h2>Logistics<a class="headerlink" href="#logistics" title="Link to this heading">#</a></h2>
@@ -542,8 +542,8 @@ document.write(`
 </ol>
 </div></blockquote>
 </section>
-<section id="exercise-2-understanding-llm-configuration-13-points">
-<h2>Exercise 2: Understanding LLM configuration (13 points)<a class="headerlink" href="#exercise-2-understanding-llm-configuration-13-points" title="Link to this heading">#</a></h2>
+<section id="exercise-2-understanding-llm-configuration-8-points">
+<h2>Exercise 2: Understanding LLM configuration (8 points)<a class="headerlink" href="#exercise-2-understanding-llm-configuration-8-points" title="Link to this heading">#</a></h2>
 <p>For this task, your job is to understand the configrations of a state-of-the-art transformer, provided in a <code class="docutils literal notranslate"><span class="pre">config.json</span></code> file for allowing to initialize a transformer through the function <code class="docutils literal notranslate"><span class="pre">AutoModelForCausalLM.from_pretrained()</span></code> witin the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> library. This file contains meta-information about the parameter configurations of the transformer.</p>
 <p>Your task is to:</p>
 <ol class="arabic simple">
@@ -597,16 +597,16 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <li><p>How does the memory load of running inference with the transformer scale with the number of attention heads?</p></li>
 </ul>
 </section>
-<section id="exercise-3-fine-tuning-gpt-2-for-qa-23-points">
-<h2>Exercise 3: Fine-tuning GPT-2 for QA (23 points)<a class="headerlink" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points" title="Link to this heading">#</a></h2>
-<p>The learning goal of this exercise is to practice fine-tuning a pretrained LM, Pythia-160M, for a particular task, namely commonsense question answering (QA). We will use a task-specific dataset, <a class="reference external" href="https://huggingface.co/datasets/tau/commonsense_qa">CommonsenseQA</a>, that was introduced by <a class="reference external" href="https://arxiv.org/abs/1811.00937">Talmor et al. (2018)</a>. We will evaluate the performance of the model on our test split of the dataset over training to monitor whether the model’s performance is improving and compare the performance of the base pretrained GPT-2 and the fine-tuned model. We will need to perform the following steps:</p>
+<section id="exercise-4-fine-tuning-pythia-for-question-answering-23-points">
+<h2>Exercise 4: Fine-tuning Pythia for Question Answering (23 points)<a class="headerlink" href="#exercise-4-fine-tuning-pythia-for-question-answering-23-points" title="Link to this heading">#</a></h2>
+<p>The learning goal of this exercise is to practice fine-tuning a pretrained LM, Pythia-160M, for a particular task, namely commonsense question answering (QA). We will use a task-specific dataset, <a class="reference external" href="https://huggingface.co/datasets/tau/commonsense_qa">CommonsenseQA</a>, that was introduced by <a class="reference external" href="https://arxiv.org/abs/1811.00937">Talmor et al. (2018)</a>. We will evaluate the performance of the model on our test split of the dataset over training to monitor whether the model’s performance is improving and compare the performance of the base pretrained Pythia model and the fine-tuned model. We will need to perform the following steps:</p>
 <ol class="arabic simple">
 <li><p>Prepare data according to steps described in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/01-introduction.html#main-training-data-processing-steps">sheet 1.1</a></p>
 <ol class="arabic simple">
 <li><p>additionally to these steps, prepare a custom Dataset (like in <a class="reference external" href="https://cogsciprag.github.io/Understanding-LLMs-course/tutorials/02c-MLP-pytorch.html#preparing-the-training-data">sheet 2.3</a>) that massages the dataset from the format that it is shipped in on HuggingFace into strings that can be used for training. Some of the procesing steps will happen in the Dataset.</p></li>
 </ol>
 </li>
-<li><p>Load the pretrained GPT-2 model</p></li>
+<li><p>Load the pretrained Pythia-160m model</p></li>
 <li><p>Set up training pipeline according to steps described in <a class="reference internal" href="#"><span class="xref myst">sheet 2.5</span></a></p></li>
 <li><p>Run the training for <strong>50 steps</strong>, while tracking the losses. This number of steps should be sufficient for being able to tell that your training is working <em>in principle</em>.</p></li>
 <li><p>Save plot of losses for submission</p></li>
@@ -773,16 +773,9 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 
 <span class="n">tokenized_dataset</span> <span class="o">=</span> <span class="n">massaged_datasets</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
     <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="c1">### YOUR CODE HERE #### </span>
-    <span class="n">batched</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">remove_columns</span><span class="o">=</span> <span class="c1">### YOUR CODE HERE #### </span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
-    <span class="n">example</span><span class="p">[],</span>
-    <span class="o">^</span>
-<span class="ne">SyntaxError</span>: invalid syntax. Perhaps you forgot a comma?
 </pre></div>
 </div>
 </div>
@@ -811,7 +804,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="n">model</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
 <span class="c1"># print num of trainable parameters</span>
 <span class="n">model_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPT-2 size: </span><span class="si">{</span><span class="n">model_size</span><span class="o">/</span><span class="mi">1000</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">M parameters&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pythia-160m size: </span><span class="si">{</span><span class="n">model_size</span><span class="o">/</span><span class="mi">1000</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">M parameters&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -832,7 +825,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="c1"># and iteratively return training examples (question answer pairs) in batches</span>
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">train_dataset</span><span class="p">,</span> 
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
     <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 <span class="c1"># create a DataLoader for the test dataset</span>
@@ -841,7 +834,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="c1"># we might also want to use a different batch size etc.</span>
 <span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">test_dataset</span><span class="p">,</span> 
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> 
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
     <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
@@ -1071,9 +1064,9 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logistics">Logistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-1-understanding-language-modeling-12-points">Exercise 1: Understanding language modeling (12 points)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-13-points">Exercise 2: Understanding LLM configuration (13 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-2-understanding-llm-configuration-8-points">Exercise 2: Understanding LLM configuration (8 points)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-15-points">Exercise 3 (15 points):</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-3-fine-tuning-gpt-2-for-qa-23-points">Exercise 3: Fine-tuning GPT-2 for QA (23 points)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercise-4-fine-tuning-pythia-for-question-answering-23-points">Exercise 4: Fine-tuning Pythia for Question Answering (23 points)</a></li>
 </ul>
   </nav></div>
 
