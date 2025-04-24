@@ -602,6 +602,13 @@ document.write(`
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install torch transformers==4.51.3 datasets langchain-community langchain_nvidia_ai_endpoints==0.3.9 python-dotenv==1.1.0 torchrl llama-index bertviz wikipedia</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
 <span class="c1"># note: if you are on Colab, you might need to install some requirements</span>
 <span class="c1"># as we did in Sheet 1.1. Otherwise, don&#39;t forget to activate your local environment</span>
@@ -929,9 +936,10 @@ document.write(`
     <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;imdb_gpt2&quot;</span><span class="p">,</span>
     <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
     <span class="n">eval_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="c1"># logging_steps=10, # the Trainer also allows to automatically track metrics like the loss; here, the loss would be captured every 10 steps</span>
+    <span class="c1"># logging = &quot;wandb&quot;, # the logs can be captured in different ways, for instance through Weights &amp; Biases</span>
     <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -968,7 +976,7 @@ document.write(`
     <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;imdb_gpt2&quot;</span><span class="p">,</span> <span class="c1"># output directory for predictions and checkpoints</span>
     <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="c1"># batch size per GPU/CPU in training</span>
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="c1"># batch size per GPU/CPU in evaluation</span>
-    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="c1"># evaluation at every 5 steps</span>
+    <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="c1"># evaluation at every 5 steps</span>
     <span class="n">eval_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># number of steps before performing backward pass</span>
@@ -1030,7 +1038,7 @@ document.write(`
 </summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">IMDBTrainer</span><span class="p">(</span><span class="n">Trainer</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">return_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_items_in_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
         <span class="n">celoss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
         <span class="n">modelout</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;logits&quot;</span><span class="p">]</span>
