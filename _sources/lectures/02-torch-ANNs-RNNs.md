@@ -8,3 +8,4 @@ If you want to dig a bit deeper, here are two (optional!) readings, a general te
 
 * [Goodfellow, Bengio & Courville (2016) Deep learning (textbook)](https://www.deeplearningbook.org/)
 * [Rumelhart et al. (1986) Learning representations by back-propagating errors](https://www.nature.com/articles/323533a0)
+* [Hochreiter & Schmidhuber (1997) Long Short-Term Memory](https://deeplearning.cs.cmu.edu/S23/document/readings/LSTM.pdf)

@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'homework/01-language-modeling';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Implications, Understanding &amp; Philosophy" href="../lectures/09-philosophy.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -123,8 +124,6 @@
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -235,6 +234,10 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">10 Understanding LLMs</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Homework 1: Language models (58 points)</a></li>
 </ul>
 
     </div>
@@ -536,7 +539,7 @@ document.write(`
 <div><ol class="arabic simple">
 <li><p>[6pts] Consider the corpus <span class="math notranslate nohighlight">\(C\)</span> with the following sentences: <span class="math notranslate nohighlight">\(C=\)</span>{“The cat sneezes”, “The bird sings”, “The cat sneezes”, “A dog sings”}.
 (a) Define the vocabulary <span class="math notranslate nohighlight">\(V\)</span> of this corpus (assuming by-word tokenization).
-(b) Pick one of the four sentences in <span class="math notranslate nohighlight">\(C\)</span>. Formulate the probability of that sentence in the form of the chain rule. Calculate the probability of each term in the chain rule, given the corpus (assuming that there is, additionally, a start-of-sequence and an end-of-sequence token).</p></li>
+(b) Pick one of the four sentences in <span class="math notranslate nohighlight">\(C\)</span>. Formulate the probability of that sentence in the form of the chain rule. Calculate the probability of each termn in the chain rule, given the corpus (assuming that there is, additionally, a start-of-sequence and an end-of-sequence token).</p></li>
 <li><p>[4pts] We want to train a neural network that takes as input two numbers <span class="math notranslate nohighlight">\(x_1, x_2\)</span>, passes them through three hidden linear layers, each with 13 neurons, each followed by the ReLU activation function, and outputs three numbers <span class="math notranslate nohighlight">\(y_1, y_2, y_3\)</span>. Write down all weight matrices of this network with their dimensions. (Example: if one weight matrix has the dimensions 3x5, write <span class="math notranslate nohighlight">\(M_1\in R^{3\times5}\)</span>)</p></li>
 <li><p>[2pts] Consider the sequence: “Input: Some students trained each language model”. Assuming that each word+space/punctuation corresponds to one token, consider the following token probabilities of this sequence under some trained language model: <span class="math notranslate nohighlight">\(p = [0.67, 0.91, 0.83, 0.40, 0.29, 0.58, 0.75]\)</span>. Compute the average surprisal of this sequence under that language model. [Note: in this class we always assume the base <span class="math notranslate nohighlight">\(e\)</span> for <span class="math notranslate nohighlight">\(log\)</span>, unless indicated otherwise. This is also usually the case throughout NLP.]</p></li>
 </ol>
@@ -581,8 +584,8 @@ document.write(`
 </section>
 <section id="exercise-3-15-points">
 <h2>Exercise 3 (15 points):<a class="headerlink" href="#exercise-3-15-points" title="Link to this heading">#</a></h2>
-<p>In the lecture, we have extensively covered a core component of the transformer – the self-attention block.
-In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up to, excluding, the forward step) from the exercise sheet assuming that the transformer has <em>two</em> attention heads, where the second attention head has the following weight matrices:</p>
+<p>In the lecture, we have extensively covered a core component of the transformer – the self-attention calculation in the forward pass.
+In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up to, excluding, the forward step) from the exercise sheet assuming that the transformer has <em>a second</em> attention heads, where the second attention head has the following weight matrices:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q_2</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
@@ -592,10 +595,12 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 </div>
 </div>
 </div>
-<p>You can submit a picture / scan of a hand-written solution, or type – up to you. Please make sure to include all the intermediate calculation steps and answer the following question:</p>
+<p>Your task is to submit a solution calculating the contextualized representations of this second attention head.
+Please make sure to include all the intermediate calculation steps and answer the following question:</p>
 <ul class="simple">
 <li><p>How does the memory load of running inference with the transformer scale with the number of attention heads?</p></li>
 </ul>
+<p>You can submit a picture / scan of a hand-written, or type it in TeX – up to you.</p>
 </section>
 <section id="exercise-4-fine-tuning-pythia-for-question-answering-23-points">
 <h2>Exercise 4: Fine-tuning Pythia for Question Answering (23 points)<a class="headerlink" href="#exercise-4-fine-tuning-pythia-for-question-answering-23-points" title="Link to this heading">#</a></h2>
@@ -608,7 +613,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 </li>
 <li><p>Load the pretrained Pythia-160m model</p></li>
 <li><p>Set up training pipeline according to steps described in <a class="reference internal" href="#"><span class="xref myst">sheet 2.5</span></a></p></li>
-<li><p>Run the training for <strong>50 steps</strong>, while tracking the losses. This number of steps should be sufficient for being able to tell that your training is working <em>in principle</em>.</p></li>
+<li><p>Run the training for <strong>200 steps</strong>, while tracking the losses. This number of steps should be sufficient for being able to tell that your training is working <em>in principle</em>.</p></li>
 <li><p>Save plot of losses for submission</p></li>
 </ol>
 <p>Your tasks:</p>
@@ -624,7 +629,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="c1"># as we did in Sheet 1.1. Otherwise, don&#39;t forget to activate your local environment</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2LMHeadModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">GPT2Tokenizer</span><span class="p">,</span> <span class="n">GPT2LMHeadModel</span><span class="p">,</span> <span class="n">DataCollatorForLanguageModeling</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
@@ -658,7 +663,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="c1"># a. Acquiring data</span>
 <span class="c1"># b. (minimally) exploring dataset</span>
 <span class="c1"># c. cleaning / wrangling data (combines step 4 from sheet 1.1 and step 1.1 above)</span>
-<span class="c1"># d. splitting data into training and test set (we will not do any hyperparam tuning) </span>
+<span class="c1"># d. splitting data into training and validation set (we will not do any hyperparameter tuning) </span>
 <span class="c1"># (we don&#39;t need further training set wrangling)</span>
 <span class="c1"># e. tokenizing data and making sure it can be batched (i.e., conversted into 2d tensors)</span>
 <span class="c1"># this will also happen in our custom Dataset class (common practice when working with text data)</span>
@@ -689,7 +694,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 </div>
 </div>
 </div>
-<p>Note that the test split does not have ground truth answer labels. Therefore, we will use the validation split as our test split.</p>
+<p>Note that the test split provided with the dataset does not have ground truth answer labels. Therefore, we will only use the validation split to asssess the performance of our model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load tokenizer</span>
@@ -740,7 +745,7 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 
     <span class="k">return</span> <span class="n">input_text</span>
 
-<span class="c1"># process input texts of train and test sets</span>
+<span class="c1"># process input texts of train and validation sets</span>
 <span class="n">massaged_datasets</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
     <span class="k">lambda</span> <span class="n">example</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">massage_input_text</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
@@ -766,8 +771,11 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tokenized</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
         <span class="n">example</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> 
-        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;longest&quot;</span><span class="p">,</span> 
+        <span class="c1"># we are fixing the length to 64 tokens to avoid memory issues</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span> 
         <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">tokenized</span>
 
@@ -817,25 +825,32 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="c1"># instantiate tokenized train dataset </span>
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####</span>
 
-<span class="c1"># instantiate tokenizes test dataset</span>
-<span class="n">test_dataset</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####,</span>
+<span class="c1"># instantiate tokenized validation dataset</span>
+<span class="n">validation_dataset</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ####,</span>
     
+<span class="c1"># instantiate a data collator</span>
+<span class="n">collate_fn</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="c1">### YOUR CODE HERE ####, </span>
+    <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 <span class="c1"># create a DataLoader for the dataset</span>
 <span class="c1"># the data loader will automatically batch the data</span>
 <span class="c1"># and iteratively return training examples (question answer pairs) in batches</span>
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">train_dataset</span><span class="p">,</span> 
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
-    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># create a DataLoader for the test dataset</span>
 <span class="c1"># reason for separate data loader is that we want to</span>
 <span class="c1"># be able to use a different index for retreiving the test batches</span>
 <span class="c1"># we might also want to use a different batch size etc.</span>
-<span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
-    <span class="n">test_dataset</span><span class="p">,</span> 
+<span class="n">validation_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">validation_dataset</span><span class="p">,</span> 
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
-    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -857,15 +872,15 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
 <span class="n">epochs</span>  <span class="o">=</span> <span class="mi">1</span>
 <span class="n">train_steps</span> <span class="o">=</span>  <span class="c1">### YOUR CODE HERE ###</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of training steps: &quot;</span><span class="p">,</span> <span class="n">train_steps</span><span class="p">)</span>
-<span class="c1"># number of test steps to perform every 10 training steps</span>
-<span class="c1"># (smaller that the ensure test split for reasons of comp. time)</span>
+<span class="c1"># number of validation steps to perform every 10 training steps</span>
+<span class="c1"># (smaller than the entire validation split for reasons of comp. time)</span>
 <span class="n">num_test_steps</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="c1"># define optimizer and learning rate</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span> 
 <span class="c1"># define some variables to accumulate the losses</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">test_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">validation_losses</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="c1"># iterate over epochs</span>
 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
@@ -892,23 +907,23 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
         <span class="c1"># zero out gradient for next step</span>
         <span class="c1">### YOUR CODE HERE ####</span>
 
-        <span class="c1"># evaluate on test set every 10 steps</span>
+        <span class="c1"># evaluate on a few steps of validation set every 10 steps</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, loss </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># track test loss for the evaluation iteration</span>
-            <span class="n">test_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">val_loss</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_test_steps</span><span class="p">):</span>
                 <span class="c1"># get test batch</span>
-                <span class="n">x_test</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">))</span>
+                <span class="n">x_test</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">validation_dataloader</span><span class="p">))</span>
                 <span class="n">x_test</span> <span class="o">=</span> <span class="n">x_test</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
                 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                     <span class="n">test_outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span>
                         <span class="c1">### YOUR CODE HERE ####</span>
                     <span class="p">)</span>
-                <span class="n">test_loss</span> <span class="o">+=</span> <span class="c1">### YOUR CODE HERE ####</span>
+                <span class="n">val_loss</span> <span class="o">+=</span> <span class="c1">### YOUR CODE HERE ####</span>
                 
-            <span class="n">test_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">test_loss</span> <span class="o">/</span> <span class="n">num_test_steps</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test loss: &quot;</span><span class="p">,</span> <span class="n">test_loss</span><span class="o">/</span><span class="n">num_test_steps</span><span class="p">)</span>
+            <span class="n">validation_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_loss</span> <span class="o">/</span> <span class="n">num_test_steps</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test loss: &quot;</span><span class="p">,</span> <span class="n">val_loss</span><span class="o">/</span><span class="n">num_test_steps</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1046,6 +1061,15 @@ In this exercise, your task is to perform the forward pass steps 1-6.i (i.e., up
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="../lectures/09-philosophy.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Implications, Understanding &amp; Philosophy</p>
+      </div>
+    </a>
 </div>
                 </footer>
               
