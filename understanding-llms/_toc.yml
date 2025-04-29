@@ -49,3 +49,6 @@ parts:
 - caption: 10 Understanding LLMs
   chapters:
   - file: lectures/09-philosophy
+- caption: Homework
+  chapters:
+  - file: homework/01-language-modeling
