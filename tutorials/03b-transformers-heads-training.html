@@ -553,7 +553,7 @@ document.write(`
 </div>
 </div>
 <p>In the former case, the AutoClass lets HF figure out the architecture automatically based on a config file that is downloaded when the model is downloaded from HF based on the name “gpt2”.
-The special class is provided specifically for GPT-2. Note that both classes provide a hint as to which task we want to initializee the model for. The AutoClass name includes <code class="docutils literal notranslate"><span class="pre">CausalLM</span></code>, meaning that the class will initialize a model with a next-token prediction head, and the GPT-2 class name includes <code class="docutils literal notranslate"><span class="pre">LMHead</span></code> directly, also meaning that a next-token prediction head will be initialized.</p>
+The special class is provided specifically for GPT-2. Note that both classes provide a hint as to which task we want to initialize the model for. The AutoClass name includes <code class="docutils literal notranslate"><span class="pre">CausalLM</span></code>, meaning that the class will initialize a model with a next-token prediction head, and the GPT-2 class name includes <code class="docutils literal notranslate"><span class="pre">LMHead</span></code> directly, also meaning that a next-token prediction head will be initialized.</p>
 <p>However, it is common in NLP to use the same architectures with <em>different model heads</em> for different tasks. For instance, based on the core of GPT-2, instead of next-token prediction, we might want to do classification or, e.g., token classification. For these tasks, we need different output layers (rather than one outputting a distribution over the vocabulary), i.e., different <em>model heads</em>. The base architecture (e.g., GPT-2) is often called the model <em>backbone</em> (also in computer vision).</p>
 <p>Luckily, HF provides different classes for different model heads. For instance, for GPT-2 there are classes like <code class="docutils literal notranslate"><span class="pre">GPT2ForSequenceClassification</span></code> or <code class="docutils literal notranslate"><span class="pre">GPT2ForTokenClassification</span></code>.
 The full list of different GPT-2 classes with different heads can be found <a class="reference external" href="https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2Config">here</a>.</p>
@@ -601,7 +601,7 @@ translation: GPT2LMHeadModel</p>
 </section>
 <section id="training-utilities">
 <h2>Training utilities<a class="headerlink" href="#training-utilities" title="Link to this heading">#</a></h2>
-<p>Training deep neural networks with millions of parameters is a tricky task. The last decades of NLP research have identified (mostly bytesting what works well in practice) several engineering tricks that usually help to stabilize the optimization process. The following (non-exhaustive!) list provides an overview of commonly used tricks, so as to equip you with a high-level conceptual idea of what these are when you encounter them in NLP papers:</p>
+<p>Training deep neural networks with millions of parameters is a tricky task. The last decades of NLP research have identified (mostly by testing what works well in practice) several engineering tricks that usually help to stabilize the optimization process. The following (non-exhaustive!) list provides an overview of commonly used tricks, so as to equip you with a high-level conceptual idea of what these are when you encounter them in NLP papers:</p>
 <ul class="simple">
 <li><p><strong>Learning rate scheduling</strong>: refers to using a schedule for decreasing the learning rate that is used for updating the weights. Helps to avoid too large updates close to potential optima.</p></li>
 <li><p><strong>Weight / gradient clipping</strong>: refers to setting min or max values that a single weight or a gradient can take on. Helps to avoid very large values in the updates of the weights or in loss computations.</p></li>
@@ -615,7 +615,7 @@ translation: GPT2LMHeadModel</p>
 <li><p><strong>Hyperparameter tuning</strong>: refers to generally selecting configurations of the model and / or the training process. For instance, it can be the process of searching for optimal learning rates, optimal dimension of hidden representations, number of layers, etc. To avoid having to test too many combinations of hyperparameters (as in an exhaustive algorithm such as grid search), specialized algorithms have been developed that balance exploration and convergence. A few common approaches include:</p>
 <ul>
 <li><p>Grid search: defines a list of values for each parameter and tries all possible combinations, while evaluating the models performance for each combination.</p></li>
-<li><p>Random search: Samples values randomly from a specifies distribution and again, evaluates the performance for each combination.</p></li>
+<li><p>Random search: Samples values randomly from a specified distribution and again, evaluates the performance for each combination.</p></li>
 <li><p>Bayesian Optimization: Defines an objective function <span class="math notranslate nohighlight">\(P(score | hyperparameters)\)</span> and tries to maximize this probability. It is essentially another machine learning model trained to find the optimal hyperparameters. The advantage to the other two approaches is that it makes an informed guess based on previous observations.</p></li>
 </ul>
 </li>
@@ -648,15 +648,19 @@ Another possibility of checking training progress is to rely on the <em>training
 The helper class <code class="docutils literal notranslate"><span class="pre">DataCollatorForLanguageModeling(tokenizer,</span> <span class="pre">mlm=True,</span> <span class="pre">mlm_probability=0.15)</span></code> that we’ve used in the previous sheet allows to flexibly switch between the different types of masking via the <code class="docutils literal notranslate"><span class="pre">mlm</span></code> parameter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataCollatorForLanguageModeling</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are using Colab, you may have to install datasets again</span>
+<span class="c1"># !pip install datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataCollatorForLanguageModeling</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
+
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;stanfordnlp/imdb&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
 <span class="n">bert_tok</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;bert-base-cased&quot;</span><span class="p">)</span>
 <span class="n">data_collator</span> <span class="o">=</span> <span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span><span class="n">bert_tok</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mlm_probability</span><span class="o">=</span><span class="mf">0.45</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span>
-        <span class="n">input_text</span><span class="p">,</span> 
+        <span class="n">input_text</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
         <span class="n">tokenizer</span><span class="o">=</span><span class="n">bert_tok</span>
     <span class="p">):</span>
