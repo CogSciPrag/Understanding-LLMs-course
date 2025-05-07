@@ -703,6 +703,15 @@ The helper class <code class="docutils literal notranslate"><span class="pre">Da
 </div>
 </div>
 </div>
+<p>##Note: Masking
+DataCollatorForMLM will return a “label” tensor in which 85% of the item are of value [-100] .
+This is because when we compute loss during pre -training, we want to compute it in relation to the words the model was tasked with retrieving (the 15% “masked” part of the output), and not include the others in the calculation.
+This type of masking is not to be confused with attention masking:</p>
+<ul class="simple">
+<li><p>attention masking ensures that the model does not attend to things like padding tokens, or prevents a causal model from accessing the right side of the input, during the specific step of attention computing</p></li>
+<li><p>label masking, such as the one in DataCollator, ensures that some tokens are not included in the loss computation.
+There are cases where we would want the token to attend to tokens like CLS or SEP (so they are accessible during the attention computation), but do not include them in the loss calculation.</p></li>
+</ul>
 </section>
 </section>
 <section id="outlook-and-optional-exercises">
