@@ -198,6 +198,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">03 LSTMs &amp; transformers</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../lectures/03-LSTMs-Transformers.html">LSTMs &amp; Transformers</a></li>
+
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Sheet 3.1: Tokenization &amp; Transformers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="03b-transformers-heads-training.html">Sheet 3.2: Transformer configurations &amp; Training utilities</a></li>
 </ul>
@@ -857,11 +858,11 @@ Extract the embedding for the token with the ID 2 (assume 0-indexing). Write dow
 </div>
 <div class="toggle docutils container">
 <p>transformer_model = TransformerModel(
-128, # size of the dictionary of embeddings
-32, # the size of each embedding vector &amp; d_model of the Positional Encoding
-1, # the number of dim for the feed forward process
-64, # nlayers: number of layers for both the encoder and the decoder
-3, # the dropout value
+128, # size of the dictionary of embeddings, ntoken
+32, # the size of each embedding vector &amp; d_model of the Positional Encoding, ninp
+1, # the number of attention heads
+64, # dimensionality of hidden representations after attention application, provided by a linear layer, nhid
+3, # the number of layers (for the encoder, and decoder, each), nlayers
 )</p>
 </div>
 <div class="cell docutils container">
