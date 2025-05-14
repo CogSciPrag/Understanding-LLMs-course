@@ -690,12 +690,23 @@ document.write(`
 <div class="toggle docutils container">
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>First tokenization: Byte-Pair Encoding tokenization. Computes unique set of words used in the corpus, containing all ASCII characters and some Unicode characters plus unknown token. Starts with small vocabulary and adds vocabulary.<br />
-Second tokenization: WordPiece Tokenization. Each word is initally split by adding a prefix # to all the characters inside the word. Starts with small vocabulary and adds vocabulary.<br />
-score=(freq_of_pair)/(freq_of_first_element×freq_of_second_element)<br />
-Third tokenization: Unigram Tokenization. Starts with large vocabulary and removes tokens. Apply BPE on a large vocabulary size. Loss computation. How much would the overall loss increase by reducing the symbol?</p></li>
-<li><p>Our GPT-2-model uses the Byte-Pair Encoding tokenization.</p></li>
-<li><p>According to the website, a Byte-Pair Encoding tokenization were used with by an implementation from Sentence Piece</p></li>
+<li><p>merges.txt: Contains the merge rules for Byte-Pair Encoding (BPE) tokenization, which defines how subword units are combined.
+vocab.json: Contains the BPE vocabulary mapping tokens to their corresponding IDs.,
+and tokenizer.json: Holds configuration settings for the tokenizer (e.g., special tokens, padding, truncation)</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><p>2.unk_token (Unknown Token): Used to represent tokens that are not found in the vocabulary. By default, GPT-2 uses &lt;|endoftext|&gt; for unknown tokens.
+bos_token (Beginning of Sequence Token): Indicates the start of a sequence. In GPT-2, this defaults to &lt;|endoftext|&gt;, though it is not commonly used explicitly since GPT-2 is decoder-only.
+eos_token (End of Sequence Token): Marks the end of a sequence. GPT-2 uses &lt;|endoftext|&gt; as the default end-of-text token.
+pad_token (Padding Token): Used to pad shorter sequences to match the length of longer ones in a batch. GPT-2 does not have a default pad token since it wasn’t trained with one, but it can be manually defined for batch processing tasks.</p>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>s&gt;: Denotes the beginning of a sequence.
+[INST] and [/INST]: Enclose each user instruction or message.
+&lt;<SYS>&gt; and &lt;</SYS>&gt;: Wrap the system prompt, providing context or behavior guidelines for the model.
+</s>: Indicates the end of the sequence.</p></li>
 </ol>
 </div></blockquote>
 </div>
