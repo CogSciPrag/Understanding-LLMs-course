@@ -504,6 +504,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lora-fine-tuning-in-practice">LoRA fine-tuning in practice</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-peft-in-practice">Outlook: PEFT in practice</a></li>
 </ul>
 </li>
@@ -566,6 +567,13 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install accelerate bitsandbytes</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import packages</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
@@ -583,18 +591,23 @@ This has also been achieved with supervised fine-tuning, where the example input
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer_instruct</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;microsoft/Phi-3-mini-4k-instruct&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer_instruct</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;Qwen/Qwen2.5-7B-Instruct&quot;</span><span class="p">)</span>
 <span class="n">model_instruct</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="s2">&quot;microsoft/Phi-3-mini-4k-instruct&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Qwen/Qwen2.5-7B-Instruct&quot;</span><span class="p">,</span>
     <span class="n">load_in_4bit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">bnb_4bit_use_double_quant</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">bnb_4bit_quant_type</span><span class="o">=</span><span class="s2">&quot;nf4&quot;</span><span class="p">,</span>
     <span class="n">bnb_4bit_compute_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="n">tokenizer_lm</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2-small&quot;</span><span class="p">)</span>
-<span class="n">model_lm</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2-small&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer_lm</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai-community/openai-gpt&quot;</span><span class="p">)</span>
+<span class="n">model_lm</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai-community/openai-gpt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -628,10 +641,8 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpt2_model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
-
-<span class="c1"># first we inspect the model&#39;s configuration</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">gpt2_model</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># first we inspect the model&#39;s configuration</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_lm</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -639,7 +650,7 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, we can inspect the model&#39;s configuration and named parameters</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">model_lm</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -654,7 +665,7 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 
 <span class="c1"># iterate over model&#39;s parameters</span>
 <span class="c1"># note that, by default, in train mode, all parameters are set to require grad = True (i.e., unfrozen)</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model_lm</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
      <span class="c1"># check that these parameters are not in the layers_to_unfreeze list</span>
      <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">layers_to_unfreeze</span><span class="p">]):</span> 
         <span class="c1"># if not, freeze these parameters</span>
@@ -666,7 +677,7 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now we check how many parameters are trainable</span>
-<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">gpt2_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">]</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model_lm</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The model has </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1"> trainable parameters&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -691,9 +702,78 @@ The QA fine-tuning that we did in homework 1 was naive fine-tuning. That is, dur
 </pre></div>
 </div>
 </div>
+<section id="lora-fine-tuning-in-practice">
+<h3>LoRA fine-tuning in practice<a class="headerlink" href="#lora-fine-tuning-in-practice" title="Link to this heading">#</a></h3>
+<p>As for full supervised fine-tuning that we have already seen, <code class="docutils literal notranslate"><span class="pre">transformers</span></code> provides high-level wrappers for conducting LoRA finetuning.
+Below is an example of setting up the fine-tuning of a 7B model, focusing on the parts that are specific to LoRA. Other parts of the training pipeline (e.g., loading and preparing the data) would be used as usual.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">peft</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoraConfig</span><span class="p">,</span> <span class="n">get_peft_model</span>
+
+<span class="c1"># first, we have to create a config object</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">LoraConfig</span><span class="p">(</span>
+    <span class="n">r</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="c1"># LORA rank; hyperparam, subject to change </span>
+    <span class="n">lora_alpha</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="c1"># alpha/rank is used; higher value will lead to higher weight of lora params over frozen params </span>
+    <span class="n">lora_dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> 
+    <span class="n">bias</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> 
+    <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;CAUSAL_LM&quot;</span><span class="p">,</span>
+    <span class="n">target_modules</span><span class="o">=</span><span class="p">[</span> <span class="c1"># this depends on the model and what you want to fine-tune; if set to &quot;all-linear&quot;, performance might be similar to QLoRA fine-tuning</span>
+        <span class="s2">&quot;q_proj&quot;</span><span class="p">,</span>  <span class="c1"># all Linear layers for OLMo</span>
+        <span class="s2">&quot;k_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;v_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;o_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gate_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;up_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;down_proj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lm_head&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># next, we have to create PEFT model wrapper around a base model we want to finetune</span>
+<span class="n">base_model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;Qwen/Qwen2.5-7B-Instruct&quot;</span><span class="p">)</span>
+<span class="n">lora_model</span> <span class="o">=</span> <span class="n">get_peft_model</span><span class="p">(</span><span class="n">base_model</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+
+<span class="c1"># next, we would set up TrainingArguments and Trainer as usual (see shett 2.5)</span>
+<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">training_args</span><span class="p">,</span> 
+    <span class="n">model</span><span class="o">=</span><span class="n">lora_model</span><span class="p">,</span>
+    <span class="c1"># lora can make use of more recent or even custom optimizers, such as AdamW8bit that are more efficient and can save memory even more</span>
+    <span class="n">optim</span><span class="o">=</span><span class="s2">&quot;paged_adamw_8bit&quot;</span><span class="p">,</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">peft</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeftModel</span>
+<span class="c1"># once the model is trained, usually, only the trained adapters are saved.</span>
+<span class="c1"># To use the full fine-tuned model that has been saved, they have to be loaded and merged back in to the base model.</span>
+<span class="n">peft_model_id</span> <span class="o">=</span> <span class="s2">&quot;path/to/adapters&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model</span><span class="p">,</span> <span class="n">peft_model_id</span><span class="p">)</span>
+<span class="c1"># this function does not keep the adapters separately in the memory and removes latencies at inference time</span>
+<span class="n">model</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
+<span class="c1"># to keep the adapters separately, we can use the following function</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model</span><span class="p">,</span> <span class="n">peft_model_id</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">merge_adapter</span><span class="p">()</span>
+<span class="c1"># unmerge the LoRA layers from the base model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">unmerge_adapter</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can find details on all the settings you can change within LoRA configuration <a class="reference external" href="https://huggingface.co/docs/peft/package_reference/lora#peft.LoraConfig">here</a>.</p>
+</section>
 <section id="outlook-peft-in-practice">
 <h3>Outlook: PEFT in practice<a class="headerlink" href="#outlook-peft-in-practice" title="Link to this heading">#</a></h3>
-<p>Below, more optional resources for the other types of fine-tuning introduced in the (LoRA, QLoRA) can be found.</p>
+<p>Below, more optional resources for the other types of fine-tuning introduced in the lecture can be found.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://huggingface.co/blog/4bit-transformers-bitsandbytes">Blog post on QLoRA with <code class="docutils literal notranslate"><span class="pre">transformers</span></code></a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/blog/peft">Overview blogpost on PEFT with <code class="docutils literal notranslate"><span class="pre">transformers</span></code></a></p></li>
@@ -759,7 +839,7 @@ Therefore, the SFT dataset usually consists of examples of target outputs writte
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">trl</span><span class="w"> </span><span class="kn">import</span> <span class="n">SFTTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trl</span><span class="w"> </span><span class="kn">import</span> <span class="n">SFTTrainer</span><span class="p">,</span> <span class="n">SFTConfig</span>
 
 <span class="c1"># load dataset</span>
 <span class="c1"># you can inspect it to get a sense of its contents and formatting</span>
@@ -773,26 +853,31 @@ Therefore, the SFT dataset usually consists of examples of target outputs writte
 <span class="c1"># and should be used in consistent ways in further training</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">formatting_prompts_func</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
-    <span class="n">output_texts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># iterate over batch</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;prompt&#39;</span><span class="p">])):</span>
-        <span class="c1"># retrieve both inputs and target labels</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;prompt&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">output_texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">output_texts</span>
+    <span class="c1"># This can be any formatting function that corresponds to the desired task</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Text: </span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;prompt&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2"> Summary: </span><span class="si">{</span><span class="n">example</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+<span class="c1"># apply the formatting function to the dataset</span>
+<span class="n">formatted_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">formatting_prompts_func</span><span class="p">)</span><span class="o">.</span><span class="n">rename_column</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;completion&quot;</span><span class="p">)</span>
+
+<span class="c1"># set up the training config</span>
+<span class="n">sft_config</span> <span class="o">=</span> <span class="n">SFTConfig</span><span class="p">(</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">max_seq_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="c1"># completion_only_loss=False,</span>
+    <span class="n">dataset_text_field</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+    <span class="n">report_to</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">SFTTrainer</span><span class="p">(</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">sft_config</span><span class="p">,</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-    <span class="n">formatting_func</span><span class="o">=</span><span class="n">formatting_prompts_func</span><span class="p">,</span>
-    <span class="n">max_seq_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-    <span class="n">dataset_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">formatted_dataset</span><span class="p">,</span>
 <span class="p">)</span>
+
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
 <span class="c1"># If one wants to pass custom training arguments, an example of doing so is here: https://github.com/huggingface/trl/blob/main/examples/scripts/sft.py</span>
-
-<span class="c1"># NOTE: if you experience errors running this, setting the version of accelerate to pip install accelerate==0.27.2 might help</span>
 </pre></div>
 </div>
 </div>
@@ -970,6 +1055,7 @@ Specifically, the theorem behind this class of methods shows that the policy can
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flavours-of-fine-tuning">Flavours of fine-tuning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lora-fine-tuning-in-practice">LoRA fine-tuning in practice</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outlook-peft-in-practice">Outlook: PEFT in practice</a></li>
 </ul>
 </li>
