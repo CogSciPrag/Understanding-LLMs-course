@@ -1,6 +1,6 @@
 # Fine-tuning and RLHF
 
-Stay tuned for slides from the fifth lecture!
+Slides from the lecture introducing different fine-tuning techniques (PEFT, instruction fine-tuning, RL-based fine-tuning) can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/05_2025-Finetuning-RLHF.pdf).
 
 ## Additional materials
 
