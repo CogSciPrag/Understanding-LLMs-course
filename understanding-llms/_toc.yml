@@ -52,3 +52,4 @@ parts:
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling
+  - file: homework/02-fine-tuning
