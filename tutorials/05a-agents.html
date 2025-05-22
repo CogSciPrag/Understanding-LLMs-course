@@ -504,7 +504,6 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain">LangChain</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#excercise-5-1-1-2">Excercise 5.1.1.2</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#agents">Agents</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-agent-with-tools">LangChain agent with tools</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-parsing">Output parsing</a></li>
@@ -538,12 +537,12 @@ document.write(`
 <p>Using the terminology of langchain, a sequence of such LLM calls is called a <em>chain</em>. For each call, one minimally needs to specify a (pretrained / fine-tuned) LLM and a prompt that specifies what exactly the call should accomplish. For the prompt, oftentimes <em>prompt templates</em> are used. These prompt templates usually specify <em>variables</em> which are filled with inputs when the respective LLM call is invoked. The idea behind this is that the calls can be re-used, e.g., with various user inputs, without having to re-type the entire prompt. Further, these inputs may come from a previous LLM call. One neat feature of langchain is that it allows to seamlessly chain LLM calls and stream outputs from one call into the next. Specific types of templates (e.g., chat prompt templates) also take care of formatting text in the way expected by the model, e.g., adding the required special tokens and format for chat models.</p>
 <p>[Disclaimer: Not sponsored by LangChain – there are other very useful tools for doing such things, for instance, <a class="reference external" href="https://github.com/deepset-ai/haystack">Haystack</a>. This is just one popular example.]</p>
 <p>Below, we will first look at a an example of a simple sequence of LLM calls. In particular, we will build a system that helps us to come up with a dinner menu, given some ingredients that we already have.</p>
-<p>We will be using the OpenAI API to get optimal performance (specifically, the GPT-3.5-turbo model). Instructions for retreiving the an API key will be provided in class.</p>
+<p>We will be using the NVIDIA API to get access to performant models for optimal performance. Instructions for retreiving the an API key will be provided in class.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># please install the following packages and versions</span>
 
-<span class="c1">#!pip install langchain==0.2.2 langchain-core==0.2.4 langchain-openai==0.1.7 wikipedia==1.4.0 langchainhub==0.1.17 langchain-community==0.2.1</span>
+<span class="c1">#!pip install langchain-community langchain-openai langchain_nvidia_ai_endpoints==0.3.9 langchainhub duckduckgo-search wikipedia python-dotenv</span>
 </pre></div>
 </div>
 </div>
@@ -551,9 +550,10 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.output_parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrOutputParser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_nvidia_ai_endpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatNVIDIA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.rate_limiters</span><span class="w"> </span><span class="kn">import</span> <span class="n">InMemoryRateLimiter</span>
 </pre></div>
 </div>
 </div>
@@ -565,6 +565,8 @@ document.write(`
 <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="c1"># define which model to query</span>
+<span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;meta/llama-3.3-70b-instruct&quot;</span>
 
 <span class="n">ingredients</span> <span class="o">=</span> <span class="s2">&quot;cauliflower, tomatoes.&quot;</span>
 
@@ -579,13 +581,21 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># instantiate model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-0125&quot;</span><span class="p">,</span>
-    <span class="n">openai_api_key</span><span class="o">=</span><span class="c1">### YOUR KEY HERE,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>   
-<span class="p">)</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NVIDIA_API_KEY</span> <span class="o">=</span> <span class="c1">### YOUR API TOKEN</span>
+
+<span class="c1"># instantiate model</span>
+<span class="n">rate_limiter</span> <span class="o">=</span> <span class="n">InMemoryRateLimiter</span><span class="p">(</span>
+    <span class="n">requests_per_second</span><span class="o">=</span><span class="mi">35</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span>  <span class="c1"># 35 requests per minute to be sure</span>
+    <span class="n">check_every_n_seconds</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># wake up every 100 ms to check whether allowed to make a request,</span>
+    <span class="n">max_bucket_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>  <span class="c1"># controls the maximum burst size</span>
+<span class="p">)</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatNVIDIA</span><span class="p">(</span>
+      <span class="n">model</span><span class="o">=</span><span class="n">MODEL_NAME</span><span class="p">,</span>
+      <span class="n">api_key</span><span class="o">=</span><span class="n">NVIDIA_API_KEY</span><span class="p">,</span> 
+      <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>   <span class="c1"># ensure reproducibility,</span>
+      <span class="n">rate_limiter</span><span class="o">=</span><span class="n">rate_limiter</span>  <span class="c1"># bind the rate limiter</span>
+  <span class="p">)</span>
 
 <span class="c1"># construct prompts for our calls</span>
 <span class="n">prompt_template_appetizer</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
@@ -601,9 +611,9 @@ document.write(`
     <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;appetizer&#39;</span><span class="p">,</span> <span class="s1">&#39;main_course&#39;</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="c1"># construct sub-chains for each course</span>
-<span class="n">appetizer_chain</span> <span class="o">=</span> <span class="n">prompt_template_appetizer</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="n">main_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="n">composed_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_summary</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">appetizer_chain</span> <span class="o">=</span> <span class="n">prompt_template_appetizer</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">main_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">composed_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_summary</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
 
 <span class="c1"># actually call the execution of the entire chain</span>
 <span class="n">composed_result</span> <span class="o">=</span> <span class="n">composed_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;ingredients&quot;</span><span class="p">:</span> <span class="n">ingredients</span><span class="p">})</span>
@@ -615,7 +625,7 @@ document.write(`
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.1: LLM chain</span></strong></p>
 <ol class="arabic simple">
-<li><p>Please look at the code above and try to understand what it does. Relevant docs about LLM calls can be found <a class="reference external" href="https://python.langchain.com/v0.1/docs/modules/model_io/prompts/quick_start/">here</a>, about chains <a class="reference external" href="https://python.langchain.com/v0.1/docs/expression_language/primitives/sequence/">here</a>.</p></li>
+<li><p>Please look at the code above and try to understand what it does. Relevant docs about LLM calls can be found <a class="reference external" href="https://python.langchain.com/docs/how_to/#prompt-templates">here</a>, about chains <a class="reference external" href="https://python.langchain.com/docs/how_to/sequence/">here</a>.</p></li>
 <li><p>Add a third course to our menu! Of course, you can also play around with the other prompts and the sequence.</p></li>
 </ol>
 </div></blockquote>
@@ -655,18 +665,7 @@ document.write(`
 <span class="expanded">Hide code cell content</span>
 </summary>
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load env file with the OpenAI API key</span>
-<span class="n">load_dotenv</span><span class="p">()</span>
-
-<span class="c1"># instantiate model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-0125&quot;</span><span class="p">,</span>
-    <span class="n">openai_api_key</span><span class="o">=</span><span class="s1">&#39;YOUR_API_KEY&#39;</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
-<span class="p">)</span>
-
-<span class="c1"># construct prompts for our calls</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># construct prompts for our calls</span>
 <span class="n">prompt_template_appetizer</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="p">(</span>
     <span class="n">template</span> <span class="o">=</span> <span class="n">instructions_text_appetizer</span><span class="p">,</span>
     <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ingredients&#39;</span><span class="p">],</span>
@@ -685,10 +684,10 @@ document.write(`
     <span class="n">input_variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;appetizer&#39;</span><span class="p">,</span> <span class="s1">&#39;main_course&#39;</span><span class="p">,</span> <span class="s1">&#39;dessert&#39;</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="c1"># construct sub-chains for each course</span>
-<span class="n">appetizer_chain</span> <span class="o">=</span> <span class="n">prompt_template_appetizer</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="n">main_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="n">dessert_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
-<span class="n">composed_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">,</span> <span class="s2">&quot;dessert&quot;</span><span class="p">:</span> <span class="n">dessert_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_summary</span> <span class="o">|</span> <span class="n">model</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">appetizer_chain</span> <span class="o">=</span> <span class="n">prompt_template_appetizer</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">main_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">dessert_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_main</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
+<span class="n">composed_chain</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appetizer&quot;</span><span class="p">:</span> <span class="n">appetizer_chain</span><span class="p">,</span> <span class="s2">&quot;main_course&quot;</span><span class="p">:</span> <span class="n">main_chain</span><span class="p">,</span> <span class="s2">&quot;dessert&quot;</span><span class="p">:</span> <span class="n">dessert_chain</span><span class="p">}</span> <span class="o">|</span> <span class="n">prompt_template_summary</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">StrOutputParser</span><span class="p">()</span>
 
 <span class="c1"># actually call the execution of the entire chain</span>
 <span class="n">composed_result</span> <span class="o">=</span> <span class="n">composed_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;ingredients&quot;</span><span class="p">:</span> <span class="n">ingredients</span><span class="p">})</span>
@@ -709,13 +708,6 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_react_agent</span>
 
-<span class="c1"># initialize the backbone model for the agent</span>
-<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-3.5-turbo-0125&quot;</span><span class="p">,</span> 
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">openai_api_key</span><span class="o">=</span><span class="c1">### YOUR KEY HERE,</span>
-<span class="p">)</span>
-
 <span class="c1"># Get an example prompt from langchain that was constructed for this agent architecture. you can modify this!</span>
 <span class="n">prompt</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="s2">&quot;hwchase17/react&quot;</span><span class="p">)</span>
 <span class="c1"># inspect the prompt</span>
@@ -724,47 +716,15 @@ document.write(`
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the agent</span>
-<span class="n">agent</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[],</span> <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">)</span>
-<span class="c1"># initialize the agent</span>
-<span class="n">agent_executor</span> <span class="o">=</span> <span class="n">AgentExecutor</span><span class="p">(</span><span class="n">agent</span><span class="o">=</span><span class="n">agent</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># actually call the agent with the same task as above</span>
-<span class="n">agent_executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;Please help me come up with a three course Italian dinner menu. It should be vegetarian. I have cauliflower and tomatoes in my fridge.&quot;</span><span class="p">})</span>
-</pre></div>
-</div>
-</div>
-</div>
-<blockquote>
-<div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.2: LLM agents</span></strong></p>
-<ol class="arabic simple">
-<li><p>Please look at the code above and try to understand what it does. Relevant information about agents can be found <a class="reference external" href="https://python.langchain.com/v0.2/docs/tutorials/agents/">here</a>. Please also try to get an overview of the React architecture (see link above).</p></li>
-<li><p>What steps does the agent (try to) perform in order to accomplish the task? How does it “know” which steps to do when?</p></li>
-<li><p>Compare the results to the chain above. Do you observe differences?</p></li>
-</ol>
-</div></blockquote>
-<div class="toggle docutils container">
-<blockquote>
-<div><ol class="arabic simple" start="2">
-<li><p>The model is trying out different possibilities to get the the right result The answer is, that its experiments are not valid. And it gives itself a suggestion what to try out next. Unfortunatelly the model is caged in a loop of making the same step over and over again:</p></li>
-</ol>
-</div></blockquote>
-<p>I should try searching for vegetarian Italian cauliflower and tomato recipes on a popular recipe website like Allrecipes or Food Network</p>
-<blockquote>
-<div><ol class="arabic simple" start="3">
-<li><p>As a result, it is not finding an satisfiying answer. Nonetheless, the model ‘understands’ that the results is not correct. In comparision the first model finds a dinnerplan - but with different ingredients (e.g. tiramiu for dessert) than I have offered.</p></li>
-</ol>
-</div></blockquote>
-</div>
-</section>
-<section id="langchain-agent-with-tools">
-<h3>LangChain agent with tools<a class="headerlink" href="#langchain-agent-with-tools" title="Link to this heading">#</a></h3>
-<p>As you might have seen above, the agent instantiation accepts a list of <em>tools</em> (which we have left empty above). The agent tried to make use of the tools above. This time, let us add a tool to agent – specifically, we will provide it with a tool to call the Wikipedia API for real time searches.</p>
+<p>For most modern out of the box agents, the agent instantiation accepts a list of <em>tools</em>. The agent tried to make use of the tools above. Below, we add such tools to the agent – specifically, we will provide it with a tool to call the Wikipedia API anf to a search API for real time searches.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">DuckDuckGoSearchRun</span>
+
+<span class="n">search</span> <span class="o">=</span> <span class="n">DuckDuckGoSearchRun</span><span class="p">()</span>
 <span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s2">&quot;wikipedia&quot;</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span>
+<span class="n">tools</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;tools&#39;</span><span class="p">,</span>  <span class="n">tools</span><span class="p">)</span>
 
 <span class="c1"># create an agent with tools</span>
@@ -780,7 +740,7 @@ document.write(`
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.3: LLM agents with tools</span></strong></p>
 <ol class="arabic simple">
-<li><p>Please look at the code above and try to understand what it does. A list of various tools can be found here <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/tools/">here</a>.</p></li>
+<li><p>Please look at the code above and try to understand what it does. A list of various tools can be found here <a class="reference external" href="https://python.langchain.com/docs/integrations/tools/">here</a>.</p></li>
 <li><p>What steps does the agent (try to) perform in order to accomplish the task? How does it “know” which steps to do when? When does it execute searhces?</p></li>
 <li><p>Compare the results to the chain above. Do you observe differences?</p></li>
 <li><p>Is the Wikipedia tool a good choice for the task at hand? What else might we consider?</p></li>
@@ -796,56 +756,21 @@ document.write(`
 </div></blockquote>
 </div>
 <p>For the sake of seeing the top possible performance of agents, we have used OpenAI models. But since they are behind a paywall, we might also want to use open-source models as a backbone for the agent. LangChain also provides integration with many <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/">various</a> LLMs, including HuggingFace models that can be used via the HF <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/huggingface_endpoint/">API endpoint</a> which might not always be available and requires and HuggingFace <a class="reference external" href="https://huggingface.co/welcome">account</a>, or with a <a class="reference external" href="https://python.langchain.com/v0.1/docs/integrations/llms/huggingface_pipelines/">local</a> model loaded via <code class="docutils literal notranslate"><span class="pre">transformers</span></code> as we have learned. The latter requires downloading the model; since agent LLM systems require good performance of the backbone LLM, it can rather be tested with large models with at least a few billion parameters (mind their size for downloads!).</p>
-<p>In case you do have a HuggingFace account or don’t mind signing up for one, you can optionally test the example below which uses the HF API.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
-
-<span class="n">HUGGINGFACEHUB_API_TOKEN</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set up huggingface LLM</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.llms</span><span class="w"> </span><span class="kn">import</span> <span class="n">HuggingFaceEndpoint</span>
-<span class="c1"># insert your huggingface API token here (DO NOT PUBLICLY SHARE IT!!!!)</span>
-<span class="n">HUGGINGFACEHUB_API_TOKEN</span> <span class="o">=</span> <span class="c1">### YOUR API TOKEN</span>
-<span class="c1"># define which model to query</span>
-<span class="n">repo_id</span> <span class="o">=</span> <span class="s2">&quot;mistralai/Mistral-7B-Instruct-v0.2&quot;</span>
-
-<span class="n">llm_hf</span> <span class="o">=</span> <span class="n">HuggingFaceEndpoint</span><span class="p">(</span>
-    <span class="n">repo_id</span><span class="o">=</span><span class="n">repo_id</span><span class="p">,</span> 
-    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> 
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> 
-    <span class="n">huggingfacehub_api_token</span><span class="o">=</span><span class="n">HUGGINGFACEHUB_API_TOKEN</span>
-<span class="p">)</span>
-
-<span class="n">agent_hf</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span><span class="n">llm_hf</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[],</span> <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">)</span>
-<span class="c1"># initialize the agent</span>
-<span class="n">agent_hf_executor</span> <span class="o">=</span> <span class="n">AgentExecutor</span><span class="p">(</span><span class="n">agent</span><span class="o">=</span><span class="n">agent_hf</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># actually call the agent with the same task as above</span>
-<span class="n">agent_hf_executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;Please help me come up with a three course Italian dinner menu. It should be vegetarian. I have cauliflower and tomatoes in my fridge.&quot;</span><span class="p">})</span>
-</pre></div>
-</div>
-</div>
-</div>
 </section>
 </section>
 <section id="output-parsing">
 <h2>Output parsing<a class="headerlink" href="#output-parsing" title="Link to this heading">#</a></h2>
-<p>One of the core bottlenecks of chaining LLM calls is the potential necessity to <em>process outputs</em> in a specific (structured) way. <a class="reference external" href="https://python.langchain.com/v0.2/docs/how_to/structured_output/">This</a> page provides an overview of how this can be approached. This is step is key for enabling integration of LLMs into automatic systems where other components depend on outputs of LLMs and usually expect particular input types or formats.</p>
+<p>One of the core bottlenecks of chaining LLM calls is the potential necessity to <em>process outputs</em> in a specific (structured) way. <a class="reference external" href="https://python.langchain.com/docs/how_to/structured_output/">This</a> page provides an overview of how this can be approached. This is step is key for enabling integration of LLMs into automatic systems where other components depend on outputs of LLMs and usually expect particular input types or formats.</p>
 <p>There are also packages / frameworks specialized in interfacing with LLMs and properly parsing their outputs like, e.g., <a class="reference external" href="https://lmql.ai/">LMQL</a> and <a class="reference external" href="https://github.com/microsoft/aici">this</a> controller framework from Microsoft.</p>
 <p>These resources are intended as optional useful information, in case you will explore and build your own agents; you are not expected to have looked at them in detail.</p>
 </section>
 <section id="memory-handling">
 <h2>Memory handling<a class="headerlink" href="#memory-handling" title="Link to this heading">#</a></h2>
-<p>One of the main issues of agents is that they are by default <em>stateless</em>; i.e., at each step of execution there is no memory of what happened before. This is handled by adding <em>memory components</em>. An overview of this can be found <a class="reference external" href="https://python.langchain.com/v0.2/docs/tutorials/agents/#adding-in-memory">here</a>.</p>
+<p>One of the main issues of agents is that they are by default <em>stateless</em>; i.e., at each step of execution there is no memory of what happened before. This is handled by adding <em>memory components</em>. An overview of this can be found <a class="reference external" href="https://python.langchain.com/docs/how_to/chatbots_memory/#summary-memory">here</a>.</p>
 <blockquote>
 <div><p><strong><span style=&ldquo;color:#D83D2B;&rdquo;>Exercise 5.1.4: Memory</span></strong></p>
 <ol class="arabic simple">
-<li><p>Take a look at the approach for handling message memory above. Recall the <em>generative agnet</em> architecture that was discussed in the lecture. What is the difference between this simple approach and the memory implementation in the generative agents? What are respective (dis)advantages of either approach?</p></li>
+<li><p>Take a look at the approach for handling message memory above. Recall the <em>generative agent</em> architecture that was discussed in the lecture. What is the difference between this simple approach and the memory implementation in the generative agents? What are respective (dis)advantages of either approach?</p></li>
 </ol>
 </div></blockquote>
 </section>
@@ -918,7 +843,6 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain">LangChain</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#excercise-5-1-1-2">Excercise 5.1.1.2</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#agents">Agents</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-agent-with-tools">LangChain agent with tools</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-parsing">Output parsing</a></li>
