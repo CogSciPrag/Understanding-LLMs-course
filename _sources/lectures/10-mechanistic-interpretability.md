@@ -1,6 +1,6 @@
 # Mechanistic Interpretability
 
-Stay tuned for slides from the tenth lecture!
+Slides from the lecture covering mechanistic interpretability methods for LMs (logit lens, residual stream, activation patching, circuit analysis, sparse autoencoders) can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/08-Mechanistic-Interpretability.pdf).
 
 ## Additional materials
 

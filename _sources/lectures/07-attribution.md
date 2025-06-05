@@ -1,6 +1,6 @@
 # Attribution methods
 
-Stay tuned for slides from the seventh lecture!
+Slides from the lecture covering various attribution methods for LM behavior (Shapley values, attention visualization, gradient tracing and probing) can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/07-Probing-Attribution.pdf).
 
 ## Additional materials
 
