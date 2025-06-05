@@ -1,6 +1,7 @@
 # LLM systems & agents
 
-Stay tuned for slides from the sixth lecture!
+Slides from the lecture covering in-context leraning, prompting and advanced LLM systems ("agents") can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/06-ICL-Agents.pdf).
+
 
 ## Additional materials
 
