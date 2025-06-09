@@ -53,3 +53,4 @@ parts:
   chapters:
   - file: homework/01-language-modeling
   - file: homework/02-fine-tuning
+  - file: homework/03_agents_interpretability
