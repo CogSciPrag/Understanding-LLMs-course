@@ -60,6 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'homework/03_agents_interpretability';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Homework 2: Fine-tuning &amp; Prompting of LMs (51 points)" href="02-fine-tuning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -121,8 +122,6 @@
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -236,9 +235,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../lectures/09-philosophy.html">Implications, Understanding &amp; Philosophy</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="01-language-modeling.html">Homework 1: Language models (58 points)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02-fine-tuning.html">Homework 2: Fine-tuning &amp; Prompting of LMs (51 points)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Homework 3: LLM agents &amp; LLM interpretability</a></li>
 </ul>
 
     </div>
@@ -522,7 +522,7 @@ document.write(`
 <section id="logistics">
 <h2>Logistics<a class="headerlink" href="#logistics" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>submission deadline: June 28th th 23:59 German time via Moodle</p>
+<li><p>submission deadline: June 24th th 23:59 German time via Moodle</p>
 <ul>
 <li><p>please upload a <strong>SINGLE .IPYNB FILE named Surname_FirstName_HW3.ipynb</strong> containing your solutions of the homework.</p></li>
 </ul>
@@ -558,7 +558,7 @@ document.write(`
 <p><strong>YOUR TASK</strong></p>
 <blockquote>
 <div><p>Your task in this exercise is to explore RAG by implementing a RAG system for recipe generation. The implemented RAG system should be compared to the performance of the same model in a “vanilla” set-up where the model solves the task directly.</p>
-<p>We will use the package <code class="docutils literal notranslate"><span class="pre">LlamaIndex</span></code> and the LLM <code class="docutils literal notranslate"><span class="pre">phi-3-mini-4k-instruct</span></code> model as the backbone for the implementation. We will use the <code class="docutils literal notranslate"><span class="pre">BAAI/bge-small-en-v1.5</span></code> model as our embedding model.</p>
+<p>We will use the package <code class="docutils literal notranslate"><span class="pre">LlamaIndex</span></code> and the LLM <code class="docutils literal notranslate"><span class="pre">microsoft/Phi-4-mini-instruct</span></code> model as the backbone for the implementation. We will use the <code class="docutils literal notranslate"><span class="pre">BAAI/bge-small-en-v1.5</span></code> model as our embedding model.</p>
 <p>We will use unstructured data in the form of a recipe dataset <code class="docutils literal notranslate"><span class="pre">m3hrdadfi/recipe_nlg_lite</span></code>. This dataset will be indexed and it will be used to supplement information for the LLM, additionally to the query. The train split of the dataset should be used for the index, and a sample from the test dataset will be used for sampling queries with which the system will be tested.</p>
 <p>For this task, please complete the following steps:</p>
 <ol class="arabic simple">
@@ -579,6 +579,7 @@ document.write(`
 <span class="c1"># !pip install llama-index</span>
 <span class="c1"># !pip install &quot;huggingface_hub[inference]&quot;</span>
 <span class="c1"># !pip install accelerate bitsandbytes</span>
+<span class="c1"># !pip install --upgrade datasets</span>
 <span class="c1"># from IPython.display import clear_output</span>
 <span class="c1"># clear_output()</span>
 </pre></div>
@@ -651,8 +652,8 @@ document.write(`
 <span class="c1"># this includes correctly formatting the query and the context into the prompt and special tokens</span>
 <span class="c1"># that are expected by the chosen LLM backbone.</span>
 
-<span class="c1"># we format the texts into the Phi-3 prompt format</span>
-<span class="c1"># See https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</span>
+<span class="c1"># we format the texts into the Phi-4 prompt format</span>
+<span class="c1"># See https://huggingface.co/microsoft/Phi-4-mini-instruct</span>
 <span class="c1"># to heck here how the prompt should look like!</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">completion_to_prompt</span><span class="p">(</span><span class="n">completion</span><span class="p">):</span>
 
@@ -1101,8 +1102,8 @@ We will use data from one split of the <a class="reference external" href="https
 </ol>
 <p>a. “The currency in the United States of America is dollar.”</p>
 <p>b. “The result of two plus two is four.”</p>
-<p>c. A prompt that includes a 3-shot example before the prompt a.</p>
-<p>d. A prompt that includes a 3-shot example before the prompt b.</p>
+<p>c. A prompt that includes a 3-shot example before the prompt a (you should come up with the prompt yourself).</p>
+<p>d. A prompt that includes a 3-shot example before the prompt b (you should come up with the prompt yourself).</p>
 <p>Answer the folowing questions (please write 3 sentences each max.):</p>
 <ol class="arabic simple" start="2">
 <li><p>Are there differences in how predictions surface for the math vs. commonsense task?</p></li>
@@ -1131,8 +1132,8 @@ We will use data from one split of the <a class="reference external" href="https
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reuse the pythia model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">LanguageModel</span><span class="p">(</span><span class="s2">&quot;EleutherAI/pythia-160m&quot;</span><span class="p">,</span> <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the pythia model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LanguageModel</span><span class="p">(</span><span class="s2">&quot;EleutherAI/pythia-410m&quot;</span><span class="p">,</span> <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1146,16 +1147,8 @@ We will use data from one split of the <a class="reference external" href="https
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gpt2</span> <span class="o">=</span> <span class="n">LanguageModel</span><span class="p">(</span><span class="s2">&quot;openai-community/gpt2&quot;</span><span class="p">,</span> <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">gpt2</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span><span class="o">=</span> <span class="s2">&quot;The result of two plus two is&quot;</span>
-<span class="n">layers</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">gpt_neox</span><span class="o">.</span><span class="n">layers</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span><span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
+<span class="n">layers</span> <span class="o">=</span> <span class="c1">### YOUR CODE HERE ###</span>
 <span class="n">probs_layers</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">with</span> <span class="n">model</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="k">as</span> <span class="n">tracer</span><span class="p">:</span>
@@ -1212,6 +1205,13 @@ We will use data from one split of the <a class="reference external" href="https
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">### YOUR CODE HERE FOR LOOKING AT OTHER PROMPT RESULTS ###</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 </section>
 
@@ -1245,6 +1245,15 @@ We will use data from one split of the <a class="reference external" href="https
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="02-fine-tuning.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Homework 2: Fine-tuning &amp; Prompting of LMs (51 points)</p>
+      </div>
+    </a>
 </div>
                 </footer>
               
