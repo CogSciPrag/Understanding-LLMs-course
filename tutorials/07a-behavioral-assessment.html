@@ -564,6 +564,13 @@ The idea is that an ideal model should have a perplexity as close to 0 as possib
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install datasets minicons evaluate</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
@@ -824,7 +831,8 @@ These metrics originate from summarization and machine translation, where corpor
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the implementation of the bleu score computation</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchtext.data.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">bleu_score</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">evaluate</span>
+<span class="n">bleu</span> <span class="o">=</span> <span class="n">evaluate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;bleu&quot;</span><span class="p">)</span>
 <span class="c1"># load model and tokenizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">T5Tokenizer</span><span class="p">,</span> <span class="n">T5ForConditionalGeneration</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
