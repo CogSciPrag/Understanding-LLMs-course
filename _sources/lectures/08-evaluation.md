@@ -1,6 +1,6 @@
 # Evaluation & behavioral assessment
 
-Stay tuned for slides from the eighth lecture!
+Slides on benchmarking and behavioral evaluation of language models can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/09-behaveAssess-CogSciLing.pdf).
 
 ## Additional materials
 

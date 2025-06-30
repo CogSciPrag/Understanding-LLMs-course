@@ -1,6 +1,6 @@
 # Implications, Understanding & Philosophy
 
-Stay tuned for slides from the ninth lecture!
+Slides on LLM understanding (both by and of) from a conceptual perspective can be found [here](https://github.com/CogSciPrag/Understanding-LLMs-course/tree/main/understanding-llms/lectures/slides/10-philo-of-LMs.pdf).
 
 ## Additional materials
 
