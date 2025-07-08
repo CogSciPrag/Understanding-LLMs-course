@@ -550,7 +550,8 @@ Please use the following test suites to answer them: anaphor_gender_agreement, d
 <p>Note: you might be prompted to reload your runtime after installing minicons, and you might see some deprecation warnings / dependency incompatibilities when it is installed. Please ignore these warnings (usually not the best practice, we know!).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install minicons datasets</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="ch">#!pip install minicons</span>
+<span class="c1">#!pip install -U datasets huggingface_hub fsspec</span>
 </pre></div>
 </div>
 </div>
@@ -902,7 +903,7 @@ Please download the relevant data <a class="reference external" href="https://gi
     <span class="c1"># generate the continuation for the true belief condition</span>
     <span class="n">pred</span> <span class="o">=</span> <span class="n">generation_pipeline</span><span class="p">(</span>
         <span class="c1">### YOUR CODE HERE ###</span>
-        <span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span>
     <span class="p">)</span>
     <span class="c1"># check if the prediction contains the correct label</span>
@@ -913,7 +914,7 @@ Please download the relevant data <a class="reference external" href="https://gi
     <span class="c1"># generate the continuation for the false belief condition</span>
     <span class="n">pred</span> <span class="o">=</span> <span class="n">generation_pipeline</span><span class="p">(</span>
         <span class="c1">### YOUR CODE HERE ###</span>
-        <span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span>
     <span class="p">)</span>
     <span class="c1"># check if the prediction contains the correct label</span>
