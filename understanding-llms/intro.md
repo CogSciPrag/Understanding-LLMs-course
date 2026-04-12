@@ -1,6 +1,6 @@
 # Course overview: Understanding LMs
 
-This course deals with language models (LMs), in particular (but not exclusively so) on transformer-based language models like GPT-x or LLama. It covers topics that will equip participants with a better conceptual and practical understanding of what LMs are, how they work, and how to understand them. In the course, we will look (among others) at LM architectures, training & fine-tuning, prompting, mechanistic interpretability of LMs, LM agents and different evaluation methods. Participants will be offered both a technical perspective and encouraged to critically think about important topics relevant to cognitive science and society in the context of LMs.
+This course deals with language models (LMs), in particular (but not exclusively so) with transformer-based language models like GPT-x or LLama. It covers topics that will equip participants with a better conceptual and practical understanding of what LMs are, how they work, and how to understand them. In the course, we will look (among others) at LM architectures, training & fine-tuning, prompting, mechanistic interpretability of LMs, LM agents and different evaluation methods. Participants will be offered both a technical perspective and encouraged to critically think about important topics relevant to cognitive science and society in the context of LMs.
 
 ## Intended audience
 
@@ -8,7 +8,7 @@ The course is intended for master students or advanced bachelor students (of, e.
 
 ## Course formalia
 
-In SS 2025, the course consists of a weekly lecture (Tue, 9-12) and a weekly practical seminar (Thu, 14-16) which will systematically introduce and cover concepts from the lecture hands-on, in practical worksheets, where participants will work with (small) LMs themselves. This webbbook will host both lecture materials and practical materials.
+In the summer term of 2026, the course consists of a weekly lecture (Tue, 9-12) and a weekly practical seminar (Thu, 14-16) which will systematically introduce and cover concepts from the lecture hands-on, in practical worksheets, where participants will work with (small) LMs themselves. This webbbook contains materials for the practical sessions.
 
 The course is intended for 6 ECTS. There will be compulsory homework assignments and a final exam. Optionally, for 9 ECTS, students will conduct group projects.
 
@@ -23,6 +23,9 @@ The lecture overview below is **preliminary** and subject to changes.
 5. Probing & attribution
 6. Evaluation
 7. Mechanistic interpretability
+8. Role of LMs in Linguistics / CogSci
+9. Understanding of / in LMs
+10. Current frotiers: multi-modal, -lingual etc.
 
 ## Further materials
 
