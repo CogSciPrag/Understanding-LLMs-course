@@ -4,51 +4,26 @@
 format: jb-book
 root: intro
 parts: 
-- caption: 01 Introduction
+- caption: 00 Introduction
   chapters:
   - file: lectures/01-introduction
-  - file: tutorials/01-introduction
-- caption: 02 ANNs & RNNs
+  - file: tutorials/00-introduction
+- caption: 01 Autograd & basics
   chapters:
   - file: lectures/02-torch-ANNs-RNNs
-  - file: tutorials/02a-pytorch-intro
-  - file: tutorials/02b-MLE
-  - file: tutorials/02c-MLP-pytorch
-  - file: tutorials/02d-char-level-RNN
-  - file: tutorials/02e-intro-to-hf
-- caption: 03 LSTMs & transformers
+  - file: tutorials/01a-autograd
+  - file: tutorials/01b-pytorch-intro
+  - file: tutorials/01c-ML
+  - file: tutorials/01d-MLP-pytorch
+- caption: 02 Recurrent Neural Networks
   chapters:
   - file: lectures/03-LSTMs-Transformers
-  - file: tutorials/03a-tokenization-transformers
+  - file: tutorials/02achar-level-LM
   - file: tutorials/03b-transformers-heads-training
-- caption: 04 Prompting
+- caption: 03 transformers
   chapters:
-  - file: lectures/04-LLMs-Prompting
-  - file: tutorials/03c-decoding-prompting
-- caption: 05 Fine-tuning & RLHF
-  chapters:
-  - file: lectures/05-finetuning-RLHF
-  - file: tutorials/04a-finetuning-RL
-- caption: 06 Agents & applications
-  chapters:
-  - file: lectures/06-agents
-  - file: tutorials/05a-agents
-- caption: 07 Attribution
-  chapters:
-  - file: lectures/07-attribution
-  - file: tutorials/06a-attribution
-- caption: 08 Behavioral evaluation
-  chapters:
-  - file: lectures/08-evaluation
-  - file: tutorials/07a-behavioral-assessment
-  - file: tutorials/07b-biases-assessment
-- caption: 09 Mechanistic interpretation
-  chapters:
-  - file: lectures/10-mechanistic-interpretability
-  - file: tutorials/08a-mechanistic-interpretability
-- caption: 10 Understanding LLMs
-  chapters:
-  - file: lectures/09-philosophy
+  - file: lectures/03a-01transformer-attention
+  - file: tutorials/03b-02transformer-full
 - caption: Homework
   chapters:
   - file: homework/01-language-modeling

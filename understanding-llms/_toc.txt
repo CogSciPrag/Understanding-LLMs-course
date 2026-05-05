@@ -1,0 +1,57 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+parts: 
+- caption: 01 Introduction
+  chapters:
+  - file: lectures/01-introduction
+  - file: tutorials/01-introduction
+- caption: 02 ANNs & RNNs
+  chapters:
+  - file: lectures/02-torch-ANNs-RNNs
+  - file: tutorials/02a-pytorch-intro
+  - file: tutorials/02b-MLE
+  - file: tutorials/02c-MLP-pytorch
+  - file: tutorials/02d-char-level-RNN
+  - file: tutorials/02e-intro-to-hf
+- caption: 03 LSTMs & transformers
+  chapters:
+  - file: lectures/03-LSTMs-Transformers
+  - file: tutorials/03a-tokenization-transformers
+  - file: tutorials/03b-transformers-heads-training
+- caption: 04 Prompting
+  chapters:
+  - file: lectures/04-LLMs-Prompting
+  - file: tutorials/03c-decoding-prompting
+- caption: 05 Fine-tuning & RLHF
+  chapters:
+  - file: lectures/05-finetuning-RLHF
+  - file: tutorials/04a-finetuning-RL
+- caption: 06 Agents & applications
+  chapters:
+  - file: lectures/06-agents
+  - file: tutorials/05a-agents
+- caption: 07 Attribution
+  chapters:
+  - file: lectures/07-attribution
+  - file: tutorials/06a-attribution
+- caption: 08 Behavioral evaluation
+  chapters:
+  - file: lectures/08-evaluation
+  - file: tutorials/07a-behavioral-assessment
+  - file: tutorials/07b-biases-assessment
+- caption: 09 Mechanistic interpretation
+  chapters:
+  - file: lectures/10-mechanistic-interpretability
+  - file: tutorials/08a-mechanistic-interpretability
+- caption: 10 Understanding LLMs
+  chapters:
+  - file: lectures/09-philosophy
+- caption: Homework
+  chapters:
+  - file: homework/01-language-modeling
+  - file: homework/02-fine-tuning
+  - file: homework/03_agents_interpretability
+  - file: homework/04_evaluation
